@@ -26,6 +26,8 @@ totarget = $(addprefix $(BINDIR)$(SLASH),$(1))
 
 # change $(name) to $(OBJPREFIX)$(name): (#names)
 # 结果为：$(OBJPREFIX)$(1)
+# kernel libs
+# OBJPREFIX	:= __objs_
 packetname = $(if $(1),$(addprefix $(OBJPREFIX),$(1)),$(OBJPREFIX))
 
 # cc compile template, generate rule for dep, obj: (file, cc[, flags, dir])
@@ -100,6 +102,10 @@ add_objs = $(eval $(call do_add_objs_to_packet,$(1),$(2)))
 # add packets and objs to target (target, #packes, #objs, cc, [, flags])
 create_target = $(eval $(call do_create_target,$(1),$(2),$(3),$(4),$(5)))
 
+# foreach  $(foreach var text commond)
+# var：局部变量
+# text：文件列表，空格隔开，每一次取一个值赋值为变量var
+# commond：对var变量进行操作（一般会使用var变量，不然没意义），每次操作结果都会以空格隔开，最后返回空格隔开的列表。
 read_packet = $(foreach p,$(call packetname,$(1)),$($(p)))
 
 add_dependency = $(eval $(1): $(2))
