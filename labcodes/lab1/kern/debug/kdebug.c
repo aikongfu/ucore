@@ -302,20 +302,27 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
+    // 调用function，通过内联汇编来读到ebp和eip的值
     uint32_t ebp = read_ebp();
-	uint32_t eip = read_eip();
-	int i, j;
-	for(i = 0; i < STACKFRAME_DEPTH && ebp != 0; i++) {
-		cprintf("ebp:0x%08x eip:0x%08x", ebp, eip);
-		uint32_t *arg = (uint32_t *)ebp + 2;
-		cprintf(" arg:");
-		for(j = 0; j < 4; j++) {
-			cprintf("0x%08x ", arg[j]);
-		}
-		cprintf("\n");
-		print_debuginfo(eip - 1);
-		eip = ((uint32_t *)ebp)[1];
-		ebp = ((uint32_t*)ebp)[0];
-	}
+    uint32_t eip = read_eip();
+
+    int index;
+    for (index = 0; index < STACKFRAME_DEPTH && ebp != 0; index++) {
+        
+        // ebp eip 
+        printf("ebp = 0x%08x\t eip = 0x%08x\t", ebp, eip);
+        // arguments 一般而言，ss:[ebp+4]处为返回地址，ss:[ebp+8]处为第一个参数值
+        // 而我们这里uint32_t占4个字节，所以指针+2就可以
+        uint32_t args[4] = (uint32_t)ebp + 2;
+        printf("args:0x%80x\t0x%80x\t0x%80x\t0x%80x\t", args[0], args[1], args[2], args[3]);
+        printf("\n");
+        print_debuginfo(eip-1);
+        
+        ebp = ((uint32_t *)ebp)[0];
+        eip = ((uint32_t *)ebp)[1];
+    }
+
+
+
 }
 
