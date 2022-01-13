@@ -37,7 +37,7 @@ kern_init(void) {
 
     //LAB1: CAHLLENGE 1 If you try to do it, uncomment lab1_switch_test()
     // user/kernel mode switch test
-    //lab1_switch_test();
+    lab1_switch_test();
 
     /* do nothing */
     while (1);
@@ -84,11 +84,14 @@ lab1_print_cur_status(void) {
 static void
 lab1_switch_to_user(void) {
     //LAB1 CHALLENGE 1 : TODO
+    // 执行一特定系统调用：获得时钟计数值
 }
 
 static void
 lab1_switch_to_kernel(void) {
     //LAB1 CHALLENGE 1 :  TODO
+    // 当内核初始完毕后，可从内核态返回到用户态的函数
+    
 }
 
 static void

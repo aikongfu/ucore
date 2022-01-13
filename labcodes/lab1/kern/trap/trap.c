@@ -45,14 +45,27 @@ idt_init(void) {
       * (3) After setup the contents of IDT, you will let CPU know where is the IDT by using 'lidt' instruction.
       *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
       *     Notice: the argument of lidt is idt_pd. try to find it!
+      * 
       */
+
+    // 根据提示，首先要__vectors，extern是外部变量声明，__vectors是通过tools/vector.c生成的vectors.S里面定义的
     extern uintptr_t __vectors[];
-	int i;
-	for (i = 0; i < sizeof(idt) / sizeof(struct gatedesc); i ++) {
+    // 对2562个中断向量表初始化
+    int i;
+    for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++) {     
+        // idt数据里面的每一个，也可以用指针表示，
+        // 0表示是一个interrupt gate
+        // segment设置为GD_KTEXT（代码段）
+        // segment selector设置为__vectors对应的内容
+        // DPL设置为0
         SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
     }
-	SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
-	lidt(&idt_pd);
+
+    // 再把切换到内核态的改一下
+    SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_KERNEL);
+
+    // 通过lidt加载
+    lidt(&idt_pd);
 }
 
 static const char *
@@ -155,9 +168,9 @@ trap_dispatch(struct trapframe *tf) {
          * (3) Too Simple? Yes, I think so!
          */
         ticks++;
-    	if (ticks % TICK_NUM == 0) {
-    		print_ticks();
-    	}
+        if (ticks % 100 == 0) {
+            print_ticks();
+        }
         break;
     case IRQ_OFFSET + IRQ_COM1:
         c = cons_getc();
