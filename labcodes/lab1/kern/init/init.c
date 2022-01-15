@@ -85,13 +85,25 @@ static void
 lab1_switch_to_user(void) {
     //LAB1 CHALLENGE 1 : TODO
     // 执行一特定系统调用：获得时钟计数值
+    __asm__ __volatile__ (
+        "sub $0x8, %%esp \n"
+        "INT %0 \n"
+        "movl %%ebp, %%esp \n"
+        :
+        :"irq"(T_SWITCH_TOU)
+    );
 }
 
 static void
 lab1_switch_to_kernel(void) {
     //LAB1 CHALLENGE 1 :  TODO
     // 当内核初始完毕后，可从内核态返回到用户态的函数
-    
+    __asm__ __volatile__ (
+        "INT %0 \n"
+        "movl %%ebp, %%esp \n"
+        :
+        :"irq"(T_SWITCH_TOK)
+    );
 }
 
 static void

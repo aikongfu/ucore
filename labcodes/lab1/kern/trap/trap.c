@@ -154,6 +154,7 @@ print_regs(struct pushregs *regs) {
     cprintf("  eax  0x%08x\n", regs->reg_eax);
 }
 
+
 /* trap_dispatch - dispatch based on what type of trap occurred */
 static void
 trap_dispatch(struct trapframe *tf) {
@@ -182,6 +183,8 @@ trap_dispatch(struct trapframe *tf) {
         break;
     //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
     case T_SWITCH_TOU:
+    // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011
+
     case T_SWITCH_TOK:
         panic("T_SWITCH_** ??\n");
         break;
