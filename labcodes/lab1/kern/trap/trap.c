@@ -162,14 +162,23 @@ void switch2user(struct trapframe *tf) {
     switchk2u.tf_ds = switchk2u.tf_es = switchk2u.tf_ss = USER_DS;
     switchk2u.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
 
-    //  eflags
+    //  eflags 
     switchk2u.tf_eflags | FL_IOPL_MASK;
 
     *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
   }
 }
 
-void switch2kernel(struct trapframe *tf) {}
+void switch2kernel(struct trapframe *tf) {
+    if (tf->tf_cs != KERNEL_CS) {
+        tf->tf_cs = KERNEL_CS;
+        tf->tf_ds = tf->tf_es = KERNEL_DS;
+        tf->tf_eflags &= ~FL_IOPL_MASK;
+        switchu2k = (struct trapframe *)(tf->tf_esp - (sizeof(struct trapframe) - 8));
+        memmove(switchu2k, tf, sizeof(struct trapframe) - 8);
+        *((uint32_t *)tf - 1) = (uint32_t)switchu2k; 
+    }
+}
 
 /* trap_dispatch - dispatch based on what type of trap occurred */
 static void trap_dispatch(struct trapframe *tf) {
