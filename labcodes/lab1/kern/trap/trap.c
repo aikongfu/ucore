@@ -175,9 +175,10 @@ void switch2user(struct trapframe *tf) {
 
     //  eflags 设置IOPL
     switchk2u.tf_eflags | FL_IOPL_MASK;
- 
+
     // (uint32_t *)tf是一个指针，指针的地址-1就
     // *((uint32_t *)tf - 1) 这个指针指向的地址设置为我们新樊笼出来的tss(switchk2u)
+  
     *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
   }
 }
