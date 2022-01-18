@@ -155,16 +155,29 @@ struct trapframe switchk2u, *switchu2k;
  *
  */
 void switch2user(struct trapframe *tf) {
+  // eflags
+  // 0x3000 = 00110000 00000000 
+  // 把nested task位置1，也就是可以嵌套
+  tf->tf_eflags |= 0x3000;
+
   // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011;
+  // 如果当前运行的程序不是在用户态的代码段执行（从内核切换过来肯定不会是）
   if (tf->tf_cs != USER_CS) {
     switchk2u = *tf;
     switchk2u.tf_cs = USER_CS;
+    // 设置数据段为USER_DS
     switchk2u.tf_ds = switchk2u.tf_es = switchk2u.tf_ss = USER_DS;
+    // 因为内存是从高到低，
+    // 而这是从内核态切换到用户态（没有ss,sp）
+    // (uint32_t)tf + sizeof(struct trapframe) - 8 即 tf->tf_esp的地址
+    // 也就是switchk2u.tf_esp，指向旧的tf_esp的值
     switchk2u.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
 
-    //  eflags 
+    //  eflags 设置IOPL
     switchk2u.tf_eflags | FL_IOPL_MASK;
-
+ 
+    // (uint32_t *)tf是一个指针，指针的地址-1就
+    // *((uint32_t *)tf - 1) 这个指针指向的地址设置为我们新樊笼出来的tss(switchk2u)
     *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
   }
 }

@@ -58,6 +58,12 @@ seta20.2:
 
     # Jump to next instruction, but in 32-bit code segment.
     # Switches processor into 32-bit mode.
+    # ljmp是长转移指令（64kb范围内转移指令）：把指令码中的目标地址addr16装入程序计数器PC，
+    # 使机器执行下一条指令时无条件转移到addr16处执行程序，不影响任何标志。
+    # 由于addr16是一个16位二进制地址（地址范围为0000H—FFFFH），
+    # 因此长转移指令一条可以在64KB范围内转移的指令。为了使程序设计方便易编，
+    # addr16常采用标号地址（如：LOOP、LOOP1、MAIN、START、DONE、NEXT1……）表示，
+    # 只有在上机执行前才被汇编（或代真）为16位二进制地址。
     ljmp $PROT_MODE_CSEG, $protcseg
 
 .code32                                             # Assemble for 32-bit mode

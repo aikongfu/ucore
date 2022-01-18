@@ -91,6 +91,7 @@ cga_init(void) {
 
 static bool serial_exists = 0;
 
+// 串口的初始化函数
 static void
 serial_init(void) {
     // Turn off the FIFO
