@@ -156,6 +156,7 @@ struct trapframe switchk2u, *switchu2k;
  */
 void switch2user(struct trapframe *tf) {
   // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011;
+  tf->tf_eflags |= 0x3000;
   if (tf->tf_cs != USER_CS) {
     switchk2u = *tf;
     switchk2u.tf_cs = USER_CS;
@@ -163,7 +164,7 @@ void switch2user(struct trapframe *tf) {
     switchk2u.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
 
     //  eflags 
-    switchk2u.tf_eflags | FL_IOPL_MASK;
+    switchk2u.tf_eflags |= FL_IOPL_MASK;
 
     *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
   }
