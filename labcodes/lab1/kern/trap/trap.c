@@ -11,7 +11,8 @@
 
 #define TICK_NUM 100
 
-static void print_ticks() {
+static void print_ticks()
+{
   cprintf("%d ticks\n", TICK_NUM);
 #ifdef DEBUG_GRADE
   cprintf("End of Test.\n");
@@ -31,7 +32,8 @@ static struct pseudodesc idt_pd = {sizeof(idt) - 1, (uintptr_t)idt};
 
 /* idt_init - initialize IDT to each of the entry points in kern/trap/vectors.S
  */
-void idt_init(void) {
+void idt_init(void)
+{
   /* LAB1 YOUR CODE : STEP 2 */
   /* (1) Where are the entry addrs of each Interrupt Service Routine (ISR)?
    *     All ISR's entry addrs are stored in __vectors. where is uintptr_t
@@ -53,23 +55,25 @@ void idt_init(void) {
   extern uintptr_t __vectors[];
   // 对2562个中断向量表初始化
   int i;
-  for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++) {
+  for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++)
+  {
     // idt数据里面的每一个，也可以用指针表示，
     // 0表示是一个interrupt gate
-    // segment设置为GD_KTEXT（代码段）
-    // segment selector设置为__vectors对应的内容
+    // segment selector设置为GD_KTEXT（代码段）
+    // offset设置为__vectors对应的内容
     // DPL设置为0
     SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
   }
 
   // 再把切换到内核态的改一下
-  SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_KERNEL);
+  SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
 
   // 通过lidt加载
   lidt(&idt_pd);
 }
 
-static const char *trapname(int trapno) {
+static const char *trapname(int trapno)
+{
   static const char *const excnames[] = {"Divide error",
                                          "Debug",
                                          "Non-Maskable Interrupt",
@@ -91,26 +95,52 @@ static const char *trapname(int trapno) {
                                          "Machine-Check",
                                          "SIMD Floating-Point Exception"};
 
-  if (trapno < sizeof(excnames) / sizeof(const char *const)) {
+  if (trapno < sizeof(excnames) / sizeof(const char *const))
+  {
     return excnames[trapno];
   }
-  if (trapno >= IRQ_OFFSET && trapno < IRQ_OFFSET + 16) {
+  if (trapno >= IRQ_OFFSET && trapno < IRQ_OFFSET + 16)
+  {
     return "Hardware Interrupt";
   }
   return "(unknown trap)";
 }
 
 /* trap_in_kernel - test if trap happened in kernel */
-bool trap_in_kernel(struct trapframe *tf) {
+bool trap_in_kernel(struct trapframe *tf)
+{
   return (tf->tf_cs == (uint16_t)KERNEL_CS);
 }
 
 static const char *IA32flags[] = {
-    "CF", NULL, "PF", NULL, "AF", NULL, "ZF", "SF",  "TF",  "IF", "DF", "OF",
-    NULL, NULL, "NT", NULL, "RF", "VM", "AC", "VIF", "VIP", "ID", NULL, NULL,
+    "CF",
+    NULL,
+    "PF",
+    NULL,
+    "AF",
+    NULL,
+    "ZF",
+    "SF",
+    "TF",
+    "IF",
+    "DF",
+    "OF",
+    NULL,
+    NULL,
+    "NT",
+    NULL,
+    "RF",
+    "VM",
+    "AC",
+    "VIF",
+    "VIP",
+    "ID",
+    NULL,
+    NULL,
 };
 
-void print_trapframe(struct trapframe *tf) {
+void print_trapframe(struct trapframe *tf)
+{
   cprintf("trapframe at %p\n", tf);
   print_regs(&tf->tf_regs);
   cprintf("  ds   0x----%04x\n", tf->tf_ds);
@@ -125,20 +155,24 @@ void print_trapframe(struct trapframe *tf) {
 
   int i, j;
   for (i = 0, j = 1; i < sizeof(IA32flags) / sizeof(IA32flags[0]);
-       i++, j <<= 1) {
-    if ((tf->tf_eflags & j) && IA32flags[i] != NULL) {
+       i++, j <<= 1)
+  {
+    if ((tf->tf_eflags & j) && IA32flags[i] != NULL)
+    {
       cprintf("%s,", IA32flags[i]);
     }
   }
   cprintf("IOPL=%d\n", (tf->tf_eflags & FL_IOPL_MASK) >> 12);
 
-  if (!trap_in_kernel(tf)) {
+  if (!trap_in_kernel(tf))
+  {
     cprintf("  esp  0x%08x\n", tf->tf_esp);
     cprintf("  ss   0x----%04x\n", tf->tf_ss);
   }
 }
 
-void print_regs(struct pushregs *regs) {
+void print_regs(struct pushregs *regs)
+{
   cprintf("  edi  0x%08x\n", regs->reg_edi);
   cprintf("  esi  0x%08x\n", regs->reg_esi);
   cprintf("  ebp  0x%08x\n", regs->reg_ebp);
@@ -154,15 +188,17 @@ struct trapframe switchk2u, *switchu2k;
 /**
  *
  */
-void switch2user(struct trapframe *tf) {
+void switch2user(struct trapframe *tf)
+{
   // eflags
-  // 0x3000 = 00110000 00000000 
+  // 0x3000 = 00110000 00000000
   // 把nested task位置1，也就是可以嵌套
   tf->tf_eflags |= 0x3000;
 
   // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011;
   // 如果当前运行的程序不是在用户态的代码段执行（从内核切换过来肯定不会是）
-  if (tf->tf_cs != USER_CS) {
+  if (tf->tf_cs != USER_CS)
+  {
     switchk2u = *tf;
     switchk2u.tf_cs = USER_CS;
     // 设置数据段为USER_DS
@@ -178,27 +214,58 @@ void switch2user(struct trapframe *tf) {
 
     // (uint32_t *)tf是一个指针，指针的地址-1就
     // *((uint32_t *)tf - 1) 这个指针指向的地址设置为我们新樊笼出来的tss(switchk2u)
-  
+
     *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
   }
 }
 
-void switch2kernel(struct trapframe *tf) {
-    if (tf->tf_cs != KERNEL_CS) {
-        tf->tf_cs = KERNEL_CS;
-        tf->tf_ds = tf->tf_es = KERNEL_DS;
-        tf->tf_eflags &= ~FL_IOPL_MASK;
-        switchu2k = (struct trapframe *)(tf->tf_esp - (sizeof(struct trapframe) - 8));
-        memmove(switchu2k, tf, sizeof(struct trapframe) - 8);
-        *((uint32_t *)tf - 1) = (uint32_t)switchu2k; 
-    }
+void switch2kernel(struct trapframe *tf)
+{
+  if (tf->tf_cs != KERNEL_CS)
+  {
+    // 设置CS为 KERNEL_CS = 0x8 = 1000 =  00001|0|00 -> Index = 1, GDT, RPL = 0 
+    tf->tf_cs = KERNEL_CS;
+    // KERNEL_DS = 00010|0|00 -> Index = 2, GDT, RPL = 0 
+    tf->tf_ds = tf->tf_es = KERNEL_DS;
+
+    // FL_IOPL_MASK = 0x00003000 = 0011000000000000 = 00110000 00000000
+    // I/O Privilege Level bitmask
+    // tf->tf_eflags = (tf->tf_eflags) & (~FL_IOPL_MASK)
+    // = (tf->tf_eflags) & (11111111 11111111 11001111 11111111)
+    // 也就是把IOPL设置为0
+    // IOPL(bits 12 and 13) [I/O privilege level field]   
+    // 指示当前运行任务的I/O特权级(I/O privilege level)，
+    // 正在运行任务的当前特权级(CPL)必须小于或等于I/O特权级才能允许访问I/O地址空间。
+    // 这个域只能在CPL为0时才能通过POPF以及IRET指令修改。
+    tf->tf_eflags &= ~FL_IOPL_MASK;
+
+    // 由于内存布局是从高到低，所以这里修改switchu2k，指向
+    switchu2k = (struct trapframe *)(tf->tf_esp - (sizeof(struct trapframe) - 8));
+
+    /* *
+    * memmove - copies the values of @n bytes from the location pointed by @src to
+    * the memory area pointed by @dst. @src and @dst are allowed to overlap.
+    * @dst        pointer to the destination array where the content is to be copied
+    * @src        pointer to the source of data to by copied
+    * @n:        number of bytes to copy
+    *
+    * The memmove() function returns @dst.
+    * */
+    // 相当于是把tf，拷贝到switchu2k
+    memmove(switchu2k, tf, sizeof(struct trapframe) - 8);
+
+    // 修改tf - 1处，指向新的trapframe
+    *((uint32_t *)tf - 1) = (uint32_t)switchu2k;
+  }
 }
 
 /* trap_dispatch - dispatch based on what type of trap occurred */
-static void trap_dispatch(struct trapframe *tf) {
+static void trap_dispatch(struct trapframe *tf)
+{
   char c;
 
-  switch (tf->tf_trapno) {
+  switch (tf->tf_trapno)
+  {
   case IRQ_OFFSET + IRQ_TIMER:
     /* LAB1 YOUR CODE : STEP 3 */
     /* handle the timer interrupt */
@@ -208,7 +275,8 @@ static void trap_dispatch(struct trapframe *tf) {
      * print_ticks(). (3) Too Simple? Yes, I think so!
      */
     ticks++;
-    if (ticks % 100 == 0) {
+    if (ticks % 100 == 0)
+    {
       print_ticks();
     }
     break;
@@ -219,6 +287,12 @@ static void trap_dispatch(struct trapframe *tf) {
   case IRQ_OFFSET + IRQ_KBD:
     c = cons_getc();
     cprintf("kbd [%03d] %c\n", c, c);
+    if (c == '3') {
+      switch2user(tf);
+    }
+    if (c == '0') {
+      switch2kernel(tf);
+    }
     break;
   // LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
   case T_SWITCH_TOU:
@@ -235,7 +309,8 @@ static void trap_dispatch(struct trapframe *tf) {
     break;
   default:
     // in kernel, it must be a mistake
-    if ((tf->tf_cs & 3) == 0) {
+    if ((tf->tf_cs & 3) == 0)
+    {
       print_trapframe(tf);
       panic("unexpected trap in kernel.\n");
     }
@@ -248,7 +323,8 @@ static void trap_dispatch(struct trapframe *tf) {
  * in the trapframe and then uses the iret instruction to return from the
  * exception.
  * */
-void trap(struct trapframe *tf) {
+void trap(struct trapframe *tf)
+{
   // dispatch based on what type of trap occurred
   trap_dispatch(tf);
 }
