@@ -65,7 +65,11 @@ void idt_init(void)
     SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
   }
 
-  // 再把切换到内核态的改一下
+  // 再把从用户态切换到内核态使用的Segment Descriptor改一下
+  // 需要注意的是，我们使用的segment都是一样的，都是GD_KTEXT
+  // 而有一点不同的是这里的DPL是DPL_USER，即从user->kernel时，需要的该段的权限级别
+  // 因为Privilege Check需要满足：DPL >= max {CPL, RPL} 
+  // 所以如果不单独改这个会造成Privilege Check失败，无法正确处理user->kernel的流程
   SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
 
   // 通过lidt加载
@@ -289,9 +293,11 @@ static void trap_dispatch(struct trapframe *tf)
     cprintf("kbd [%03d] %c\n", c, c);
     if (c == '3') {
       switch2user(tf);
+      print_trapframe(tf);
     }
     if (c == '0') {
       switch2kernel(tf);
+      print_trapframe(tf);
     }
     break;
   // LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
@@ -300,7 +306,7 @@ static void trap_dispatch(struct trapframe *tf)
     switch2user(tf);
     break;
   case T_SWITCH_TOK:
-    panic("T_SWITCH_** ??\n");
+    // panic("T_SWITCH_** ??\n");
     switch2kernel(tf);
     break;
   case IRQ_OFFSET + IRQ_IDE1:
