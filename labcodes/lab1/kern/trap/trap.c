@@ -288,18 +288,57 @@ static void trap_dispatch(struct trapframe *tf)
     c = cons_getc();
     cprintf("serial [%03d] %c\n", c, c);
     break;
-  case IRQ_OFFSET + IRQ_KBD:
-    c = cons_getc();
-    cprintf("kbd [%03d] %c\n", c, c);
-    if (c == '3') {
-      switch2user(tf);
-      print_trapframe(tf);
-    }
-    if (c == '0') {
-      switch2kernel(tf);
-      print_trapframe(tf);
-    }
-    break;
+    case IRQ_OFFSET + IRQ_KBD:
+        c = cons_getc();
+        cprintf("kbd [%03d] %c\n", c, c);
+		
+		/*********************/
+		//Hardware Interrupt is different with software trap, so no need use temp stack
+		
+		//if keyboard input '3' it will go to USER mode
+		
+		if ( c =='3'){
+			
+			tf->tf_eflags |= 0x3000;
+			if (tf->tf_cs != USER_CS) {
+				
+				tf->tf_cs = USER_CS;
+				tf->tf_ds = tf->tf_es = tf->tf_ss = USER_DS;
+				//tf.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
+				
+				// set eflags, make sure ucore can use io under user mode.
+				// if CPL > IOPL, then cpu will generate a general protection.
+				tf->tf_eflags |= FL_IOPL_MASK;
+				
+				// set temporary stack
+				// then iret will jump to the right stack
+				//*((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
+			}
+			
+			//the status can show in trapframe, 
+			//however register value change at iret in trapentry.s,
+			//so lab1_print_cur_status() does not work
+			print_trapframe(tf);
+			//lab1_print_cur_status();
+		}
+		
+		//if keyboard input '0' it will go to Kernel mode
+		if ( c =='0'){
+
+			if (tf->tf_cs != KERNEL_CS) {
+				tf->tf_cs = KERNEL_CS;
+				tf->tf_ds = tf->tf_es = KERNEL_DS;
+				tf->tf_eflags &= ~FL_IOPL_MASK;
+		
+			}
+			print_trapframe(tf);
+			//lab1_print_cur_status();
+		}   
+		/*******************/
+		
+		break;
+		
+    //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
   // LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
   case T_SWITCH_TOU:
     // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011
