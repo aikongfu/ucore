@@ -298,23 +298,7 @@ static void trap_dispatch(struct trapframe *tf)
 		//if keyboard input '3' it will go to USER mode
 		
 		if ( c =='3'){
-			
-			tf->tf_eflags |= 0x3000;
-			if (tf->tf_cs != USER_CS) {
-				
-				tf->tf_cs = USER_CS;
-				tf->tf_ds = tf->tf_es = tf->tf_ss = USER_DS;
-				//tf.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
-				
-				// set eflags, make sure ucore can use io under user mode.
-				// if CPL > IOPL, then cpu will generate a general protection.
-				tf->tf_eflags |= FL_IOPL_MASK;
-				
-				// set temporary stack
-				// then iret will jump to the right stack
-				//*((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
-			}
-			
+			switch2user(tf);	
 			//the status can show in trapframe, 
 			//however register value change at iret in trapentry.s,
 			//so lab1_print_cur_status() does not work
@@ -325,12 +309,7 @@ static void trap_dispatch(struct trapframe *tf)
 		//if keyboard input '0' it will go to Kernel mode
 		if ( c =='0'){
 
-			if (tf->tf_cs != KERNEL_CS) {
-				tf->tf_cs = KERNEL_CS;
-				tf->tf_ds = tf->tf_es = KERNEL_DS;
-				tf->tf_eflags &= ~FL_IOPL_MASK;
-		
-			}
+			switch2kernel(tf);
 			print_trapframe(tf);
 			//lab1_print_cur_status();
 		}   
