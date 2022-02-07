@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef unsigned int uint32_t;
+
 struct list_entry {
 	struct list_entry *prev, *next;
 };
@@ -14,7 +16,6 @@ struct page {
 
 void printPage(struct page *p) {
 	printf("page: {index: %d, flag: %d, link: %d}\n", p->index, p->flag, &p->link);
-	// printf("page: {index: %d, flag: %d, link: \n", p->index, p->flag);
 }
 
 void list_init(struct list_entry *elm) {
@@ -23,29 +24,37 @@ void list_init(struct list_entry *elm) {
 }
 
 int main() {
-	struct list_entry *l0 = (struct list_entry *)malloc(sizeof(struct list_entry));
-	struct list_entry *l1 = (struct list_entry *)malloc(sizeof(struct list_entry));
-	struct list_entry *l2 = (struct list_entry *)malloc(sizeof(struct list_entry));
 
-	l0->next = l1;
-	l1->prev = l0;
-	l1->next = l2;
-	l2->prev = l1;
+	struct list_entry *l0 = (struct list_entry *)malloc(sizeof(struct list_entry));
+	struct list_entry *l1, *l2;
 
 	struct page *p1 = (struct page *)malloc(sizeof(struct page));
 	p1->index = 1;
 	p1->flag = 1;
-	// p1->link = (struct link_entry *)&l1;
-	p1->link = *l1;
+	p1->link = *(struct list_entry *)malloc(sizeof(struct list_entry));
 
-	struct page *p2 = (struct page *)malloc(sizeof(struct page));
-	p2->index = 1;
-	p2->flag = 1;
-	// p2->link = (struct link_entry *)&l2;
-	p2->link = *l2;
+	struct page *p2 = (struct page*)malloc(sizeof(struct page));
+	p2->index = 2;
+	p2->flag = 3;
+	p2->link = *(struct list_entry *)malloc(sizeof(struct list_entry));
+
+	p1->link.next = (struct list_entry *)&p2->link;
 
 
 	printPage(p1);
+
+
+	printPage(p2);
+	
+	uint32_t offset = (&((struct page *)0)->link);
+	
+	uint32_t l22_address = p1->link.next;
+
+	uint32_t p2_address = l22_address - offset;
+
+	struct page *p22 = (struct page *)p2_address;
+
+	printPage(p22);
 
 	return 0;
 }
