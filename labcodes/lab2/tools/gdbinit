@@ -1,3 +1,13 @@
 file bin/kernel
 target remote :1234
-break kern_init
+set architecture i8086
+b *0xffff0
+b *0x7c00
+b lab1_switch_test
+b lab1_switch_to_user
+b lab1_switch_to_kernel
+
+# continue
+# x /2i $pc
+# break kern_init
+# continue

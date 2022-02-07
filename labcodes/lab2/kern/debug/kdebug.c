@@ -305,5 +305,25 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
+  // 调用function，通过内联汇编来读到ebp和eip的值
+  uint32_t ebp = read_ebp();
+  uint32_t eip = read_eip();
+
+  int index;
+  for (index = 0; index < STACKFRAME_DEPTH && ebp != 0; index++) {
+
+    // ebp eip
+    cprintf("ebp = 0x%08x\t eip = 0x%08x\t", ebp, eip);
+    cprintf("\n");
+    // arguments 一般而言，ss:[ebp+4]处为返回地址，ss:[ebp+8]处为第一个参数值
+    // 而我们这里uint32_t占4个字节，所以指针+2就可以
+    uint32_t args[4];
+    args[0] = (uint32_t *)ebp + 2;
+    cprintf("args:0x%08x\t0x%08x\t0x%08x\t0x%08x\t", args[0], args[1], args[2],args[3]);
+    cprintf("\n");
+    print_debuginfo(eip - 1);
+
+    ebp = ((uint32_t *)ebp)[0];
+    eip = ((uint32_t *)ebp)[1];
 }
 

@@ -10,6 +10,9 @@ __alltraps:
     pushl %es
     pushl %fs
     pushl %gs
+    
+    # pushl, popl       - push/pop long
+    # pushal, popal     - push/pop * order : EAX - ECX - EDX - EBX - ESP - EBP - ESI - EDI
     pushal
 
     # load GD_KDATA into %ds and %es to set up data segments for kernel
@@ -30,6 +33,8 @@ __alltraps:
 .globl __trapret
 __trapret:
     # restore registers from stack
+    # pushl, popl       - push/pop long
+    # pushal, popal     - push/pop * order : EAX - ECX - EDX - EBX - ESP - EBP - ESI - EDI
     popal
 
     # restore %ds, %es, %fs and %gs
