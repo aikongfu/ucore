@@ -67,6 +67,7 @@ idt_init(void) {
 
   // Í¨¹ılidt¼ÓÔØ
   lidt(&idt_pd);
+  }
 }
 
 static const char *

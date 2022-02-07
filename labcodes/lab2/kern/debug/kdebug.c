@@ -325,5 +325,7 @@ print_stackframe(void) {
 
     ebp = ((uint32_t *)ebp)[0];
     eip = ((uint32_t *)ebp)[1];
-}
 
+  }
+
+}
