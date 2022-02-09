@@ -44,18 +44,23 @@ seta20.2:
     movb $0xdf, %al                                 # 0xdf -> port 0x60
     outb %al, $0x60                                 # 0xdf = 11011111, means set P2's A20 bit(the 1 bit) to 1
 
+# 探针探测内存
 probe_memory:
-    movl $0, 0x8000
-    xorl %ebx, %ebx
-    movw $0x8004, %di
+    movl $0, 0x8000         # 0x8000处清零
+    xorl %ebx, %ebx         # ebx寄存器通过异或清零
+    # SI是源变址寄存器，DI是目的变址寄存器,
+    # 在串处理指令中，SI用作隐含的源串地址，默认在DS中；DI用做隐含的目的串地址，默认在ES中；此时不能混用。
+    # %di寄存器放$0x8004，即0x8000 + 0x4
+    movw $0x8004, %di       
+    
 start_probe:
-    movl $0xE820, %eax
-    movl $20, %ecx
-    movl $SMAP, %edx
-    int $0x15
-    jnc cont
-    movw $12345, 0x8000
-    jmp finish_probe
+    movl $0xE820, %eax      # eax 为0xE820
+    movl $20, %ecx          # ecx 为20
+    movl $SMAP, %edx        # SMAP为0x534d4150
+    int $0x15               # 调用INT 0x15中断
+    jnc cont                # 如果进位位没有置位则跳转(无进位时转移)，进位则
+    movw $12345, 0x8000     # 12345放到0x8000处
+    jmp finish_probe        # 跳转finish_probe
 cont:
     addw $20, %di
     incl 0x8000
