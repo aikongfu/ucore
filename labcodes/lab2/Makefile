@@ -38,7 +38,7 @@ QEMU := $(shell if which qemu-system-i386 > /dev/null; \
 endif
 
 # eliminate default suffix rules
-# Ä¬ÈÏµÄºó×ºÁĞ±íÊÇ:.out, .a, .ln, .o, .c, .cc, .C, .p,
+# é»˜è®¤çš„åç¼€åˆ—è¡¨æ˜¯:.out, .a, .ln, .o, .c, .cc, .C, .p,
 # .f, .F, .r, .y, .l, .s, .S, .mod, .sym, .def, .h, 
 # .info, .dvi, .tex, .texinfo, .texi,
 # .txinfo, .w, .ch .web, .sh, .elc, .el
@@ -92,15 +92,15 @@ ALLOBJS	:=
 ALLDEPS	:=
 TARGETS	:=
 
-# ÒıÈëtoolsÏÂµÄfunction.mk
+# å¼•å…¥toolsä¸‹çš„function.mk
 include tools/function.mk
 
-# $(1)Ä¿Â¼ÏÂ£¬Âú×ã`%.c %.S`µÄÎÄ¼ş
+# $(1)ç›®å½•ä¸‹ï¼Œæ»¡è¶³`%.c %.S`çš„æ–‡ä»¶
 listf_cc = $(call listf,$(1),$(CTYPE))
 
-# ºóÃæµÄ1,2,3,4,5¶¼ÊÇ²ÎÊıÕ¼Î»£¬±íÊ¾µÚ1£¬2£¬3£¬4£¬5¸ö²ÎÊı
+# åé¢çš„1,2,3,4,5éƒ½æ˜¯å‚æ•°å ä½ï¼Œè¡¨ç¤ºç¬¬1ï¼Œ2ï¼Œ3ï¼Œ4ï¼Œ5ä¸ªå‚æ•°
 # for cc
-# ÏÈadd£¬ºócreate target
+# å…ˆaddï¼Œåcreate target
 add_files_cc = $(call add_files,$(1),$(CC),$(CFLAGS) $(3),$(2),$(4))
 create_target_cc = $(call create_target,$(1),$(2),$(3),$(CC),$(CFLAGS))
 
@@ -155,13 +155,13 @@ $(call add_files_cc,$(call listf_cc,$(KSRCDIR)),kernel,$(KCFLAGS))
 KOBJS	= $(call read_packet,kernel libs)
 
 # create kernel target
-# ÔÚbinÄ¿Â¼Éú³ÉkernelÎÄ¼ş
+# åœ¨binç›®å½•ç”Ÿæˆkernelæ–‡ä»¶
 kernel = $(call totarget,kernel)
 
-# ĞèÒªtools/kernel.ld
+# éœ€è¦tools/kernel.ld
 $(kernel): tools/kernel.ld
 
-# ĞèÒªKOBJS
+# éœ€è¦KOBJS
 $(kernel): $(KOBJS)
 	@echo + ld $@
 	$(V)$(LD) $(LDFLAGS) -T tools/kernel.ld -o $@ $(KOBJS)
@@ -210,28 +210,28 @@ $(call create_target_host,sign,sign)
 # -------------------------------------------------------------------
 
 # create ucore.img
-# ´ÓÕâÀï¿ªÊ¼¿´£¬µ÷ÓÃtotarget£¬²ÎÊıÊÇucore.img
-# ¶øtotarget = $(addprefix $(BINDIR)$(SLASH),$(1))
-# ¿É¼û£¬targetÊÇbin/ucore.img
+# ä»è¿™é‡Œå¼€å§‹çœ‹ï¼Œè°ƒç”¨totargetï¼Œå‚æ•°æ˜¯ucore.img
+# è€Œtotarget = $(addprefix $(BINDIR)$(SLASH),$(1))
+# å¯è§ï¼Œtargetæ˜¯bin/ucore.img
 
 UCOREIMG	:= $(call totarget,ucore.img)
 
 # V       := @
-# prerequisites ÊÇkernelºÍbootblock
+# prerequisites æ˜¯kernelå’Œbootblock
 $(UCOREIMG): $(kernel) $(bootblock) $(kernel_nopage)
-# ½ÓÏÂÀ´ÊÇcommand
+# æ¥ä¸‹æ¥æ˜¯command
 # @dd if=/dev/zero of=$@ count=10000
 # @dd if=$(bootblock) of=$@ conv=notrunc
 # @dd if=$(kernel) of=$@ seek=1 conv=notrunc
-# dd£ºÓÃÖ¸¶¨´óĞ¡µÄ¿é¿½±´Ò»¸öÎÄ¼ş£¬²¢ÔÚ¿½±´µÄÍ¬Ê±½øĞĞÖ¸¶¨µÄ×ª»»¡£
-# if=ÎÄ¼şÃû£ºÊäÈëÎÄ¼şÃû£¬È±Ê¡Îª±ê×¼ÊäÈë¡£¼´Ö¸¶¨Ô´ÎÄ¼ş¡£< if=input file >
-# of=ÎÄ¼şÃû£ºÊä³öÎÄ¼şÃû£¬È±Ê¡Îª±ê×¼Êä³ö¡£¼´Ö¸¶¨Ä¿µÄÎÄ¼ş¡£< of=output file >
-# count=blocks£º½ö¿½±´blocks¸ö¿é£¬¿é´óĞ¡µÈÓÚibsÖ¸¶¨µÄ×Ö½ÚÊı¡£
-# conv=conversion£ºÓÃÖ¸¶¨µÄ²ÎÊı×ª»»ÎÄ¼ş¡£
-# notrunc£º²»½Ø¶ÌÊä³öÎÄ¼ş
-# ÊäÈëÎÄ¼ş£º/dev/zero£¬¸öÊı1000¸ö£¬Êä³öÎÄ¼şÄ¬ÈÏ
-# ÊäÈëÎÄ¼ş£ºbootblock£¬²»½Ø¶ÌÊä³öÎÄ¼ş£¬Êä³öÎÄ¼şÄ¬ÈÏ
-# ÊäÈëÎÄ¼ş£ºkernel£¬²»½Ø¶ÌÊä³öÎÄ¼ş£¬Êä³öÎÄ¼şÄ¬ÈÏ£¬´ÓÊä³öÎÄ¼ş¿ªÍ·Ìø¹ı1¸ö¿éºóÔÙ¿ªÊ¼¸´ÖÆ
+# ddï¼šç”¨æŒ‡å®šå¤§å°çš„å—æ‹·è´ä¸€ä¸ªæ–‡ä»¶ï¼Œå¹¶åœ¨æ‹·è´çš„åŒæ—¶è¿›è¡ŒæŒ‡å®šçš„è½¬æ¢ã€‚
+# if=æ–‡ä»¶åï¼šè¾“å…¥æ–‡ä»¶åï¼Œç¼ºçœä¸ºæ ‡å‡†è¾“å…¥ã€‚å³æŒ‡å®šæºæ–‡ä»¶ã€‚< if=input file >
+# of=æ–‡ä»¶åï¼šè¾“å‡ºæ–‡ä»¶åï¼Œç¼ºçœä¸ºæ ‡å‡†è¾“å‡ºã€‚å³æŒ‡å®šç›®çš„æ–‡ä»¶ã€‚< of=output file >
+# count=blocksï¼šä»…æ‹·è´blocksä¸ªå—ï¼Œå—å¤§å°ç­‰äºibsæŒ‡å®šçš„å­—èŠ‚æ•°ã€‚
+# conv=conversionï¼šç”¨æŒ‡å®šçš„å‚æ•°è½¬æ¢æ–‡ä»¶ã€‚
+# notruncï¼šä¸æˆªçŸ­è¾“å‡ºæ–‡ä»¶
+# è¾“å…¥æ–‡ä»¶ï¼š/dev/zeroï¼Œä¸ªæ•°1000ä¸ªï¼Œè¾“å‡ºæ–‡ä»¶é»˜è®¤
+# è¾“å…¥æ–‡ä»¶ï¼šbootblockï¼Œä¸æˆªçŸ­è¾“å‡ºæ–‡ä»¶ï¼Œè¾“å‡ºæ–‡ä»¶é»˜è®¤
+# è¾“å…¥æ–‡ä»¶ï¼škernelï¼Œä¸æˆªçŸ­è¾“å‡ºæ–‡ä»¶ï¼Œè¾“å‡ºæ–‡ä»¶é»˜è®¤ï¼Œä»è¾“å‡ºæ–‡ä»¶å¼€å¤´è·³è¿‡1ä¸ªå—åå†å¼€å§‹å¤åˆ¶
 	$(V)dd if=/dev/zero of=$@ count=10000
 	$(V)dd if=$(bootblock) of=$@ conv=notrunc
 	$(V)dd if=$(kernel) of=$@ seek=1 conv=notrunc

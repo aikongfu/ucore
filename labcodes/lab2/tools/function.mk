@@ -9,32 +9,32 @@ OBJPREFIX	:= __objs_
 # $(if $(2),%.c %.S,%) = %.c %.S
 # listf = $(filter %.c %.S, $(wildcard $(1)/*))
 # $(1) is empty, so the listf is empty
-# `wildcard`ÕÒµ½Âú×ãpatternµÄËùÓĞÎÄ¼şÁĞ±í¡£
+# `wildcard`æ‰¾åˆ°æ»¡è¶³patternçš„æ‰€æœ‰æ–‡ä»¶åˆ—è¡¨ã€‚
 listf = $(filter $(if $(2),$(addprefix %.,$(2)),%),\
 		  $(wildcard $(addsuffix $(SLASH)*,$(1))))
 
 # get .o obj files: (#files[, packet])
-# È·¶¨objµÄ¾ø¶ÔÂ·¾¶£º $(OBJDIR)/$(2)/$(1).o
+# ç¡®å®šobjçš„ç»å¯¹è·¯å¾„ï¼š $(OBJDIR)/$(2)/$(1).o
 toobj = $(addprefix $(OBJDIR)$(SLASH)$(if $(2),$(2)$(SLASH)),\
 		$(addsuffix .o,$(basename $(1))))
 
 # get .d dependency files: (#files[, packet])
-# ½á¹ûÎª£º $(OBJDIR)/$(2)/$(1).d
+# ç»“æœä¸ºï¼š $(OBJDIR)/$(2)/$(1).d
 todep = $(patsubst %.o,%.d,$(call toobj,$(1),$(2)))
 
 totarget = $(addprefix $(BINDIR)$(SLASH),$(1))
 
 # change $(name) to $(OBJPREFIX)$(name): (#names)
-# ½á¹ûÎª£º$(OBJPREFIX)$(1)
+# ç»“æœä¸ºï¼š$(OBJPREFIX)$(1)
 # kernel libs
 # OBJPREFIX	:= __objs_
 packetname = $(if $(1),$(addprefix $(OBJPREFIX),$(1)),$(OBJPREFIX))
 
 # cc compile template, generate rule for dep, obj: (file, cc[, flags, dir])
-# $4£ºdir Ä¿Â¼
-# $3£ºflags ±àÒëÑ¡Ïî
-# $2£ºcc ±àÒëÃüÁî
-# $1£ºfile ÒÀÀµÎÄ¼ş
+# $4ï¼šdir ç›®å½•
+# $3ï¼šflags ç¼–è¯‘é€‰é¡¹
+# $2ï¼šcc ç¼–è¯‘å‘½ä»¤
+# $1ï¼šfile ä¾èµ–æ–‡ä»¶
 define cc_template
 $$(call todep,$(1),$(4)): $(1) | $$$$(dir $$$$@)
 	@$(2) -I$$(dir $(1)) $(3) -MM $$< -MT "$$(patsubst %.d,%.o,$$@) $$@"> $$@
@@ -103,9 +103,9 @@ add_objs = $(eval $(call do_add_objs_to_packet,$(1),$(2)))
 create_target = $(eval $(call do_create_target,$(1),$(2),$(3),$(4),$(5)))
 
 # foreach  $(foreach var text commond)
-# var£º¾Ö²¿±äÁ¿
-# text£ºÎÄ¼şÁĞ±í£¬¿Õ¸ñ¸ô¿ª£¬Ã¿Ò»´ÎÈ¡Ò»¸öÖµ¸³ÖµÎª±äÁ¿var
-# commond£º¶Ôvar±äÁ¿½øĞĞ²Ù×÷£¨Ò»°ã»áÊ¹ÓÃvar±äÁ¿£¬²»È»Ã»ÒâÒå£©£¬Ã¿´Î²Ù×÷½á¹û¶¼»áÒÔ¿Õ¸ñ¸ô¿ª£¬×îºó·µ»Ø¿Õ¸ñ¸ô¿ªµÄÁĞ±í¡£
+# varï¼šå±€éƒ¨å˜é‡
+# textï¼šæ–‡ä»¶åˆ—è¡¨ï¼Œç©ºæ ¼éš”å¼€ï¼Œæ¯ä¸€æ¬¡å–ä¸€ä¸ªå€¼èµ‹å€¼ä¸ºå˜é‡var
+# commondï¼šå¯¹varå˜é‡è¿›è¡Œæ“ä½œï¼ˆä¸€èˆ¬ä¼šä½¿ç”¨varå˜é‡ï¼Œä¸ç„¶æ²¡æ„ä¹‰ï¼‰ï¼Œæ¯æ¬¡æ“ä½œç»“æœéƒ½ä¼šä»¥ç©ºæ ¼éš”å¼€ï¼Œæœ€åè¿”å›ç©ºæ ¼éš”å¼€çš„åˆ—è¡¨ã€‚
 read_packet = $(foreach p,$(call packetname,$(1)),$($(p)))
 
 add_dependency = $(eval $(1): $(2))

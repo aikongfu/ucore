@@ -46,26 +46,26 @@ idt_init(void) {
       *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
-  // ¸ù¾İÌáÊ¾£¬Ê×ÏÈÒª__vectors£¬externÊÇÍâ²¿±äÁ¿ÉùÃ÷£¬__vectorsÊÇÍ¨¹ıtools/vector.cÉú³ÉµÄvectors.SÀïÃæ¶¨ÒåµÄ
+  // æ ¹æ®æç¤ºï¼Œé¦–å…ˆè¦__vectorsï¼Œexternæ˜¯å¤–éƒ¨å˜é‡å£°æ˜ï¼Œ__vectorsæ˜¯é€šè¿‡tools/vector.cç”Ÿæˆçš„vectors.Sé‡Œé¢å®šä¹‰çš„
   extern uintptr_t __vectors[];
-  // ¶Ô2562¸öÖĞ¶ÏÏòÁ¿±í³õÊ¼»¯
+  // å¯¹2562ä¸ªä¸­æ–­å‘é‡è¡¨åˆå§‹åŒ–
   int i;
   for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++)
   {
-    // idtÊı¾İÀïÃæµÄÃ¿Ò»¸ö£¬Ò²¿ÉÒÔÓÃÖ¸Õë±íÊ¾£¬
-    // 0±íÊ¾ÊÇÒ»¸öinterrupt gate
-    // segment selectorÉèÖÃÎªGD_KTEXT£¨´úÂë¶Î£©
-    // offsetÉèÖÃÎª__vectors¶ÔÓ¦µÄÄÚÈİ
-    // DPLÉèÖÃÎª0
+    // idtæ•°æ®é‡Œé¢çš„æ¯ä¸€ä¸ªï¼Œä¹Ÿå¯ä»¥ç”¨æŒ‡é’ˆè¡¨ç¤ºï¼Œ
+    // 0è¡¨ç¤ºæ˜¯ä¸€ä¸ªinterrupt gate
+    // segment selectorè®¾ç½®ä¸ºGD_KTEXTï¼ˆä»£ç æ®µï¼‰
+    // offsetè®¾ç½®ä¸º__vectorså¯¹åº”çš„å†…å®¹
+    // DPLè®¾ç½®ä¸º0
     SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
-	  // ÔÙ°Ñ´ÓÓÃ»§Ì¬ÇĞ»»µ½ÄÚºËÌ¬Ê¹ÓÃµÄSegment Descriptor¸ÄÒ»ÏÂ
-  // ĞèÒª×¢ÒâµÄÊÇ£¬ÎÒÃÇÊ¹ÓÃµÄsegment¶¼ÊÇÒ»ÑùµÄ£¬¶¼ÊÇGD_KTEXT
-  // ¶øÓĞÒ»µã²»Í¬µÄÊÇÕâÀïµÄDPLÊÇDPL_USER£¬¼´´Óuser->kernelÊ±£¬ĞèÒªµÄ¸Ã¶ÎµÄÈ¨ÏŞ¼¶±ğ
-  // ÒòÎªPrivilege CheckĞèÒªÂú×ã£ºDPL >= max {CPL, RPL} 
-  // ËùÒÔÈç¹û²»µ¥¶À¸ÄÕâ¸ö»áÔì³ÉPrivilege CheckÊ§°Ü£¬ÎŞ·¨ÕıÈ·´¦Àíuser->kernelµÄÁ÷³Ì
+	  // å†æŠŠä»ç”¨æˆ·æ€åˆ‡æ¢åˆ°å†…æ ¸æ€ä½¿ç”¨çš„Segment Descriptoræ”¹ä¸€ä¸‹
+  // éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œæˆ‘ä»¬ä½¿ç”¨çš„segmentéƒ½æ˜¯ä¸€æ ·çš„ï¼Œéƒ½æ˜¯GD_KTEXT
+  // è€Œæœ‰ä¸€ç‚¹ä¸åŒçš„æ˜¯è¿™é‡Œçš„DPLæ˜¯DPL_USERï¼Œå³ä»user->kernelæ—¶ï¼Œéœ€è¦çš„è¯¥æ®µçš„æƒé™çº§åˆ«
+  // å› ä¸ºPrivilege Checkéœ€è¦æ»¡è¶³ï¼šDPL >= max {CPL, RPL} 
+  // æ‰€ä»¥å¦‚æœä¸å•ç‹¬æ”¹è¿™ä¸ªä¼šé€ æˆPrivilege Checkå¤±è´¥ï¼Œæ— æ³•æ­£ç¡®å¤„ç†user->kernelçš„æµç¨‹
   SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
 
-  // Í¨¹ılidt¼ÓÔØ
+  // é€šè¿‡lidtåŠ è½½
   lidt(&idt_pd);
   }
 }
@@ -165,28 +165,28 @@ void switch2user(struct trapframe *tf)
 {
   // eflags
   // 0x3000 = 00110000 00000000
-  // °Ñnested taskÎ»ÖÃ1£¬Ò²¾ÍÊÇ¿ÉÒÔÇ¶Ì×
+  // æŠŠnested taskä½ç½®1ï¼Œä¹Ÿå°±æ˜¯å¯ä»¥åµŒå¥—
   tf->tf_eflags |= 0x3000;
 
   // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011;
-  // Èç¹ûµ±Ç°ÔËĞĞµÄ³ÌĞò²»ÊÇÔÚÓÃ»§Ì¬µÄ´úÂë¶ÎÖ´ĞĞ£¨´ÓÄÚºËÇĞ»»¹ıÀ´¿Ï¶¨²»»áÊÇ£©
+  // å¦‚æœå½“å‰è¿è¡Œçš„ç¨‹åºä¸æ˜¯åœ¨ç”¨æˆ·æ€çš„ä»£ç æ®µæ‰§è¡Œï¼ˆä»å†…æ ¸åˆ‡æ¢è¿‡æ¥è‚¯å®šä¸ä¼šæ˜¯ï¼‰
   if (tf->tf_cs != USER_CS)
   {
     switchk2u = *tf;
     switchk2u.tf_cs = USER_CS;
-    // ÉèÖÃÊı¾İ¶ÎÎªUSER_DS
+    // è®¾ç½®æ•°æ®æ®µä¸ºUSER_DS
     switchk2u.tf_ds = switchk2u.tf_es = switchk2u.tf_ss = USER_DS;
-    // ÒòÎªÄÚ´æÊÇ´Ó¸ßµ½µÍ£¬
-    // ¶øÕâÊÇ´ÓÄÚºËÌ¬ÇĞ»»µ½ÓÃ»§Ì¬£¨Ã»ÓĞss,sp£©
-    // (uint32_t)tf + sizeof(struct trapframe) - 8 ¼´ tf->tf_espµÄµØÖ·
-    // Ò²¾ÍÊÇswitchk2u.tf_esp£¬Ö¸Ïò¾ÉµÄtf_espµÄÖµ
+    // å› ä¸ºå†…å­˜æ˜¯ä»é«˜åˆ°ä½ï¼Œ
+    // è€Œè¿™æ˜¯ä»å†…æ ¸æ€åˆ‡æ¢åˆ°ç”¨æˆ·æ€ï¼ˆæ²¡æœ‰ss,spï¼‰
+    // (uint32_t)tf + sizeof(struct trapframe) - 8 å³ tf->tf_espçš„åœ°å€
+    // ä¹Ÿå°±æ˜¯switchk2u.tf_espï¼ŒæŒ‡å‘æ—§çš„tf_espçš„å€¼
     switchk2u.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
 
-    //  eflags ÉèÖÃIOPL
+    //  eflags è®¾ç½®IOPL
     switchk2u.tf_eflags | FL_IOPL_MASK;
 
-    // (uint32_t *)tfÊÇÒ»¸öÖ¸Õë£¬Ö¸ÕëµÄµØÖ·-1¾Í
-    // *((uint32_t *)tf - 1) Õâ¸öÖ¸ÕëÖ¸ÏòµÄµØÖ·ÉèÖÃÎªÎÒÃÇĞÂ·®Áı³öÀ´µÄtss(switchk2u)
+    // (uint32_t *)tfæ˜¯ä¸€ä¸ªæŒ‡é’ˆï¼ŒæŒ‡é’ˆçš„åœ°å€-1å°±
+    // *((uint32_t *)tf - 1) è¿™ä¸ªæŒ‡é’ˆæŒ‡å‘çš„åœ°å€è®¾ç½®ä¸ºæˆ‘ä»¬æ–°æ¨Šç¬¼å‡ºæ¥çš„tss(switchk2u)
 
     *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
   }
@@ -196,7 +196,7 @@ void switch2kernel(struct trapframe *tf)
 {
   if (tf->tf_cs != KERNEL_CS)
   {
-    // ÉèÖÃCSÎª KERNEL_CS = 0x8 = 1000 =  00001|0|00 -> Index = 1, GDT, RPL = 0 
+    // è®¾ç½®CSä¸º KERNEL_CS = 0x8 = 1000 =  00001|0|00 -> Index = 1, GDT, RPL = 0 
     tf->tf_cs = KERNEL_CS;
     // KERNEL_DS = 00010|0|00 -> Index = 2, GDT, RPL = 0 
     tf->tf_ds = tf->tf_es = KERNEL_DS;
@@ -205,14 +205,14 @@ void switch2kernel(struct trapframe *tf)
     // I/O Privilege Level bitmask
     // tf->tf_eflags = (tf->tf_eflags) & (~FL_IOPL_MASK)
     // = (tf->tf_eflags) & (11111111 11111111 11001111 11111111)
-    // Ò²¾ÍÊÇ°ÑIOPLÉèÖÃÎª0
+    // ä¹Ÿå°±æ˜¯æŠŠIOPLè®¾ç½®ä¸º0
     // IOPL(bits 12 and 13) [I/O privilege level field]   
-    // Ö¸Ê¾µ±Ç°ÔËĞĞÈÎÎñµÄI/OÌØÈ¨¼¶(I/O privilege level)£¬
-    // ÕıÔÚÔËĞĞÈÎÎñµÄµ±Ç°ÌØÈ¨¼¶(CPL)±ØĞëĞ¡ÓÚ»òµÈÓÚI/OÌØÈ¨¼¶²ÅÄÜÔÊĞí·ÃÎÊI/OµØÖ·¿Õ¼ä¡£
-    // Õâ¸öÓòÖ»ÄÜÔÚCPLÎª0Ê±²ÅÄÜÍ¨¹ıPOPFÒÔ¼°IRETÖ¸ÁîĞŞ¸Ä¡£
+    // æŒ‡ç¤ºå½“å‰è¿è¡Œä»»åŠ¡çš„I/Oç‰¹æƒçº§(I/O privilege level)ï¼Œ
+    // æ­£åœ¨è¿è¡Œä»»åŠ¡çš„å½“å‰ç‰¹æƒçº§(CPL)å¿…é¡»å°äºæˆ–ç­‰äºI/Oç‰¹æƒçº§æ‰èƒ½å…è®¸è®¿é—®I/Oåœ°å€ç©ºé—´ã€‚
+    // è¿™ä¸ªåŸŸåªèƒ½åœ¨CPLä¸º0æ—¶æ‰èƒ½é€šè¿‡POPFä»¥åŠIRETæŒ‡ä»¤ä¿®æ”¹ã€‚
     tf->tf_eflags &= ~FL_IOPL_MASK;
 
-    // ÓÉÓÚÄÚ´æ²¼¾ÖÊÇ´Ó¸ßµ½µÍ£¬ËùÒÔÕâÀïĞŞ¸Äswitchu2k£¬Ö¸Ïò
+    // ç”±äºå†…å­˜å¸ƒå±€æ˜¯ä»é«˜åˆ°ä½ï¼Œæ‰€ä»¥è¿™é‡Œä¿®æ”¹switchu2kï¼ŒæŒ‡å‘
     switchu2k = (struct trapframe *)(tf->tf_esp - (sizeof(struct trapframe) - 8));
 
     /* *
@@ -224,10 +224,10 @@ void switch2kernel(struct trapframe *tf)
     *
     * The memmove() function returns @dst.
     * */
-    // Ïàµ±ÓÚÊÇ°Ñtf£¬¿½±´µ½switchu2k
+    // ç›¸å½“äºæ˜¯æŠŠtfï¼Œæ‹·è´åˆ°switchu2k
     memmove(switchu2k, tf, sizeof(struct trapframe) - 8);
 
-    // ĞŞ¸Ätf - 1´¦£¬Ö¸ÏòĞÂµÄtrapframe
+    // ä¿®æ”¹tf - 1å¤„ï¼ŒæŒ‡å‘æ–°çš„trapframe
     *((uint32_t *)tf - 1) = (uint32_t)switchu2k;
   }
 }
