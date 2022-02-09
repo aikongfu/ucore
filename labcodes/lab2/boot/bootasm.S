@@ -58,14 +58,14 @@ start_probe:
     movl $20, %ecx          # ecx 为20
     movl $SMAP, %edx        # SMAP为0x534d4150
     int $0x15               # 调用INT 0x15中断
-    jnc cont                # 如果进位位没有置位则跳转(无进位时转移)，进位则
+    jnc cont                # JNC 意思是CF=0，则跳转，表示的是AX大于或等于0的时候转移到EXIT处，所以JNC也可以看成是加法没有进位，减法没有借位的时候转移。
     movw $12345, 0x8000     # 12345放到0x8000处
     jmp finish_probe        # 跳转finish_probe
 cont:
-    addw $20, %di
-    incl 0x8000
-    cmpl $0, %ebx
-    jnz start_probe
+    addw $20, %di           # di + 20
+    incl 0x8000             # 自增指令inc(类似c里的++i)
+    cmpl $0, %ebx           # cmpl指令将两个操作数相减，但计算结果并不保存，只是根据计算结果改变eflags寄存器中的标志位。如果两个操作数相等，则计算结果为0，eflags中的ZF位置1。
+    jnz start_probe         # JNE/JNZ 不等于时转移.
 finish_probe:
     # 全局描述符表：存放8字节的段描述符，段描述符包含段的属性。
     # 段选择符：总共16位，高13位用作全局描述符表中的索引位，GDT的第一项总是设为0，
