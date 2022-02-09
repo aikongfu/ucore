@@ -30,8 +30,8 @@ start:
 
 seta20.1:
     inb $0x64, %al                                  # Wait for not busy(8042 input buffer empty).
-    testb $0x2, %al                                 # ��� %al �ڵ�2λΪ1����ZF = 0, ����ת
-    jnz seta20.1                                    # ��� %al �ڵ�2λΪ0����ZF = 1, ����ת
+    testb $0x2, %al                                 # 如果 %al 第低2位为1，则ZF = 0, 则跳转
+    jnz seta20.1                                    # 如果 %al 第低2位为0，则ZF = 1, 则不跳转
 
     movb $0xd1, %al                                 # 0xd1 -> port 0x64
     outb %al, $0x64                                 # 0xd1 means: write data to 8042's P2 port
@@ -62,10 +62,10 @@ cont:
     cmpl $0, %ebx
     jnz start_probe
 finish_probe:
-    # ȫ���������������8�ֽڵĶ����������������������ε����ԡ�
-    # ��ѡ������ܹ�16λ����13λ����ȫ�����������е�����λ��GDT�ĵ�һ��������Ϊ0��
-    #   ��˿׶�ѡ������߼���ַ�ᱻ��Ϊ����Ч�ģ��Ӷ�����һ���������쳣��GDT����
-    #   �����Ŀ��8191������2^13 - 1.
+    # 全局描述符表：存放8字节的段描述符，段描述符包含段的属性。
+    # 段选择符：总共16位，高13位用作全局描述符表中的索引位，GDT的第一项总是设为0，
+    #   因此孔断选择符的逻辑地址会被认为是无效的，从而引起一个处理器异常。GDT表项
+    #   最大数目是8191个，即2^13 - 1.
     # Switch from real to protected mode, using a bootstrap GDT
     # and segment translation that makes virtual addresses
     # identical to physical addresses, so that the
@@ -77,12 +77,12 @@ finish_probe:
 
     # Jump to next instruction, but in 32-bit code segment.
     # Switches processor into 32-bit mode.
-    # ljmp�ǳ�ת��ָ�64kb��Χ��ת��ָ�����ָ�����е�Ŀ���ַaddr16װ����������PC��
-    # ʹ����ִ����һ��ָ��ʱ������ת�Ƶ�addr16��ִ�г��򣬲�Ӱ���κα�־��
-    # ����addr16��һ��16λ�����Ƶ�ַ����ַ��ΧΪ0000H��FFFFH����
-    # ��˳�ת��ָ��һ��������64KB��Χ��ת�Ƶ�ָ�Ϊ��ʹ������Ʒ����ױ࣬
-    # addr16�����ñ�ŵ�ַ���磺LOOP��LOOP1��MAIN��START��DONE��NEXT1��������ʾ��
-    # ֻ�����ϻ�ִ��ǰ�ű���ࣨ����棩Ϊ16λ�����Ƶ�ַ��
+    # ljmp是长转移指令（64kb范围内转移指令）：把指令码中的目标地址addr16装入程序计数器PC，
+    # 使机器执行下一条指令时无条件转移到addr16处执行程序，不影响任何标志。
+    # 由于addr16是一个16位二进制地址（地址范围为0000H—FFFFH），
+    # 因此长转移指令一条可以在64KB范围内转移的指令。为了使程序设计方便易编，
+    # addr16常采用标号地址（如：LOOP、LOOP1、MAIN、START、DONE、NEXT1……）表示，
+    # 只有在上机执行前才被汇编（或代真）为16位二进制地址。
     ljmp $PROT_MODE_CSEG, $protcseg
 
 .code32                                             # Assemble for 32-bit mode
