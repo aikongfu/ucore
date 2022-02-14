@@ -16,6 +16,8 @@ static void lab1_switch_test(void);
 
 int
 kern_init(void) {
+    // TODO 需要搞清楚作用
+    // “edata”表示数据段的结束地址“.bss”表示数据段的结束地址和BSS段的起始地址，而“end”表示BSS段的结束地址。
     extern char edata[], end[];
     memset(edata, 0, end - edata);
 
@@ -26,14 +28,22 @@ kern_init(void) {
 
     print_kerninfo();
 
+    // 最后调用到print_stackframe
+    // 看不出来作用？可能是要试一下给C执行环境准备的栈是否可用？
     grade_backtrace();
 
+    // LAB2 实验
     pmm_init();                 // init physical memory management
 
+    // 初始化中断控制器
     pic_init();                 // init interrupt controller
+    
+    // 初始化中断描述符表
     idt_init();                 // init interrupt descriptor table
 
+    // 初始化时钟中断
     clock_init();               // init clock interrupt
+    // 通过内联汇编调用 "sti" 指令，置中断允许位
     intr_enable();              // enable irq interrupt
 
     //LAB1: CAHLLENGE 1 If you try to do it, uncomment lab1_switch_test()

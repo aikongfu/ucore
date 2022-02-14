@@ -69,9 +69,9 @@
  * */
 
 /* All physical memory mapped at this address */
-#define KERNBASE            0xC0000000
-#define KMEMSIZE            0x38000000                  // the maximum amount of physical memory
-#define KERNTOP             (KERNBASE + KMEMSIZE)
+#define KERNBASE            0xC0000000                  // 3072M
+#define KMEMSIZE            0x38000000                  // 896M,the maximum amount of physical memory
+#define KERNTOP             (KERNBASE + KMEMSIZE)       // kernel top memory
 
 /* *
  * Virtual page table. Entry PDX[VPT] in the PD (Page Directory) contains

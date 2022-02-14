@@ -46,25 +46,28 @@ seta20.2:
 
 # 探针探测内存
 probe_memory:
+# 对0x8000处的32位单元清零,即给位于0x8000处的
+# struct e820map的成员变量nr_map清零
     movl $0, 0x8000         # 0x8000处清零
     xorl %ebx, %ebx         # ebx寄存器通过异或清零
     # SI是源变址寄存器，DI是目的变址寄存器,
     # 在串处理指令中，SI用作隐含的源串地址，默认在DS中；DI用做隐含的目的串地址，默认在ES中；此时不能混用。
     # %di寄存器放$0x8004，即0x8000 + 0x4
+    # 表示设置调用INT 15h BIOS中断后，BIOS返回的映射地址描述符的起始地址
     movw $0x8004, %di       
     
 start_probe:
-    movl $0xE820, %eax      # eax 为0xE820
-    movl $20, %ecx          # ecx 为20
-    movl $SMAP, %edx        # SMAP为0x534d4150
-    int $0x15               # 调用INT 0x15中断
-    jnc cont                # JNC 意思是CF=0，则跳转，表示的是AX大于或等于0的时候转移到EXIT处，所以JNC也可以看成是加法没有进位，减法没有借位的时候转移。
-    movw $12345, 0x8000     # 12345放到0x8000处
+    movl $0xE820, %eax      # eax 为0xE820,INT 15的中断调用参数
+    movl $20, %ecx          # 设置地址范围描述符的大小为20字节，其大小等于struct e820map的成员变量map的大小
+    movl $SMAP, %edx        # SMAP为0x534d4150,设置edx为534D4150h (即4个ASCII字符“SMAP”)，这是一个约定
+    int $0x15               # int 0x15中断，要求BIOS返回一个用地址范围描述符表示的内存段信息
+    jnc cont                # 如果eflags的CF位为0，则表示还有内存段需要探测,JNC 意思是CF=0，则跳转，表示的是AX大于或等于0的时候转移到EXIT处，所以JNC也可以看成是加法没有进位，减法没有借位的时候转移。
+    movw $12345, 0x8000     # 探测有问题，结束探测
     jmp finish_probe        # 跳转finish_probe
 cont:
-    addw $20, %di           # di + 20
-    incl 0x8000             # 自增指令inc(类似c里的++i)
-    cmpl $0, %ebx           # cmpl指令将两个操作数相减，但计算结果并不保存，只是根据计算结果改变eflags寄存器中的标志位。如果两个操作数相等，则计算结果为0，eflags中的ZF位置1。
+    addw $20, %di           # di + 20,设置下一个BIOS返回的映射地址描述符的起始地址
+    incl 0x8000             # 自增指令inc(类似c里的++i),递增struct e820map的成员变量nr_map
+    cmpl $0, %ebx           # 如果INT0x15返回的ebx为零，表示探测结束，否则继续探测,cmpl指令将两个操作数相减，但计算结果并不保存，只是根据计算结果改变eflags寄存器中的标志位。如果两个操作数相等，则计算结果为0，eflags中的ZF位置1。
     jnz start_probe         # JNE/JNZ 不等于时转移.
 finish_probe:
     # 全局描述符表：存放8字节的段描述符，段描述符包含段的属性。

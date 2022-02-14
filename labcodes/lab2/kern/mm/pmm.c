@@ -57,8 +57,30 @@ const struct pmm_manager *pmm_manager;
  * always available at virtual address PGADDR(PDX(VPT), PDX(VPT), 0), to which
  * vpd is set bellow.
  * */
+// #define VPT                 0xFAC00000
+// 0xFAC00000 = 1111101011 0000000000 000000000000
 pte_t * const vpt = (pte_t *)VPT;
+
+// PDXSHIFT 22
+// PTXSHIFT 12
+// 0x3FF = 1023 =   1111111111
+// page directory index
+// #define PDX(la) ((((uintptr_t)(la)) >> PDXSHIFT) & 0x3FF)
+// (VPT >> 22) & 0x3FF = (0xFAC00000 >> 22) & 0x3FF = 1003 = 1111101011
+// PGADDR(1003, 1003, 0)
+// construct linear address from indexes and offset
+// #define PGADDR(d, t, o) ((uintptr_t)((d) << PDXSHIFT | (t) << PTXSHIFT | (o)))
+// (1003 << 22) | (1003) << 12 | 0) =  1111101011 1111101011 000000000000
 pde_t * const vpd = (pde_t *)PGADDR(PDX(VPT), PDX(VPT), 0);
+
+/**
+ * 最终
+ * vpt 页目录表中第一个目录表项指向的页表的起始虚地址
+ * vpd 页目录表的起始虚地址
+ * vpt = 1111101011 0000000000 000000000000
+ * vpd = 1111101011 1111101011 000000000000
+ * 
+ */
 
 /* *
  * Global Descriptor Table:
