@@ -207,10 +207,15 @@ nr_free_pages(void) {
     return ret;
 }
 
+// 初始化物理内存
 /* pmm_init - initialize the physical memory management */
 static void
 page_init(void) {
+    // KERNBASE = 0xC0000000
+    // 在建立了临时的地址映射机制后，原0x8000相当于0x8000 + 0xC0000000
+    // 所以要从0x8000 + 0xC0000000开始来找e820map的数据
     struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
+    // 最大物理内存
     uint64_t maxpa = 0;
 
     cprintf("e820map:\n");
