@@ -239,6 +239,7 @@ page_init(void) {
     npage = maxpa / PGSIZE;
     pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);
 
+    // 先把pages设置为reserved，后面再把type为E820_ARM（1）的设置为可用
     for (i = 0; i < npage; i ++) {
         SetPageReserved(pages + i);
     }

@@ -65,12 +65,20 @@ free_area_t free_area;
  */
 static void
 default_init(void) {
-
+    // node<->node
+    list_init(&free_list);
+    nr_free = 0;
 }
 
+/**
+ * @brief 
+ * 
+ * @param base 
+ * @param n 
+ */
 static void
 default_init_memmap(struct Page *base, size_t n) {
-   
+    // 
 }
 
 static struct Page *
