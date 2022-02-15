@@ -279,12 +279,8 @@ trap_dispatch(struct trapframe *tf) {
 			switch2kernel(tf);
 			print_trapframe(tf);
 			//lab1_print_cur_status();
-		}   
-		/*******************/
-		
+		}		
 		break;
-		
-    //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
   // LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
   case T_SWITCH_TOU:
     // USER_CS = 3 << 3 | 3 = 24 | 3 = 27 = 0x1B = 00011011
