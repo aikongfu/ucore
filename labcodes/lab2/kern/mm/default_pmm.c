@@ -79,6 +79,7 @@ default_init(void) {
 static void
 default_init_memmap(struct Page *base, size_t n) {
     // 
+    assert(n > 0);
 }
 
 static struct Page *
