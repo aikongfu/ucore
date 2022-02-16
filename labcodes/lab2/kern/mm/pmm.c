@@ -230,6 +230,7 @@ page_init(void) {
             }
         }
     }
+    // 通过KMEMSIZE限制最大内存为896M
     if (maxpa > KMEMSIZE) {
         maxpa = KMEMSIZE;
     }
@@ -244,10 +245,14 @@ page_init(void) {
         SetPageReserved(pages + i);
     }
 
+    // 空闲地址的起始地址
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
+    // 循环处理前面扫描出来的几块内容区域
     for (i = 0; i < memmap->nr_map; i ++) {
+        // 内容区域的begin-->end
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
+        // 如果内存类型是E820_ARM（可用），比较
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
@@ -255,10 +260,25 @@ page_init(void) {
             if (end > KMEMSIZE) {
                 end = KMEMSIZE;
             }
+
+            // 对每一个扫出来的内存区域，通过 begin向上取整对齐，end向下取整对齐
             if (begin < end) {
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
+                // 此内存区域的page数量：n (end - begin) / PGSIZE
+                // pa2page:
+                // static inline struct Page *
+                // pa2page(uintptr_t pa) {
+                //     if (PPN(pa) >= npage) {
+                //         panic("pa2page called with invalid pa");
+                //     }
+                //     return &pages[PPN(pa)];
+                // }
+                // (begin >> 12)(根据起始地址得到的页数) 必需要小于 n ---->相当于是除以4K，因为2^12=4096=1page大小
+                // &pages[PPN(pa)];  PPN(pa) 另一个角度来讲就是pages数组里的index
+                // pa2page(begin) 通过这种方式，可以把一个physical address变成page
                 if (begin < end) {
+                    // 接着开始初始化（memory map -> page）
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
             }

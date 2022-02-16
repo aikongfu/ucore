@@ -78,13 +78,29 @@ default_init(void) {
  */
 static void
 default_init_memmap(struct Page *base, size_t n) {
-    // 
     assert(n > 0);
+    
+	int i;
+	for (i = 0; i < n; i++) {
+		// page
+		struct Page *p = base + i;
+		
+		// should set page property
+        // ref, flags, property, page_link
+        base->property++;
+        
+        SetPageProperty(p);
+
+        p->flags &= PG_property;
+
+        
+	}
 }
 
 static struct Page *
 default_alloc_pages(size_t n) {
-    
+	
+    return NULL;
 }
 
 static void

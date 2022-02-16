@@ -84,6 +84,10 @@ page2pa(struct Page *page) {
     return page2ppn(page) << PGSHIFT;
 }
 
+// page number field of address
+// #define PPN(la) (((uintptr_t)(la)) >> PTXSHIFT)
+// PTXSHIFT = 12
+// 
 static inline struct Page *
 pa2page(uintptr_t pa) {
     if (PPN(pa) >= npage) {
