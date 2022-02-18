@@ -80,32 +80,105 @@ static void
 default_init_memmap(struct Page *base, size_t n) {
     assert(n > 0);
     
-	int i;
-	for (i = 0; i < n; i++) {
-		// page
-		struct Page *p = base + i;
-		
-		// should set page property
-        // ref, flags, property, page_link
-        base->property++;
-        
-        SetPageProperty(p);
+    // 需要循环设置每一页的flags, property, ref, 且要在链表中连接起来(1->2->3)
+    // 然后把这一段内存区域加入到free_list中，设置nr_free
+    struct Page *temp = base;
+    for (; temp != base + n; temp++) {
+        assert(PageReserved(temp));
+        temp->flags = 0;
+        temp->property = 0;
+        set_page_ref(temp, 0);
+    }
 
-        p->flags &= PG_property;
-
-        
-	}
+    base->property = n;
+    SetPageProperty(base);
+    list_add(&free_list, &base->page_link);
+    nr_free += n;
 }
 
 static struct Page *
 default_alloc_pages(size_t n) {
-	
-    return NULL;
+    // 先提前校验
+	assert(n > 0);
+    if (n > nr_free) {
+        return NULL;
+    }
+    
+    list_entry_t *le = &free_list;
+    struct Page *sp = NULL;
+    // 遍历查找
+    while((le = list_next(le)) != &free_list) {
+        struct Page *p = le2page(le, page_link);
+        if (p->property >= n) {
+             // 找到可能符合条件的去做其他操作
+            sp = p;
+            break;
+        }
+    }
+
+    if (sp != NULL) {
+        if (sp->property > n) {
+            struct Page *p = sp + n;
+            p->property = sp->property - n;
+            list_add(&sp->page_link, &p->page_link);
+        }
+
+        nr_free -= n;
+        ClearPageProperty(sp);
+        list_del(&sp->page_link);
+    }
+    return sp;
 }
 
 static void
 default_free_pages(struct Page *base, size_t n) {
+    // 逻辑如下：
+    // 1 先把base的属性更新
+    // 2 循环在free_list中查找
+    // 2.1 *base可能刚好在某个空闲块的后面
+    // 2.2 *base可能刚好在某个空闲块的前面
+    // 2.3 可能在尾部或者某两个之间
+    // 2.4 对应的物理页地址没有问题的情况下插入到空闲链表中
+    // 3、可能刚好应该插入的头的情况
+
+    assert(n > 0);
+    assert(base);
+
+    struct Page *p = base;
+    for(; p <= base + n; p++) {
+        // flags的低两位
+        assert(!PageReserved(p));
+        p->flags = 0;
+        set_page_ref(p, 0);
+    }
+    base->property += n;
+    SetPageProperty(base);
+
+    list_entry_t *le = &free_list;
+    while (le = list_next(le) != &free_list) {
+        struct Page *iPage = le2page(le, page_link);
+        if (base + base->property == iPage) {
+            base->property += iPage->property;
+            ClearPageProperty(iPage);
+            list_del(&(iPage->page_link));
+        }
+
+        if (iPage + iPage->property == base) {
+            iPage->property += base->property;
+            base = iPage;
+            list_del(&iPage->page_link);
+        }
+
+        if (pa2page(base) < pa2page(iPage)) {
+            list_add_before(le, &(base->page_link));
+        }
+    }
     
+    if (le == &free_list) {
+        list_add_before(le, &(base->page_link));
+    }
+    
+    nr_free += n;
 }
 
 static size_t

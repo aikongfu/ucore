@@ -39,6 +39,8 @@ QEMU := $(shell if which qemu-system-i386 > /dev/null; \
 	echo "***" 1>&2; exit 1; fi)
 endif
 
+QEMU := qemu-system-i386
+
 # eliminate default suffix rules
 # 默认的后缀列表是:.out, .a, .ln, .o, .c, .cc, .C, .p,
 # .f, .F, .r, .y, .l, .s, .S, .mod, .sym, .def, .h, 
@@ -51,10 +53,14 @@ endif
 
 # define compiler and flags
 ifndef  USELLVM
+# HOSTCC		:= gcc
+#HOSTCFLAGS	:= -g -Wall -O2
 HOSTCC		:= gcc
-HOSTCFLAGS	:= -g -Wall -O2 -gdwarf-2 -g3
-CC		:= $(GCCPREFIX)gcc
-CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gdwarf-2 -g3 -nostdinc $(DEFS)
+HOSTCFLAGS	:= -g -Wall -O2 -s
+# CC		:= $(GCCPREFIX)gcc
+# CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gstabs -nostdinc $(DEFS)
+CC		:= gcc
+CFLAGS	:= -fno-builtin -Wall -ggdb -s -m32 -gstabs -fno-pic -nostdinc $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 else
 HOSTCC		:= clang

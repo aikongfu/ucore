@@ -27,6 +27,8 @@ main(int argc, char *argv[]) {
         fprintf(stderr, "read '%s' error, size is %d.\n", argv[1], size);
         return -1;
     }
+
+	printf("sizesize = %d\n", size);
     fclose(ifp);
     buf[510] = 0x55;
     buf[511] = 0xAA;
