@@ -69,6 +69,7 @@
  * */
 
 /* All physical memory mapped at this address */
+// 0xC0000000 = 11000000 00000000 00000000 00000000
 #define KERNBASE            0xC0000000                  // 3072M
 #define KMEMSIZE            0x38000000                  // 896M,the maximum amount of physical memory
 #define KERNTOP             (KERNBASE + KMEMSIZE)       // kernel top memory

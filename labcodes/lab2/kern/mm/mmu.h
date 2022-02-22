@@ -200,14 +200,17 @@ struct taskstate {
 // To construct a linear address la from PDX(la), PTX(la), and PGOFF(la),
 // use PGADDR(PDX(la), PTX(la), PGOFF(la)).
 
-// PDXSHIFT 22 =    10110
-// 0x3FF = 1023 =   1111111111
+// PDXSHIFT 22  =   0000010110
+// 0x3FF = 1023 =   001111111111
 // page directory index
+// 右移22位再与001111111111，这样就是page directory index（前10位）
 #define PDX(la) ((((uintptr_t)(la)) >> PDXSHIFT) & 0x3FF)
 
+// PTXSHIFT 12
 // page table index
 #define PTX(la) ((((uintptr_t)(la)) >> PTXSHIFT) & 0x3FF)
 
+// PTXSHIFT 12
 // page number field of address
 #define PPN(la) (((uintptr_t)(la)) >> PTXSHIFT)
 
@@ -218,6 +221,8 @@ struct taskstate {
 #define PGADDR(d, t, o) ((uintptr_t)((d) << PDXSHIFT | (t) << PTXSHIFT | (o)))
 
 // address in page table or page directory entry
+// 0xFFF = 111111111111
+// ~0xFFF = 1111111111 1111111111 000000000000
 #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF)
 #define PDE_ADDR(pde)   PTE_ADDR(pde)
 

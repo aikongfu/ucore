@@ -9,6 +9,7 @@ static inline void change_bit(int nr, volatile void *addr) __attribute__((always
 static inline bool test_bit(int nr, volatile void *addr) __attribute__((always_inline));
 
 /* *
+ * 这里的指令btsl将一个32位操作数中的某一位设置成1。参数nr和addr表示将内存地址为addr的32位数的nr位设置成1。 
  * set_bit - Atomically set a bit in memory
  * @nr:     the bit to set
  * @addr:   the address to start counting from

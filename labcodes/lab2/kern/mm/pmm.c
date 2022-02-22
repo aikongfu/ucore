@@ -385,8 +385,8 @@ pmm_init(void) {
     print_pgdir();
 
 }
-
-//get_pte - get pte and return the kernel virtual address of this pte for la
+// pte -> page table entry
+// get_pte - get pte and return the kernel virtual address of this pte for la
 //        - if the PT contians this pte didn't exist, alloc a page for PT
 // parameter:
 //  pgdir:  the kernel virtual base address of PDT
@@ -412,9 +412,9 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
      *   memset(void *s, char c, size_t n) : sets the first n bytes of the memory area pointed by s
      *                                       to the specified value c.
      * DEFINEs:
-     *   PTE_P           0x001                   // page table/directory entry flags bit : Present
-     *   PTE_W           0x002                   // page table/directory entry flags bit : Writeable
-     *   PTE_U           0x004                   // page table/directory entry flags bit : User can access
+     *   PTE_P           0x001                   // 00000001 page table/directory entry flags bit : Present
+     *   PTE_W           0x002                   // 00000010 page table/directory entry flags bit : Writeable
+     *   PTE_U           0x004                   // 00000100 page table/directory entry flags bit : User can access
      */
 #if 0
     pde_t *pdep = NULL;   // (1) find page directory entry
@@ -428,6 +428,51 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     }
     return NULL;          // (8) return page table entry
 #endif
+    // typedef uintptr_t pde_t
+    // PDX 左边10位(PDE）
+    // PTX 中间10位(PTE)
+    // KADDR - takes a physical address and returns the corresponding kernel virtual address
+    // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF) address in page table or page directory entry
+    // #define PDE_ADDR(pde)   PTE_ADDR(pde) address in page table or page directory entry
+    // pdep: page dirtory 
+    pde_t *pdep = NULL;
+    uintptr_t pde = PDX(la);
+    pdep = &pgdir[pde];
+    // 非present也就是不存在这样的page（缺页），需要分配页
+    if (!(*pdep & PTE_P)) {
+        struct Page *p;
+        // 如果不需要分配或者分配的页为NULL
+        if (!create || (p = alloc_page()) == NULL) {
+            return NULL;
+        }
+        set_page_ref(p, 1);
+        // page table的索引值（PTE)
+        uintptr_t pti = page2pa(p);
+
+        // KADDR: takes a physical address and returns the corresponding kernel virtual address.
+        memset(KADDR(pti), 0, sizeof(struct Page));
+
+        // 相当于把物理地址给了pdep
+        // pdep: page directory entry point
+        *pdep = pti | PTE_P | PTE_W | PTE_U;
+    }
+
+    // 先找到pde address
+    // address in page table or page directory entry
+    // 0xFFF = 111111111111
+    // ~0xFFF = 1111111111 1111111111 000000000000
+    // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF)
+    // #define PDE_ADDR(pde)   PTE_ADDR(pde)
+    uintptr_t pa = PDE_ADDR(*pdep);
+    // 再转换为虚拟地址（线性地址）
+    // KADDR = pa >> 12 + 0xC0000000
+    // 0xC0000000 = 11000000 00000000 00000000 00000000
+    pte_t *pde_kva = KADDR(pa);
+    
+    // 需要映射的线性地址
+    // 中间10位(PTE)
+    uintptr_t need_to_map_ptx = PTX(la);
+    return &pde_kva[need_to_map_ptx];
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
