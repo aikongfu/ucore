@@ -511,13 +511,27 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
      */
 #if 0
     if (0) {                      //(1) check if this page table entry is present
-        struct Page *page = NULL; //(2) find corresponding page to pte
+        struct Page *page = NULL; //(2) findvc    page to pte
                                   //(3) decrease page reference
                                   //(4) and free this page when page reference reachs 0
                                   //(5) clear second page table entry
                                   //(6) flush tlb
     }
 #endif
+
+    if ((*ptep & PTE_P)) {
+        struct Page *page = pte2page(*ptep);
+        if (page_ref_dec(page) == 0) {
+            free_page(page);
+        }
+        
+        // clear second page table entry
+        *ptep = 0;
+
+        // flush tlb
+        tlb_invalidate(pgdir, la);
+    }
+    
 }
 
 //page_remove - free an Page which is related linear address la and has an validated pte
