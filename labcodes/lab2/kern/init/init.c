@@ -31,15 +31,19 @@ kern_init(void) {
     // 最后调用到print_stackframe
     // 看不出来作用？可能是要试一下给C执行环境准备的栈是否可用？
     grade_backtrace();
-
+    cprintf("%s\n\n", "grade_backtrace");
+    
     // LAB2 实验
     pmm_init();                 // init physical memory management
+    cprintf("%s\n\n", "pmm_init");
 
     // 初始化中断控制器
     pic_init();                 // init interrupt controller
-    
+    cprintf("%s\n\n", "pic_init");
+
     // 初始化中断描述符表
     idt_init();                 // init interrupt descriptor table
+    cprintf("%s\n\n", "idt_init");
 
     // 初始化时钟中断
     clock_init();               // init clock interrupt
