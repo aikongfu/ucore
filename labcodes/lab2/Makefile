@@ -56,10 +56,10 @@ CC		:= gcc-5
 CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gdwarf-2 -g3 -nostdinc -fno-pic $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 else
-HOSTCC		:= clang
-HOSTCFLAGS	:= -g -Wall -O2 -gdwarf-2 -g3
+HOSTCC		:= gcc-5
+HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
 CC		:= clang
-CFLAGS	:= -fno-builtin -Wall -g -m32 -mno-sse -nostdinc  -fno-pic $(DEFS)
+CFLAGS	:= -fno-builtin -Wall -g -m32 -mno-sse -g3 -nostdinc  -fno-pic $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 endif
 
