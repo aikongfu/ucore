@@ -78,38 +78,41 @@ default_init(void) {
  */
 static void
 default_init_memmap(struct Page *base, size_t n) {
-    // assert(n > 0);
-    
-    // // 需要循环设置每一页的flags, property, ref, 且要在链表中连接起来(1->2->3)
-    // // 然后把这一段内存区域加入到free_list中，设置nr_free
-    // struct Page *temp = base;
-    // for (; temp != base + n; temp++) {
-    //     assert(PageReserved(temp));
-    //     temp->flags = 0;
-    //     SetPageProperty(temp);
-    //     temp->property = 0;
-    //     set_page_ref(temp, 0);
-    //     list_add_before(&free_list, &base->page_link);
-    // }
-
-    // base->property = n;
-    // nr_free += n;
+    // 需要循环设置每一页的flags, property, ref, 且要在链表中连接起来(1->2->3)
+    // 然后把这一段内存区域加入到free_list中，设置nr_free
 
     assert(n > 0);
     struct Page *p = base;
-    for (; p != base + n; p ++) {
+    for (; p != base + n; p++) {
         assert(PageReserved(p));
         p->flags = p->property = 0;
         set_page_ref(p, 0);
     }
-    base->property = n;
+
+    // 设置这段内存区域第一页的属性
     SetPageProperty(base);
+    base->property += n;
     nr_free += n;
-    list_add_before(&free_list, &(base->page_link));
+    // 加入到free_list中
+    // 双向循环链表
+    // free_list<->add1_pages<->add2_pages<->add3_pages<->free_list
+    list_add_before(&free_list, &base->page_link);
 }
 
 static struct Page *
 default_alloc_pages(size_t n) {
+    assert(n > 0);
+    if (nr_free < n) {
+        return NULL;
+    }
+    list_entry_t *le = &free_list;
+    struct Page *p = NULL;
+    while (le = list_next(le) && le != &free_list) {
+        /* code */
+    }
+    
+    return p;
+
     /** 
     // 先提前校验
 	assert(n > 0);
@@ -142,32 +145,6 @@ default_alloc_pages(size_t n) {
     }
     return sp;
     */
-    assert(n > 0);
-    if (n > nr_free) {
-        return NULL;
-    }
-    struct Page *page = NULL;
-    list_entry_t *le = &free_list;
-    // TODO: optimize (next-fit)
-    while ((le = list_next(le)) != &free_list) {
-        struct Page *p = le2page(le, page_link);
-        if (p->property >= n) {
-            page = p;
-            break;
-        }
-    }
-    if (page != NULL) {
-        if (page->property > n) {
-            struct Page *p = page + n;
-            p->property = page->property - n;
-            SetPageProperty(p);
-            list_add_after(&(page->page_link), &(p->page_link));
-        }
-        list_del(&(page->page_link));
-        nr_free -= n;
-        ClearPageProperty(page);
-    }
-    return page;
 }
 
 static void
