@@ -146,7 +146,7 @@ default_free_pages(struct Page *base, size_t n) {
     // 2.4 对应的物理页地址没有问题的情况下插入到空闲链表中
     // 3、可能刚好应该插入的头的情况
     
-    // 先做一些预处理（flags, ref, 页链表头的property等）
+    // 先做一些处理（设置flags, ref, 页链表头的property等）
     assert(n > 0);
     struct Page *p = base;
     for (; p != base + n; p++) {
