@@ -171,7 +171,7 @@ default_free_pages(struct Page *base, size_t n) {
             break;
         }
         // 刚好在后面
-        else if (p + p->property == base) {
+        if (p + p->property == base) {
             p->property += base->property;
             ClearPageProperty(base);
             base = p;
