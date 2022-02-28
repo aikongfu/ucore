@@ -2,6 +2,7 @@
 #include <list.h>
 #include <string.h>
 #include <default_pmm.h>
+#include <stdio.h>
 
 /* In the first fit algorithm, the allocator keeps a list of free blocks (known as the free list) and,
    on receiving a request for memory, scans along the list for the first block that is large enough to
@@ -158,10 +159,16 @@ default_free_pages(struct Page *base, size_t n) {
     SetPageProperty(base);
 
     // 再往合适的位置（free_list）插
+    cprintf("base = [%s], base + n = [%s]\n", base, base + base->property);
+    int i = 0;
     list_entry_t *le = &free_list;
     while ((le = list_next(le)) != &free_list) {
         p = le2page(le, page_link);
-        
+        i++;
+        cprintf("%s\t", p);
+        if (i % 4 == 0) {
+            cprintf("\n");
+        }
         // 刚好在前面
         if (base + base->property == p) {
             base->property += p->property;
