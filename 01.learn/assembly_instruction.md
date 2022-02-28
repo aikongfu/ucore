@@ -1805,3 +1805,67 @@ rep ; movsl
 %4、%5、%6。其中操作数%3与操作数%0使用同一个寄存器ecx，表示将复制长度从字节个数换算成长字个数（n/4）；%4表示n本身，要求任意分配一个寄存器存放；%5、%6即参数to和from，分别与%1和%2使用相同的寄存器（edi和esi）
      再看指令部。第一条指令是”rep“，只是一个标号，表示下一条指令movsl要重复执行，每重复一遍就把寄存器ecx中的内容减1，直到变成0为止。所 以，在这段代码中一共执行n/4次。movsl是386指令系统中一条很重要的复杂指令，它从esi所指到的地方复制一个长字到edi所指的地方，并使 esi和edi分别加4。这样，当代码中的movsl指令执行完毕，准备执行testb指令的时候，所有的长字都复制好了，最多只剩下三个字节了。在这个 过程中隐含用到了上述三个寄存器，这就说明了为什么这些操作数必须在输入和输出部中指定必须存放的寄存器。 
     接着就是处理剩下的字节了（最多三个）。先通过testb测试操作数%4，即复制长度n的最低字节中的bit2，如果这一位位1就说明至少还有两 个字节，所以就通过movesw复制一个短字（esi和edi则分别加2），否则就把它跳过。再通过testb测试操作数%4的bit1，如果这一位为 1，就说明还剩一个字节，所以通过指令movsb再复制一个字节，否则跳过。当达到标号2的时候，执行就结束了。
+
+
+
+
+
+
+
+
+n = 0x28 (40)
+
+new:
+base = [0xc010e170], base + n = [0xc010e184]    n = 0x14 (20)
+p :
+end
+
+------end
+new:
+base = [0xc010e184], base + n = [0xc010e198]    n = 0x14 (20)
+p : p : 0xc010e170, p+p->property : 0xc010e184
+end
+
+------end
+new:
+base = [0xc010e198], base + n = [0xc010e1ac]
+p : p : 0xc010e170, p+p->property : 0xc010e198
+end
+
+------end
+new:
+base = [0xc010e170], base + n = [0xc010e184]    n = 0x14 (20)
+p :
+end
+
+------end
+
+new:
+base = [0xc010e170], base + n = [0xc010e184]    n = 0x14 (20)
+p : p : 0xc010e1ac, p+p->property : 0xc01abd80
+end
+base = [0xc010e170], base + n = [0xc010e184]    n = 0x14 (20)
+p : 0xc010e1ac, p+p->property : 0xc01abd80
+------end
+
+new:
+base = [0xc010e184], base + n = [0xc010e198]    n = 0x14 (20)
+p : p : 0xc010e170, p+p->property : 0xc010e184
+end
+base = [0xc010e170], base + n = [0xc010e198]    n = 0x28 (40)
+p : 0xc010e1ac, p+p->property : 0xc01abd80
+------end
+
+new:
+base = [0xc010e198], base + n = [0xc010e1ac]    n = 0x14 (20)
+p : p : 0xc010e170, p+p->property : 0xc010e198
+
+end
+base = [0xc010e170], base + n = [0xc010e1ac]    n = 0x3c (60)
+p : 0xc010e1ac, p+p->property : 0xc01abd80      
+
+
+kernel panic at kern/mm/default_pmm.c:202:
+    assertion failed: base + base->property != p
+Welcome to the kernel debug monitor!!
+Type 'help' for a list of commands.

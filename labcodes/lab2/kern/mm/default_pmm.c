@@ -158,24 +158,22 @@ default_free_pages(struct Page *base, size_t n) {
     base->property = n;
     SetPageProperty(base);
 
+    struct Page *t = base + base->property;
     // 再往合适的位置（free_list）插
-    cprintf("base = [%s], base + n = [%s]\n", base, base + base->property);
     int i = 0;
     list_entry_t *le = &free_list;
     while ((le = list_next(le)) != &free_list) {
         p = le2page(le, page_link);
         i++;
-        cprintf("%s\t", p);
-        if (i % 4 == 0) {
-            cprintf("\n");
-        }
         // 刚好在前面
+        // 两个if不能直接break，因为可能存在 
+        // p + p->property = base， 下一个链表
+        // base + base->property = p(next le)
         if (base + base->property == p) {
             base->property += p->property;
             // tempP不是头
             ClearPageProperty(p);
             list_del(&(p->page_link));
-            break;
         }
         // 刚好在后面
         if (p + p->property == base) {
@@ -183,11 +181,9 @@ default_free_pages(struct Page *base, size_t n) {
             ClearPageProperty(base);
             base = p;
             list_del(&(p->page_link));
-            break;
         }
 
     }
-
     le = &free_list;
     while ((le = list_next(le)) != &free_list) {
         // 在中间(前插，即找到比base地址大的，插入前面)
