@@ -1,5 +1,7 @@
 #include "buddy2.h"
 #include <stdio.h>
+#include <string.h>
+
 int main() {
   char cmd[80];
   int arg;
