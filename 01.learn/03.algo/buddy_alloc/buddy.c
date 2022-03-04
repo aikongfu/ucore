@@ -165,6 +165,41 @@ uint32_t buddy_size(struct buddy* self, uint32_t offset) {
 
 
 void buddy_dump(struct buddy* self) {
-    
+    char canvas[65];
+    int i, j;
+    uint32_t node_size, offset;
 
+    if (self == NULL) {
+        printf("buddy_dump: (struct buddy*)self == NULL");
+        return;
+    }
+
+    if (self->size > 64) {
+        printf("buddy_dump: (struct buddy*)self is too big to dump");
+        return;
+    }
+
+    memset(canvas, '_', sizeof(canvas));
+
+    node_size = self->size * 2;
+    for (int i = 0; i < 2 * self->size * 2; ++i) {
+        if (IS_POWER_OF_2(i)) {
+            node_size /= 2;
+        }
+
+        if (self->longest[i] == 0) {
+            if (i >= self->size - 1) {
+                canvas[i - self->size + 1] = '*';
+            } else if (self->longest[LEFT_LEAF(i)] && self->longest[RIGHT_LEAF(i)]) {
+                offset = (i + 1) * node_size - self->size;
+                for (j = offset; j < offset + node_size; ++j) {
+                    canvas[j] = '*';
+                }
+            }
+
+        }
+    }
+
+    canvas[self->size] = '\0';
+    puts(canvas);
 }
