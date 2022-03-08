@@ -69,6 +69,7 @@ void print_pgdir(void);
  * 
  * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
  * pa >> 12 + 0xC0000000
+ * pa >> 12 + 1100000000 0000000000 000000000000
  * */
 #define KADDR(pa) ({                                                    \
             uintptr_t __m_pa = (pa);                                    \
