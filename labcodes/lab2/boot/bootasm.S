@@ -124,26 +124,23 @@ gdtdesc:
     .word 0x17                                      # 2bytes sizeof(gdt) - 1 = 24 - 1 = 23
     .long gdt                                       # 4bytes address gdt
 
-; .word 0x17
-; 
-
-; /* Normal segment */
-; #define SEG_NULLASM                                             \
-;     .word 0, 0;                                                 \
-;     .byte 0, 0, 0, 0
-; 
-; #define SEG_ASM(type,base,lim)                                  \
-;     .word (((lim) >> 12) & 0xffff), ((base) & 0xffff);          \
-;     .byte (((base) >> 16) & 0xff), (0x90 | (type)),             \
-;         (0xC0 | (((lim) >> 28) & 0xf)), (((base) >> 24) & 0xff)
-
-
-; # NULL SEGMENT
-; 00000000 00000000 00000000 00000000
-; 00000000 00000000 00000000 00000000
-; # CODE SEGMENT
-; 11111111 11001111 10011010 11111111
-; 11111111 11111111 11111111 11111111
-; # DATA SEGMENT
-; 11111111 11001111 10010010 11111111
-; 11111111 11111111 11111111 11111111
+# .word 0x17
+# 
+# /* Normal segment */
+# #define SEG_NULLASM                                             \
+#     .word 0, 0;                                                 \
+#     .byte 0, 0, 0, 0
+# 
+# #define SEG_ASM(type,base,lim)                                  \
+#     .word (((lim) >> 12) & 0xffff), ((base) & 0xffff);          \
+#     .byte (((base) >> 16) & 0xff), (0x90 | (type)),             \
+#         (0xC0 | (((lim) >> 28) & 0xf)), (((base) >> 24) & 0xff)
+# # NULL SEGMENT
+# 00000000 00000000 00000000 00000000
+# 00000000 00000000 00000000 00000000
+# # CODE SEGMENT
+# 11111111 11001111 10011010 11111111
+# 11111111 11111111 11111111 11111111
+# # DATA SEGMENT
+# 11111111 11001111 10010010 11111111
+# 11111111 11111111 11111111 11111111
