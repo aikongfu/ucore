@@ -91,7 +91,7 @@ page2ppn(struct Page *page) {
 
 // pages: virtual address of physicall page array
 // page - pages相当于pages数组的索引值
-// 得到pages数组的索引值，再左移12位，也就是变成page table的索引值
+// 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
 static inline uintptr_t
 page2pa(struct Page *page) {
     return page2ppn(page) << PGSHIFT;
