@@ -158,7 +158,7 @@ gdt_init(void) {
 //init_pmm_manager - initialize a pmm_manager instance
 static void
 init_pmm_manager(void) {
-    pmm_manager = &default_pmm_manager;
+    pmm_manager = &buddy_pmm_manager;
     cprintf("memory management: %s\n", pmm_manager->name);
     pmm_manager->init();
 }
@@ -437,6 +437,8 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     // pdep: page dirtory 
     pde_t *pdep = NULL;
     uintptr_t pde = PDX(la);
+
+    // pgdir:  the kernel virtual base address of PDT
     pdep = &pgdir[pde];
     // 非present也就是不存在这样的page（缺页），需要分配页
     if (!(*pdep & PTE_P)) {
@@ -447,9 +449,19 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
         }
         set_page_ref(p, 1);
         // page table的索引值（PTE)
+        // pages: virtual address of physicall page array
+        // page - pages相当于pages数组的索引值
+        // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
         uintptr_t pti = page2pa(p);
 
         // KADDR: takes a physical address and returns the corresponding kernel virtual address.
+        /* *
+        * KADDR - takes a physical address and returns the corresponding kernel virtual
+        * address. It panics if you pass an invalid physical address.
+        * 
+        * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
+        * pa >> 12 + 0xC0000000
+        * */
         memset(KADDR(pti), 0, sizeof(struct Page));
 
         // 相当于把物理地址给了pdep
