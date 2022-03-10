@@ -1,0 +1,75 @@
+
+Special kernel symbols:
+  entry  0xc010002a (phys)
+  etext  0xc0105d5e (phys)
+  edata  0xc010aa36 (phys)
+  end    0xc010b9c8 (phys)
+Kernel executable memory footprint: 47KB
+ebp = 0xc0109f48         eip = 0xc0100ab6
+args:0xc0109f50 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100ab5 --
+ebp = 0xc0109f58         eip = 0xc0100102
+args:0xc0109f60 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100101 --
+ebp = 0xc0109f78         eip = 0xc0100124
+args:0xc0109f80 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100123 --
+ebp = 0xc0109f98         eip = 0xc0100141
+args:0xc0109fa0 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100140 --
+ebp = 0xc0109fb8         eip = 0xc0100162
+args:0xc0109fc0 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100161 --
+ebp = 0xc0109fd8         eip = 0xc010007a
+args:0xc0109fe0 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100079 --
+ebp = 0xc0109ff8         eip = 0xc0100028
+args:0xc010a000 0xc0109f7c      0x00000020      0xc010591b
+    <unknow>: -- 0xc0100027 --
+grade_backtrace
+
+memory management: default_pmm_manager
+e820map:
+  memory: 0009fc00, [00000000, 0009fbff], type = 1.
+  memory: 00000400, [0009fc00, 0009ffff], type = 2.
+  memory: 00010000, [000f0000, 000fffff], type = 2.
+  memory: 07ee0000, [00100000, 07fdffff], type = 1.
+  memory: 00020000, [07fe0000, 07ffffff], type = 2.
+  memory: 00040000, [fffc0000, ffffffff], type = 2.
+check_alloc_page() succeeded!
+check_pgdir() succeeded!
+check_boot_pgdir() succeeded!
+-------------------- BEGIN --------------------
+PDE(0e0) c0000000-f8000000 38000000 urw
+  |-- PTE(38000) c0000000-f8000000 38000000 -rw
+PDE(001) fac00000-fb000000 00400000 -rw
+  |-- PTE(000e0) faf00000-fafe0000 000e0000 urw
+  |-- PTE(00001) fafeb000-fafec000 00001000 -rw
+--------------------- END ---------------------
+pmm_init
+
+pic_init
+
+idt_init
+
+++ setup timer interrupts
+0: @ring 0
+0:  cs = 8
+0:  ds = 10
+0:  es = 10
+0:  ss = 10
++++ switch to  user  mode +++
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
+100 ticks
