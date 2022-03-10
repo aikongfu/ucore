@@ -87,6 +87,25 @@ void buddy_new(uint32_t size) {
 
 }
 
+static uint32_t
+buddy_alloc(struct buddy *self, uint32_t size) {
+    uint32_t index;
+    uint32_t node_size;
+    uint32_t offset;
+
+    if (self == NULL) {
+        return -1;
+    }
+
+    if (size <= 0) {
+        size = 1;
+    } else if (!IS_POWER_OF_2(size)) {
+        size = uint32_round_up(size);
+    }
+
+    return NULL;
+}
+
 
 static void
 buddy_init(void) {
@@ -109,6 +128,8 @@ buddy_init_memmap(struct Page *base, size_t n) {
     SetPageProperty(base);
     base->property = n;
     nr_free += n;
+
+    // 这里只是简化处理，这样存在一个问题，真正可用的页数就是小于等于n的最大的一个2^k次幂，所以size - n 将浪费掉，也可以继续分割（size - n）
     uint32_t size = uint32_round_down(n);
     buddy_new(size);
 }
@@ -116,6 +137,10 @@ buddy_init_memmap(struct Page *base, size_t n) {
 
 static struct Page *
 buddy_alloc_pages(size_t n) {
+    uint32_t index;
+    uint32_t node_size;
+    uint32_t offset;
+
     return NULL;
 }
 
