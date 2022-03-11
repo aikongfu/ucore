@@ -45,10 +45,10 @@ struct alloc_record {
     size_t nr;      // 块大小
 } all;
 
-// 存放偏移量的数组
-struct alloc_record *alloced[1024 * 1024];
-// 已分配的块数
-uint32_t nr_block;
+// 存放偏移量的数组,记录全部已分配的信息
+struct alloc_record alloced[1024 * 1024];
+// 已分配的块数，从0开始
+uint32_t nr_block = 0;
 
 //找到大于等于所需内存的2的倍数
 static uint32_t uint32_round_up(uint32_t size) {
@@ -214,12 +214,11 @@ buddy_init_memmap(struct Page *base, size_t n) {
         set_page_ref(p, 0);
     }
 
-    SetPageProperty(base);
-    base->property = n;
-    nr_free += n;
-
     // 这里只是简化处理，这样存在一个问题，真正可用的页数就是小于等于n的最大的一个2^k次幂，所以size - n 将浪费掉，也可以继续分割（size - n）
     uint32_t size = uint32_round_down(n);
+    base->property = n;
+    nr_free += n;
+    SetPageProperty(base);
     buddy_new(size);
 }
 
@@ -230,41 +229,42 @@ buddy_init_memmap(struct Page *base, size_t n) {
 static struct Page *
 buddy_alloc_pages(size_t n) {
     int i;
+    int alloc_size = n;
+    struct Page* page = NULL;
+    struct Page* p;
     assert(n > 0);
     if (n > nr_free) {
         return NULL;
     }
 
-    struct Page* page = NULL;
-    struct Page* p;
-    list_entry_t *le = &free_list;
-    int allocPages = n;
+    if (!IS_POWER_OF_2(n)) {
+        alloc_size = uint32_round_up(n);
+    }
 
     // 记录偏移量
-    alloced[nr_block]->offset = buddy_alloc(root, n);
-    
-    for(i = 0; i < alloced[nr_block]->offset + 1; i++) {
+    uint32_t offset = buddy_alloc(root, alloc_size);
+    alloced[nr_block].offset = offset;
+    list_entry_t *le = list_next(&free_list);
+
+    for (i = 0; i < offset; i++) {
         le = list_next(le);
     }
 
     page = le2page(le, page_link);
     
-    if (!IS_POWER_OF_2(n)) {
-        allocPages = uint32_round_up(n);
-    }
-    
     // 根据需求n得到块大小
     // 记录分配块首页
     // 记录分配的页数
-    alloced[nr_block]->base = page;
-    alloced[nr_block]->nr = allocPages;
-    nr_block++;
-    for (p = page; p != page + allocPages; p++) {
+    alloced[nr_block].base = page;
+    alloced[nr_block].nr = alloc_size;
+    for (p = page; p != page + alloc_size; p++) {
         ClearPageProperty(p);
     }
 
-    nr_free -= allocPages;
-    page->property = allocPages;
+    page->property = alloc_size;
+    
+    nr_free -= alloc_size;
+    nr_block++;
     return page;
 }
 
@@ -277,12 +277,12 @@ buddy_free_pages(struct Page *base, size_t n) {
     struct buddy* self = root;
     int i = 0;
     for (i = 0; i < nr_block; i++) {
-        if (alloced[i]->base == base) {
+        if (alloced[i].base == base) {
             break;
         }
     }
 
-    uint32_t offset = alloced[i]->offset;
+    uint32_t offset = alloced[i].offset;
     position = i;
     i = 0;
     list_entry_t *le = list_next(&free_list);
