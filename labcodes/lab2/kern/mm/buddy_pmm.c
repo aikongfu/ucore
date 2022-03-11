@@ -85,7 +85,6 @@ void buddy_new(uint32_t size) {
 
         root->longest[i] = node_size;
     }
-
 }
 
 static uint32_t
@@ -220,6 +219,7 @@ buddy_init_memmap(struct Page *base, size_t n) {
     nr_free += n;
     SetPageProperty(base);
     buddy_new(size);
+    cprintf("size = [%d], root size = [%d]\n", size, sizeof(*root));
 }
 
 
@@ -261,6 +261,8 @@ buddy_alloc_pages(size_t n) {
         ClearPageProperty(p);
     }
 
+    cprintf("need page = [%d], nr_block = [%d], base = [%p], nr = [%d], offset = [%d]", 
+            n, nr_block, page, alloc_size, offset);
     page->property = alloc_size;
     
     nr_free -= alloc_size;
