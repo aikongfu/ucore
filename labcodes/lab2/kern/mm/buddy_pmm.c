@@ -25,7 +25,6 @@
 //小于a的最大的2^k
 #define UINT32_ROUND_DOWN(a)    (UINT32_REMAINDER(a)?((a)-UINT32_REMAINDER(a)):(a))
 
-
 free_area_t free_area;
 
 #define free_list (free_area.free_list)
@@ -33,20 +32,23 @@ free_area_t free_area;
 
 struct buddy {
     uint32_t size;  // 内存大小
-    uint32_t longest[1024 * 1024 - 1];
+    uint32_t longest[1024 * 1024];
 };
-// 存入buddy信息，用来分配内存
-struct buddy *root;
 
 // 记录分配块的信息
 struct alloc_record {
     struct Page *base;
     uint32_t offset;
     size_t nr;      // 块大小
-} all;
+};
+
+// 存入buddy信息，用来分配内存
+struct buddy buddy_alloctor;
+struct buddy *root = &buddy_alloctor;
 
 // 存放偏移量的数组,记录全部已分配的信息
 struct alloc_record alloced[1024 * 1024];
+
 // 已分配的块数，从0开始
 uint32_t nr_block = 0;
 
@@ -71,6 +73,7 @@ void buddy_new(uint32_t size) {
     nr_block = 0;
 
     // check
+    cprintf("buddy_new, size = [%d], IS_POWER_OF_2(size) = [%d]\n", size, IS_POWER_OF_2(size));
     if (size < 1 || !IS_POWER_OF_2(size)) {
         return;
     }
@@ -81,21 +84,28 @@ void buddy_new(uint32_t size) {
     for (i = 0; i < 2 * size - 1; i++) {
         if (IS_POWER_OF_2(i + 1)) {
             node_size /= 2;
+            cprintf("root->longest[%d] = [%d]\n", i, node_size);
         }
 
         root->longest[i] = node_size;
     }
+    cprintf("\n");
+    cprintf("buddy_new, root = [%d], root->longest= [%d], longest size = [%d]\n", size, IS_POWER_OF_2(size),
+            sizeof(root->longest));
+
 }
 
 static uint32_t
 buddy_alloc(struct buddy *self, uint32_t size) {
-    uint32_t index;
+    uint32_t index = 0;
     uint32_t node_size;
     uint32_t offset;
     uint32_t left;
     uint32_t right;
 
+    cprintf("buddy_alloc, self = [%p], root = [%p], self->size = [%d]\n", self->size, self, self->size);
     if (self == NULL) {
+        cprintf("buddy_alloc, return -1\n");
         return -1;
     }
 
@@ -106,6 +116,7 @@ buddy_alloc(struct buddy *self, uint32_t size) {
         size = uint32_round_up(size);
     }
 
+    cprintf("buddy_alloc, self->longest[index] = [%d], size = [%d]\n", self->longest[index], size);
     // 无足够空间
     if (self->longest[index] < size) {
         return -1;
@@ -118,7 +129,7 @@ buddy_alloc(struct buddy *self, uint32_t size) {
 
         // 如果两个子节点的空间都大于>=size，取较小的那个，都等于，则取左节点
         if (self->longest[left] >= size && self->longest[right] >= size) {
-            index = self->longest[right] < self->longest[left] ? self->longest[right] : self->longest[left];
+            index = self->longest[right] < self->longest[left] ? right : left;
             continue;
         }
 
@@ -219,7 +230,8 @@ buddy_init_memmap(struct Page *base, size_t n) {
     nr_free += n;
     SetPageProperty(base);
     buddy_new(size);
-    cprintf("size = [%d], root size = [%d]\n", size, sizeof(*root));
+    cprintf("buddy_init_memmap, n = [%d], size = [%d], root size = [%d]\n", n, size, sizeof(*root));
+    cprintf("buddy_init_memmap, root = [%p], root->size = [%d], root->longest = [%p]\n", root, root->size, root->longest);
 }
 
 
@@ -261,10 +273,10 @@ buddy_alloc_pages(size_t n) {
         ClearPageProperty(p);
     }
 
-    cprintf("need page = [%d], nr_block = [%d], base = [%p], nr = [%d], offset = [%d]", 
-            n, nr_block, page, alloc_size, offset);
     page->property = alloc_size;
-    
+    cprintf("buddy_alloc_pages, need page = [%d], nr_block = [%d], page = [%p], nr = [%d], offset = [%d]\n", 
+            n, nr_block, page, alloc_size, offset);
+
     nr_free -= alloc_size;
     nr_block++;
     return page;
@@ -322,9 +334,16 @@ buddy_nr_free_pages(void) {
 static void 
 buddy_check(void) {
     struct Page *p0, *A, *B, *C, *D;
-    assert(p0 == alloc_page() != NULL);
-    assert(A == alloc_page() != NULL);
-    assert(B == alloc_page() != NULL);
+    p0 = alloc_page();
+    A = alloc_page();
+    B = alloc_page();
+
+    cprintf("p0 = [%p]\n", p0);
+    cprintf("A = [%p]\n", A);
+    cprintf("B = [%p]\n", B);
+    assert(p0 != NULL);
+    assert(A != NULL);
+    assert(B != NULL);
 
     assert(p0 != A && p0 != B && A != B);
     free_page(p0);
