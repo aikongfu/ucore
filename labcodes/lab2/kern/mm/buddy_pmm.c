@@ -4,10 +4,11 @@
 #include <string.h>
 #include <buddy_pmm.h>
 #include <stdio.h>
+#include <stdio.h>
 
 
 #define LEFT_LEAF(index) ((index) * 2 + 1)
-#define LEFT_RIGHT(index) ((index) * 2 + 2)
+#define RIGHT_LEAF(index) ((index) * 2 + 2)
 #define PARENT(index) (((index) + 1 ) / 2 - 1)
 
 #define IS_POWER_OF_2(n) (!((n) & ((n) - 1)))
@@ -38,14 +39,14 @@ struct buddy {
 struct buddy *root;
 
 // 记录分配块的信息
-struct allocRecord {
+struct alloc_record {
     struct Page *base;
     uint32_t offset;
     size_t nr;      // 块大小
-};
+} all;
 
 // 存放偏移量的数组
-struct allocRecord *alloced[1024 * 1024];
+struct alloc_record *alloced[1024 * 1024];
 // 已分配的块数
 uint32_t nr_block;
 
@@ -92,6 +93,8 @@ buddy_alloc(struct buddy *self, uint32_t size) {
     uint32_t index;
     uint32_t node_size;
     uint32_t offset;
+    uint32_t left;
+    uint32_t right;
 
     if (self == NULL) {
         return -1;
@@ -100,10 +103,96 @@ buddy_alloc(struct buddy *self, uint32_t size) {
     if (size <= 0) {
         size = 1;
     } else if (!IS_POWER_OF_2(size)) {
+        // 向上取2的n次幂
         size = uint32_round_up(size);
     }
 
-    return NULL;
+    // 无足够空间
+    if (self->longest[index] < size) {
+        return -1;
+    }
+    
+    // 开始查找符合条件的节点
+    for (node_size = self->size; node_size != size; node_size /= 2) {
+        left = LEFT_LEAF(index);
+        right = RIGHT_LEAF(index);
+
+        // 如果两个子节点的空间都大于>=size，取较小的那个，都等于，则取左节点
+        if (self->longest[left] >= size && self->longest[right] >= size) {
+            index = self->longest[right] < self->longest[left] ? self->longest[right] : self->longest[left];
+            continue;
+        }
+
+        // 如果一个小于size,则取另一个
+        if (self->longest[left] < size) {
+            index = right;
+        } else if (self->longest[right] < size) {
+            index = left;
+        }
+    }
+
+    self->longest[index] = 0;
+    // 计算offset
+    offset = (index + 1) * node_size - self->size;
+    // 回滚，更改父节点的数据
+    while (index) {
+        index = PARENT(index);
+        self->longest[index] = 
+        MAX(self->longest[LEFT_LEAF(index)], self->longest[RIGHT_LEAF(index)]);
+    }
+
+    return offset;
+}
+
+static void buddy_free(struct buddy* self, uint32_t offset) {
+    uint32_t node_size;
+    uint32_t index = 0;
+    uint32_t left_child_size, right_child_size;
+
+    assert(self && offset >= 0 && self->size >= offset);
+    
+    node_size = 1;
+
+    // index
+    index = offset + self->size -1;
+
+    // 向上寻找分配过的节点
+    for (; self->longest[index]; index = PARENT(index)) {
+        node_size *= 2;
+        // 如果节点不存在
+        if (index == 0) {
+            return;
+        }
+    }
+
+    self->longest[index] = node_size;
+
+    while (index) {
+        index = PARENT(index);
+        node_size *= 2;
+        left_child_size = self->longest[LEFT_LEAF(index)];
+        right_child_size = self->longest[RIGHT_LEAF(index)];
+
+        if (node_size == left_child_size + right_child_size) {
+            self->longest[index] = node_size;
+        } else {
+            self->longest[index] = MAX(left_child_size, right_child_size);
+        }
+    }
+    
+}
+
+
+static uint32_t buddy_size(struct buddy* self, uint32_t offset) {
+    uint32_t node_size, index = 0;
+    assert(self && offset >= 0 && offset <= self->size);
+
+    node_size = 1;
+    for (index = offset + self->size - 1; self->longest[index]; index = PARENT(index)) {
+        node_size *= 2;
+    }
+
+    return node_size;
 }
 
 
@@ -135,28 +224,143 @@ buddy_init_memmap(struct Page *base, size_t n) {
 }
 
 
+// 分配的逻辑是：
+// 1、首先在buddy的“二叉树”结构中找到应该分配的物理页在整个实际双向链表中的位置
+// 2、而后把相应的page进行标识表明该物理页已经分出去了。
 static struct Page *
 buddy_alloc_pages(size_t n) {
-    uint32_t index;
-    uint32_t node_size;
-    uint32_t offset;
+    int i;
+    assert(n > 0);
+    if (n > nr_free) {
+        return NULL;
+    }
 
-    return NULL;
+    struct Page* page = NULL;
+    struct Page* p;
+    list_entry_t *le = &free_list;
+    int allocPages = n;
+
+    // 记录偏移量
+    alloced[nr_block]->offset = buddy_alloc(root, n);
+    
+    for(i = 0; i < alloced[nr_block]->offset + 1; i++) {
+        le = list_next(le);
+    }
+
+    page = le2page(le, page_link);
+    
+    if (!IS_POWER_OF_2(n)) {
+        allocPages = uint32_round_up(n);
+    }
+    
+    // 根据需求n得到块大小
+    // 记录分配块首页
+    // 记录分配的页数
+    alloced[nr_block]->base = page;
+    alloced[nr_block]->nr = allocPages;
+    nr_block++;
+    for (p = page; p != page + allocPages; p++) {
+        ClearPageProperty(p);
+    }
+
+    nr_free -= allocPages;
+    page->property = allocPages;
+    return page;
 }
 
 
 static void
 buddy_free_pages(struct Page *base, size_t n) {
- 
+    uint32_t node_size, index = 0;
+    uint32_t left_longest, right_longest;
+    uint32_t position = 0;
+    struct buddy* self = root;
+    int i = 0;
+    for (i = 0; i < nr_block; i++) {
+        if (alloced[i]->base == base) {
+            break;
+        }
+    }
+
+    uint32_t offset = alloced[i]->offset;
+    position = i;
+    i = 0;
+    list_entry_t *le = list_next(&free_list);
+
+    while (i < offset) {
+        le = list_next(le);
+        i++;
+    }
+
+    int allocPages = n;
+    if (!IS_POWER_OF_2(n)) {
+        allocPages = uint32_round_up(n);
+    }
+
+    assert(self && offset >= 0 && offset <= self->size);
+
+    nr_free += allocPages;
+    struct Page *p;
+    for (i = 0; i < allocPages; i++) {
+        p = le2page(le, page_link);
+        p->flags = p->property = 0;
+        le = list_next(le);
+    }
+
+    buddy_free(root, offset);
+
+    nr_block--;
 }
 
 static size_t
 buddy_nr_free_pages(void) {
-
+    return nr_free;
 }
 
 static void 
 buddy_check(void) {
+    struct Page *p0, *A, *B, *C, *D;
+    assert(p0 == alloc_page() != NULL);
+    assert(A == alloc_page() != NULL);
+    assert(B == alloc_page() != NULL);
+
+    assert(p0 != A && p0 != B && A != B);
+    free_page(p0);
+    free_page(A);
+    free_page(B);
+
+    A = alloc_pages(500);
+    B = alloc_pages(500);
+    cprintf("A %p\n", A);
+    cprintf("B %p\n", B);
+
+    free_pages(A, 250);
+    free_pages(B, 500);
+    free_pages(A + 250, 250);
+
+    p0=alloc_pages(1024);
+    cprintf("p0 %p\n",p0);
+    assert(p0 == A);
+    //以下是根据链接中的样例测试编写的
+    A=alloc_pages(70);  
+    B=alloc_pages(35);
+    assert(A+128==B);//检查是否相邻
+    cprintf("A %p\n",A);
+    cprintf("B %p\n",B);
+    C=alloc_pages(80);
+    assert(A+256==C);//检查C有没有和A重叠
+    cprintf("C %p\n",C);
+    free_pages(A,70);//释放A
+    cprintf("B %p\n",B);
+    D=alloc_pages(60);
+    cprintf("D %p\n",D);
+    assert(B+64==D);//检查B，D是否相邻
+    free_pages(B,35);
+    cprintf("D %p\n",D);
+    free_pages(D,60);
+    cprintf("C %p\n",C);
+    free_pages(C,80);
+    free_pages(p0,1000);//全部释放
 
 }
 
