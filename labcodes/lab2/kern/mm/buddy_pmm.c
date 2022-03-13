@@ -283,6 +283,15 @@ buddy_alloc_pages(size_t n) {
 }
 
 
+/**
+ * @brief 遍历alloced数组，找到对应页page，及相关信息
+ *        回收需要回收的，回溯更新buddy节点信息，需要注意的可能当时分配的是100页（真正分配128页），现在回收的是40页
+ *        此时，因为40并非是2的整次幂，其往下2的整次幂为32，往上2的整次幂为64， 
+ *        那么如果回收64，会把还在用的页回收掉，因而需要32，8这样分多次去回收，直到全部回收，需要更新alloced
+ * 
+ * @param base 
+ * @param n 
+ */
 static void
 buddy_free_pages(struct Page *base, size_t n) {
     uint32_t node_size, index = 0;
