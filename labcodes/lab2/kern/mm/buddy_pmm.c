@@ -327,6 +327,7 @@ buddy_free_pages(struct Page *base, size_t n) {
     for (i = 0; i < allocPages; i++) {
         p = le2page(le, page_link);
         p->flags = p->property = 0;
+        set_page_ref(p, 0);
         le = list_next(le);
     }
 
