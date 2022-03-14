@@ -119,7 +119,7 @@ buddy_alloc(struct buddy *self, uint32_t size) {
 
         // 如果两个子节点的空间都大于>=size，取较小的那个，都等于，则取左节点
         if (self->longest[left] >= size && self->longest[right] >= size) {
-            index = self->longest[right] < self->longest[left] ? self->longest[right] : self->longest[left];
+            index = self->longest[right] < self->longest[left] ? right : left;
             continue;
         }
 
