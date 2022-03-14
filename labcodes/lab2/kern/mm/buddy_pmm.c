@@ -25,7 +25,6 @@
 //小于a的最大的2^k
 #define UINT32_ROUND_DOWN(a)    (UINT32_REMAINDER(a)?((a)-UINT32_REMAINDER(a)):(a))
 
-
 free_area_t free_area;
 
 #define free_list (free_area.free_list)
@@ -33,22 +32,25 @@ free_area_t free_area;
 
 struct buddy {
     uint32_t size;  // 内存大小
-    uint32_t longest[1024 * 1024 - 1];
+    uint32_t longest[1024 * 1024];
 };
-// 存入buddy信息，用来分配内存
-struct buddy *root;
 
 // 记录分配块的信息
 struct alloc_record {
     struct Page *base;
     uint32_t offset;
     size_t nr;      // 块大小
-} all;
+};
 
-// 存放偏移量的数组
-struct alloc_record *alloced[1024 * 1024];
-// 已分配的块数
-uint32_t nr_block;
+// 存入buddy信息，用来分配内存
+struct buddy buddy_alloctor;
+struct buddy *root = &buddy_alloctor;
+
+// 存放偏移量的数组,记录全部已分配的信息
+struct alloc_record alloced[1024 * 1024];
+
+// 已分配的块数，从0开始
+uint32_t nr_block = 0;
 
 //找到大于等于所需内存的2的倍数
 static uint32_t uint32_round_up(uint32_t size) {
@@ -71,6 +73,7 @@ void buddy_new(uint32_t size) {
     nr_block = 0;
 
     // check
+    cprintf("buddy_new, size = [%d], IS_POWER_OF_2(size) = [%d]\n", size, IS_POWER_OF_2(size));
     if (size < 1 || !IS_POWER_OF_2(size)) {
         return;
     }
@@ -81,22 +84,28 @@ void buddy_new(uint32_t size) {
     for (i = 0; i < 2 * size - 1; i++) {
         if (IS_POWER_OF_2(i + 1)) {
             node_size /= 2;
+            cprintf("root->longest[%d] = [%d]\n", i, node_size);
         }
 
         root->longest[i] = node_size;
     }
+    cprintf("\n");
+    cprintf("buddy_new, root = [%d], root->longest= [%d], longest size = [%d]\n", size, IS_POWER_OF_2(size),
+            sizeof(root->longest));
 
 }
 
 static uint32_t
 buddy_alloc(struct buddy *self, uint32_t size) {
-    uint32_t index;
+    uint32_t index = 0;
     uint32_t node_size;
     uint32_t offset;
     uint32_t left;
     uint32_t right;
 
+    cprintf("buddy_alloc, self = [%p], root = [%p], self->size = [%d]\n", self->size, self, self->size);
     if (self == NULL) {
+        cprintf("buddy_alloc, return -1\n");
         return -1;
     }
 
@@ -107,6 +116,7 @@ buddy_alloc(struct buddy *self, uint32_t size) {
         size = uint32_round_up(size);
     }
 
+    cprintf("buddy_alloc, self->longest[index] = [%d], size = [%d]\n", self->longest[index], size);
     // 无足够空间
     if (self->longest[index] < size) {
         return -1;
@@ -214,13 +224,14 @@ buddy_init_memmap(struct Page *base, size_t n) {
         set_page_ref(p, 0);
     }
 
-    SetPageProperty(base);
-    base->property = n;
-    nr_free += n;
-
     // 这里只是简化处理，这样存在一个问题，真正可用的页数就是小于等于n的最大的一个2^k次幂，所以size - n 将浪费掉，也可以继续分割（size - n）
     uint32_t size = uint32_round_down(n);
+    base->property = n;
+    nr_free += n;
+    SetPageProperty(base);
     buddy_new(size);
+    cprintf("buddy_init_memmap, n = [%d], size = [%d], root size = [%d]\n", n, size, sizeof(*root));
+    cprintf("buddy_init_memmap, root = [%p], root->size = [%d], root->longest = [%p]\n", root, root->size, root->longest);
 }
 
 
@@ -230,45 +241,57 @@ buddy_init_memmap(struct Page *base, size_t n) {
 static struct Page *
 buddy_alloc_pages(size_t n) {
     int i;
+    int alloc_size = n;
+    struct Page* page = NULL;
+    struct Page* p;
     assert(n > 0);
     if (n > nr_free) {
         return NULL;
     }
 
-    struct Page* page = NULL;
-    struct Page* p;
-    list_entry_t *le = &free_list;
-    int allocPages = n;
+    if (!IS_POWER_OF_2(n)) {
+        alloc_size = uint32_round_up(n);
+    }
 
     // 记录偏移量
-    alloced[nr_block]->offset = buddy_alloc(root, n);
-    
-    for(i = 0; i < alloced[nr_block]->offset + 1; i++) {
+    uint32_t offset = buddy_alloc(root, alloc_size);
+    alloced[nr_block].offset = offset;
+    list_entry_t *le = list_next(&free_list);
+
+    for (i = 0; i < offset; i++) {
         le = list_next(le);
     }
 
     page = le2page(le, page_link);
     
-    if (!IS_POWER_OF_2(n)) {
-        allocPages = uint32_round_up(n);
-    }
-    
     // 根据需求n得到块大小
     // 记录分配块首页
     // 记录分配的页数
-    alloced[nr_block]->base = page;
-    alloced[nr_block]->nr = allocPages;
-    nr_block++;
-    for (p = page; p != page + allocPages; p++) {
+    alloced[nr_block].base = page;
+    alloced[nr_block].nr = alloc_size;
+    for (p = page; p != page + alloc_size; p++) {
         ClearPageProperty(p);
     }
 
-    nr_free -= allocPages;
-    page->property = allocPages;
+    page->property = alloc_size;
+    cprintf("buddy_alloc_pages, need page = [%d], nr_block = [%d], page = [%p], nr = [%d], offset = [%d]\n", 
+            n, nr_block, page, alloc_size, offset);
+
+    nr_free -= alloc_size;
+    nr_block++;
     return page;
 }
 
 
+/**
+ * @brief 遍历alloced数组，找到对应页page，及相关信息
+ *        回收需要回收的，回溯更新buddy节点信息，需要注意的可能当时分配的是100页（真正分配128页），现在回收的是40页
+ *        此时，因为40并非是2的整次幂，其往下2的整次幂为32，往上2的整次幂为64， 
+ *        那么如果回收64，会把还在用的页回收掉，因而需要32，8这样分多次去回收，直到全部回收，需要更新alloced
+ * 
+ * @param base 
+ * @param n 
+ */
 static void
 buddy_free_pages(struct Page *base, size_t n) {
     uint32_t node_size, index = 0;
@@ -277,12 +300,12 @@ buddy_free_pages(struct Page *base, size_t n) {
     struct buddy* self = root;
     int i = 0;
     for (i = 0; i < nr_block; i++) {
-        if (alloced[i]->base == base) {
+        if (alloced[i].base == base) {
             break;
         }
     }
 
-    uint32_t offset = alloced[i]->offset;
+    uint32_t offset = alloced[i].offset;
     position = i;
     i = 0;
     list_entry_t *le = list_next(&free_list);
@@ -304,6 +327,7 @@ buddy_free_pages(struct Page *base, size_t n) {
     for (i = 0; i < allocPages; i++) {
         p = le2page(le, page_link);
         p->flags = p->property = 0;
+        set_page_ref(p, 0);
         le = list_next(le);
     }
 
@@ -320,9 +344,16 @@ buddy_nr_free_pages(void) {
 static void 
 buddy_check(void) {
     struct Page *p0, *A, *B, *C, *D;
-    assert(p0 == alloc_page() != NULL);
-    assert(A == alloc_page() != NULL);
-    assert(B == alloc_page() != NULL);
+    p0 = alloc_page();
+    A = alloc_page();
+    B = alloc_page();
+
+    cprintf("p0 = [%p]\n", p0);
+    cprintf("A = [%p]\n", A);
+    cprintf("B = [%p]\n", B);
+    assert(p0 != NULL);
+    assert(A != NULL);
+    assert(B != NULL);
 
     assert(p0 != A && p0 != B && A != B);
     free_page(p0);
