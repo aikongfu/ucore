@@ -4,22 +4,37 @@ OBJPREFIX	:= __objs_
 # -------------------- function begin --------------------
 
 # list all files in some directories: (#directories, #types)
+# $(2) = c S
+# $(addprefix %.,$(2)) = %.c %.S
+# $(if $(2),%.c %.S,%) = %.c %.S
+# listf = $(filter %.c %.S, $(wildcard $(1)/*))
+# $(1) is empty, so the listf is empty
+# `wildcard`找到满足pattern的所有文件列表。
 listf = $(filter $(if $(2),$(addprefix %.,$(2)),%),\
 		  $(wildcard $(addsuffix $(SLASH)*,$(1))))
 
 # get .o obj files: (#files[, packet])
+# 确定obj的绝对路径： $(OBJDIR)/$(2)/$(1).o
 toobj = $(addprefix $(OBJDIR)$(SLASH)$(if $(2),$(2)$(SLASH)),\
 		$(addsuffix .o,$(basename $(1))))
 
 # get .d dependency files: (#files[, packet])
+# 结果为： $(OBJDIR)/$(2)/$(1).d
 todep = $(patsubst %.o,%.d,$(call toobj,$(1),$(2)))
 
 totarget = $(addprefix $(BINDIR)$(SLASH),$(1))
 
 # change $(name) to $(OBJPREFIX)$(name): (#names)
+# 结果为：$(OBJPREFIX)$(1)
+# kernel libs
+# OBJPREFIX	:= __objs_
 packetname = $(if $(1),$(addprefix $(OBJPREFIX),$(1)),$(OBJPREFIX))
 
 # cc compile template, generate rule for dep, obj: (file, cc[, flags, dir])
+# $4：dir 目录
+# $3：flags 编译选项
+# $2：cc 编译命令
+# $1：file 依赖文件
 define cc_template
 $$(call todep,$(1),$(4)): $(1) | $$$$(dir $$$$@)
 	@$(2) -I$$(dir $(1)) $(3) -MM $$< -MT "$$(patsubst %.d,%.o,$$@) $$@"> $$@
@@ -87,6 +102,10 @@ add_objs = $(eval $(call do_add_objs_to_packet,$(1),$(2)))
 # add packets and objs to target (target, #packes, #objs, cc, [, flags])
 create_target = $(eval $(call do_create_target,$(1),$(2),$(3),$(4),$(5)))
 
+# foreach  $(foreach var text commond)
+# var：局部变量
+# text：文件列表，空格隔开，每一次取一个值赋值为变量var
+# commond：对var变量进行操作（一般会使用var变量，不然没意义），每次操作结果都会以空格隔开，最后返回空格隔开的列表。
 read_packet = $(foreach p,$(call packetname,$(1)),$($(p)))
 
 add_dependency = $(eval $(1): $(2))

@@ -2,6 +2,7 @@
 #include <list.h>
 #include <string.h>
 #include <default_pmm.h>
+#include <stdio.h>
 
 /* In the first fit algorithm, the allocator keeps a list of free blocks (known as the free list) and,
    on receiving a request for memory, scans along the list for the first block that is large enough to
@@ -59,84 +60,143 @@ free_area_t free_area;
 #define free_list (free_area.free_list)
 #define nr_free (free_area.nr_free)
 
+/**
+ * @brief 默认的初始化free_list
+ * 
+ */
 static void
 default_init(void) {
+    // node<->node
     list_init(&free_list);
     nr_free = 0;
 }
 
+/**
+ * @brief 
+ * 
+ * @param base 
+ * @param n 
+ */
 static void
 default_init_memmap(struct Page *base, size_t n) {
+    // 需要循环设置每一页的flags, property, ref, 且要在链表中连接起来(1->2->3)
+    // 然后把这一段内存区域加入到free_list中，设置nr_free
+
     assert(n > 0);
     struct Page *p = base;
-    for (; p != base + n; p ++) {
+    for (; p != base + n; p++) {
         assert(PageReserved(p));
         p->flags = p->property = 0;
         set_page_ref(p, 0);
     }
-    base->property = n;
+
+    // 设置这段内存区域第一页的属性
     SetPageProperty(base);
+    base->property = n;
     nr_free += n;
-    list_add(&free_list, &(base->page_link));
+    // 加入到free_list中
+    // 双向循环链表
+    // free_list<->add1_pages<->add2_pages<->add3_pages<->free_list
+    list_add(&free_list, &base->page_link);
 }
 
 static struct Page *
 default_alloc_pages(size_t n) {
+
     assert(n > 0);
     if (n > nr_free) {
         return NULL;
     }
+
     struct Page *page = NULL;
     list_entry_t *le = &free_list;
     while ((le = list_next(le)) != &free_list) {
         struct Page *p = le2page(le, page_link);
+        // 找到符合条件的
         if (p->property >= n) {
             page = p;
             break;
         }
     }
+
     if (page != NULL) {
-        list_del(&(page->page_link));
+        // 如果分配n个后还有page页，则后面的补上
         if (page->property > n) {
-            struct Page *p = page + n;
-            p->property = page->property - n;
-            list_add(&free_list, &(p->page_link));
-    }
-        nr_free -= n;
+            struct Page *pn = page + n;
+            pn->property = page->property - n;
+            SetPageProperty(pn);
+            list_add_after(&page->page_link, &pn->page_link);
+        }
+
         ClearPageProperty(page);
+        nr_free -= n;
+        list_del(&page->page_link);
     }
+    
     return page;
 }
 
 static void
 default_free_pages(struct Page *base, size_t n) {
+    // 逻辑如下：
+    // 1 先把base的属性更新
+    // 2 循环在free_list中查找
+    // 2.1 *base可能刚好在某个空闲块的后面
+    // 2.2 *base可能刚好在某个空闲块的前面
+    // 2.3 可能在尾部或者某两个之间
+    // 2.4 对应的物理页地址没有问题的情况下插入到空闲链表中
+    // 3、可能刚好应该插入的头的情况
+    
+    // 先做一些处理（设置flags, ref, 页链表头的property等）
     assert(n > 0);
     struct Page *p = base;
-    for (; p != base + n; p ++) {
+    for (; p != base + n; p++) {
         assert(!PageReserved(p) && !PageProperty(p));
         p->flags = 0;
         set_page_ref(p, 0);
     }
     base->property = n;
     SetPageProperty(base);
-    list_entry_t *le = list_next(&free_list);
-    while (le != &free_list) {
+
+    struct Page *t = base + base->property;
+    // 再往合适的位置（free_list）插
+    int i = 0;
+    list_entry_t *le = &free_list;
+    while ((le = list_next(le)) != &free_list) {
         p = le2page(le, page_link);
-        le = list_next(le);
+        i++;
+        // 刚好在前面
+        // 两个if不能直接break，因为可能存在 
+        // p + p->property = base， 下一个链表
+        // base + base->property = p(next le)
         if (base + base->property == p) {
             base->property += p->property;
+            // tempP不是头
             ClearPageProperty(p);
             list_del(&(p->page_link));
         }
-        else if (p + p->property == base) {
+        // 刚好在后面
+        if (p + p->property == base) {
             p->property += base->property;
             ClearPageProperty(base);
             base = p;
             list_del(&(p->page_link));
         }
+
     }
+    le = &free_list;
+    while ((le = list_next(le)) != &free_list) {
+        // 在中间(前插，即找到比base地址大的，插入前面)
+        p = le2page(le, page_link);
+        if (base + base->property <= p) {
+            assert(base + base->property != p);
+            break;
+        }
+    }
+
+    list_add_before(le, &(base->page_link));
+    
     nr_free += n;
-    list_add(&free_list, &(base->page_link));
 }
 
 static size_t

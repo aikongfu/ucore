@@ -1,3 +1,12 @@
 file bin/kernel
 target remote :1234
-break kern_init
+set architecture i8086
+
+#b print_stackframe
+#b kern_entry
+#b alloc_page
+b kern_init
+#b init_pmm_manager
+#b default_alloc_pages
+#b page_init
+continue

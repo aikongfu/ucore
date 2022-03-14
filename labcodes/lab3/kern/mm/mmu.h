@@ -200,12 +200,17 @@ struct taskstate {
 // To construct a linear address la from PDX(la), PTX(la), and PGOFF(la),
 // use PGADDR(PDX(la), PTX(la), PGOFF(la)).
 
+// PDXSHIFT 22  =   0000010110
+// 0x3FF = 1023 =   001111111111
 // page directory index
+// 右移22位再与001111111111，这样就是page directory index（前10位）
 #define PDX(la) ((((uintptr_t)(la)) >> PDXSHIFT) & 0x3FF)
 
+// PTXSHIFT 12
 // page table index
 #define PTX(la) ((((uintptr_t)(la)) >> PTXSHIFT) & 0x3FF)
 
+// PTXSHIFT 12
 // page number field of address
 #define PPN(la) (((uintptr_t)(la)) >> PTXSHIFT)
 
@@ -216,6 +221,8 @@ struct taskstate {
 #define PGADDR(d, t, o) ((uintptr_t)((d) << PDXSHIFT | (t) << PTXSHIFT | (o)))
 
 // address in page table or page directory entry
+// 0xFFF = 111111111111
+// ~0xFFF = 1111111111 1111111111 000000000000
 #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF)
 #define PDE_ADDR(pde)   PTE_ADDR(pde)
 
@@ -232,11 +239,11 @@ struct taskstate {
 #define PDXSHIFT        22                      // offset of PDX in a linear address
 
 /* page table/directory entry flags */
-#define PTE_P           0x001                   // Present
-#define PTE_W           0x002                   // Writeable
-#define PTE_U           0x004                   // User
-#define PTE_PWT         0x008                   // Write-Through
-#define PTE_PCD         0x010                   // Cache-Disable
+#define PTE_P           0x001                   // 00000001 Present
+#define PTE_W           0x002                   // 00000010 Writeable
+#define PTE_U           0x004                   // 00000100 User
+#define PTE_PWT         0x008                   // 00001000 Write-Through
+#define PTE_PCD         0x010                   // 00001010 Cache-Disable
 #define PTE_A           0x020                   // Accessed
 #define PTE_D           0x040                   // Dirty
 #define PTE_PS          0x080                   // Page Size

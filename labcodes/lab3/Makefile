@@ -38,6 +38,10 @@ QEMU := $(shell if which qemu-system-i386 > /dev/null; \
 endif
 
 # eliminate default suffix rules
+# 默认的后缀列表是:.out, .a, .ln, .o, .c, .cc, .C, .p,
+# .f, .F, .r, .y, .l, .s, .S, .mod, .sym, .def, .h, 
+# .info, .dvi, .tex, .texinfo, .texi,
+# .txinfo, .w, .ch .web, .sh, .elc, .el
 .SUFFIXES: .c .S .h
 
 # delete target files if there is an error (or make is interrupted)
@@ -45,16 +49,17 @@ endif
 
 # define compiler and flags
 ifndef  USELLVM
-HOSTCC		:= gcc
-HOSTCFLAGS	:= -g -Wall -O2
-CC		:= $(GCCPREFIX)gcc
-CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gstabs -nostdinc $(DEFS)
+HOSTCC		:= gcc-5
+HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
+# CC		:= $(GCCPREFIX)gcc
+CC		:= gcc-5
+CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gdwarf-2 -g3 -nostdinc -fno-pic $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 else
-HOSTCC		:= clang
-HOSTCFLAGS	:= -g -Wall -O2
-CC		:= clang
-CFLAGS	:= -fno-builtin -Wall -g -m32 -mno-sse -nostdinc $(DEFS)
+HOSTCC		:= gcc-5
+HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
+CC		:= gcc-5
+CFLAGS	:= -fno-builtin -Wall -g -m32 -mno-sse -g3 -nostdinc  -fno-pic $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 endif
 
@@ -78,6 +83,9 @@ SH		:= sh
 TR		:= tr
 TOUCH	:= touch -c
 
+TAR		:= tar
+ZIP		:= gzip
+
 OBJDIR	:= obj
 BINDIR	:= bin
 
@@ -85,18 +93,24 @@ ALLOBJS	:=
 ALLDEPS	:=
 TARGETS	:=
 
+# 引入tools下的function.mk
 include tools/function.mk
 
+# $(1)目录下，满足`%.c %.S`的文件
 listf_cc = $(call listf,$(1),$(CTYPE))
 
+# 后面的1,2,3,4,5都是参数占位，表示第1，2，3，4，5个参数
 # for cc
+# 先add，后create target
 add_files_cc = $(call add_files,$(1),$(CC),$(CFLAGS) $(3),$(2),$(4))
 create_target_cc = $(call create_target,$(1),$(2),$(3),$(CC),$(CFLAGS))
 
 # for hostcc
+# gcc or clang
 add_files_host = $(call add_files,$(1),$(HOSTCC),$(HOSTCFLAGS),$(2),$(3))
 create_target_host = $(call create_target,$(1),$(2),$(3),$(HOSTCC),$(HOSTCFLAGS))
 
+# $(patsubst <pattern>,<replacement>,<text> ) 
 cgtype = $(patsubst %.$(2),%.$(3),$(1))
 objfile = $(call toobj,$(1))
 asmfile = $(call cgtype,$(call toobj,$(1)),o,asm)
@@ -144,15 +158,32 @@ $(call add_files_cc,$(call listf_cc,$(KSRCDIR)),kernel,$(KCFLAGS))
 KOBJS	= $(call read_packet,kernel libs)
 
 # create kernel target
+# 在bin目录生成kernel文件
 kernel = $(call totarget,kernel)
 
+# 需要tools/kernel.ld
 $(kernel): tools/kernel.ld
 
+# 需要KOBJS
 $(kernel): $(KOBJS)
 	@echo + ld $@
 	$(V)$(LD) $(LDFLAGS) -T tools/kernel.ld -o $@ $(KOBJS)
 	@$(OBJDUMP) -S $@ > $(call asmfile,kernel)
 	@$(OBJDUMP) -t $@ | $(SED) '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $(call symfile,kernel)
+
+$(call create_target,kernel)
+
+
+# create kernel_nopage target
+kernel_nopage = $(call totarget,kernel_nopage)
+
+$(kernel_nopage): tools/kernel_nopage.ld
+
+$(kernel_nopage): $(KOBJS)
+	@echo + ld $@
+	$(V)$(LD) $(LDFLAGS) -T tools/kernel_nopage.ld -o $@ $(KOBJS)
+	@$(OBJDUMP) -S $@ > $(call asmfile,kernel_nopage)
+	@$(OBJDUMP) -t $@ | $(SED) '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $(call symfile,kernel_nopage)
 
 $(call create_target,kernel)
 
@@ -182,9 +213,28 @@ $(call create_target_host,sign,sign)
 # -------------------------------------------------------------------
 
 # create ucore.img
+# 从这里开始看，调用totarget，参数是ucore.img
+# 而totarget = $(addprefix $(BINDIR)$(SLASH),$(1))
+# 可见，target是bin/ucore.img
+
 UCOREIMG	:= $(call totarget,ucore.img)
 
-$(UCOREIMG): $(kernel) $(bootblock)
+# V       := @
+# prerequisites 是kernel和bootblock
+$(UCOREIMG): $(kernel) $(bootblock) $(kernel_nopage)
+# 接下来是command
+# @dd if=/dev/zero of=$@ count=10000
+# @dd if=$(bootblock) of=$@ conv=notrunc
+# @dd if=$(kernel) of=$@ seek=1 conv=notrunc
+# dd：用指定大小的块拷贝一个文件，并在拷贝的同时进行指定的转换。
+# if=文件名：输入文件名，缺省为标准输入。即指定源文件。< if=input file >
+# of=文件名：输出文件名，缺省为标准输出。即指定目的文件。< of=output file >
+# count=blocks：仅拷贝blocks个块，块大小等于ibs指定的字节数。
+# conv=conversion：用指定的参数转换文件。
+# notrunc：不截短输出文件
+# 输入文件：/dev/zero，个数1000个，输出文件默认
+# 输入文件：bootblock，不截短输出文件，输出文件默认
+# 输入文件：kernel，不截短输出文件，输出文件默认，从输出文件开头跳过1个块后再开始复制
 	$(V)dd if=/dev/zero of=$@ count=10000
 	$(V)dd if=$(bootblock) of=$@ conv=notrunc
 	$(V)dd if=$(kernel) of=$@ seek=1 conv=notrunc
