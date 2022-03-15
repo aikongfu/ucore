@@ -203,7 +203,7 @@ struct taskstate {
 // PDXSHIFT 22  =   0000010110
 // 0x3FF = 1023 =   001111111111
 // page directory index
-// ÓÒÒÆ22Î»ÔÙÓë001111111111£¬ÕâÑù¾ÍÊÇpage directory index£¨Ç°10Î»£©
+// å³ç§»22ä½å†ä¸Ž001111111111ï¼Œè¿™æ ·å°±æ˜¯page directory indexï¼ˆå‰10ä½ï¼‰
 #define PDX(la) ((((uintptr_t)(la)) >> PDXSHIFT) & 0x3FF)
 
 // PTXSHIFT 12

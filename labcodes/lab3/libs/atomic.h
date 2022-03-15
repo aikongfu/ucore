@@ -9,7 +9,7 @@ static inline void change_bit(int nr, volatile void *addr) __attribute__((always
 static inline bool test_bit(int nr, volatile void *addr) __attribute__((always_inline));
 
 /* *
- * ÕâÀïµÄÖ¸Áîbtsl½«Ò»¸ö32Î»²Ù×÷ÊıÖĞµÄÄ³Ò»Î»ÉèÖÃ³É1¡£²ÎÊınrºÍaddr±íÊ¾½«ÄÚ´æµØÖ·ÎªaddrµÄ32Î»ÊıµÄnrÎ»ÉèÖÃ³É1¡£ 
+ * è¿™é‡Œçš„æŒ‡ä»¤btslå°†ä¸€ä¸ª32ä½æ“ä½œæ•°ä¸­çš„æŸä¸€ä½è®¾ç½®æˆ1ã€‚å‚æ•°nrå’Œaddrè¡¨ç¤ºå°†å†…å­˜åœ°å€ä¸ºaddrçš„32ä½æ•°çš„nrä½è®¾ç½®æˆ1ã€‚ 
  * set_bit - Atomically set a bit in memory
  * @nr:     the bit to set
  * @addr:   the address to start counting from

@@ -305,7 +305,7 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
-  // µ÷ÓÃfunction£¬Í¨¹ıÄÚÁª»ã±àÀ´¶Áµ½ebpºÍeipµÄÖµ
+  // è°ƒç”¨functionï¼Œé€šè¿‡å†…è”æ±‡ç¼–æ¥è¯»åˆ°ebpå’Œeipçš„å€¼
   uint32_t ebp = read_ebp();
   uint32_t eip = read_eip();
 
@@ -315,8 +315,8 @@ print_stackframe(void) {
     // ebp eip
     cprintf("ebp = 0x%08x\t eip = 0x%08x\t", ebp, eip);
     cprintf("\n");
-    // arguments Ò»°ã¶øÑÔ£¬ss:[ebp+4]´¦Îª·µ»ØµØÖ·£¬ss:[ebp+8]´¦ÎªµÚÒ»¸ö²ÎÊıÖµ
-    // ¶øÎÒÃÇÕâÀïuint32_tÕ¼4¸ö×Ö½Ú£¬ËùÒÔÖ¸Õë+2¾Í¿ÉÒÔ
+    // arguments ä¸€èˆ¬è€Œè¨€ï¼Œss:[ebp+4]å¤„ä¸ºè¿”å›åœ°å€ï¼Œss:[ebp+8]å¤„ä¸ºç¬¬ä¸€ä¸ªå‚æ•°å€¼
+    // è€Œæˆ‘ä»¬è¿™é‡Œuint32_tå 4ä¸ªå­—èŠ‚ï¼Œæ‰€ä»¥æŒ‡é’ˆ+2å°±å¯ä»¥
     uint32_t args[4];
     args[0] = (uint32_t *)ebp + 2;
     cprintf("args:0x%08x\t0x%08x\t0x%08x\t0x%08x\t", args[0], args[1], args[2],args[3]);

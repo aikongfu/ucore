@@ -68,7 +68,7 @@ void print_pgdir(void);
  * KADDR - takes a physical address and returns the corresponding kernel virtual
  * address. It panics if you pass an invalid physical address.
  * 
- * PPN(__m_pa) = __m_pa >> 12, Ò²¾ÍÊÇÔÚpagesÊı×éÖĞµÄË÷Òı 
+ * PPN(__m_pa) = __m_pa >> 12, ä¹Ÿå°±æ˜¯åœ¨pagesæ•°ç»„ä¸­çš„ç´¢å¼• 
  * pa >> 12 + 0xC0000000
  * pa >> 12 + 1100000000 0000000000 000000000000
  * */
@@ -85,15 +85,15 @@ extern struct Page *pages;
 extern size_t npage;
 
 // pages: virtual address of physicall page array
-// page - pagesÏàµ±ÓÚpagesÊı×éµÄË÷ÒıÖµ
+// page - pagesç›¸å½“äºpagesæ•°ç»„çš„ç´¢å¼•å€¼
 static inline ppn_t
 page2ppn(struct Page *page) {
     return page - pages;
 }
 
 // pages: virtual address of physicall page array
-// page - pagesÏàµ±ÓÚpagesÊı×éµÄË÷ÒıÖµ
-// µÃµ½Ïà¶ÔpagesÊı×éÆğÊ¼µØÖ·µÄÆ«ÒÆÁ¿£¬ÔÙ×óÒÆ12Î»£¬Ò²¾ÍÊÇ±ä³Épage tableµÄË÷ÒıÖµ
+// page - pagesç›¸å½“äºpagesæ•°ç»„çš„ç´¢å¼•å€¼
+// å¾—åˆ°ç›¸å¯¹pagesæ•°ç»„èµ·å§‹åœ°å€çš„åç§»é‡ï¼Œå†å·¦ç§»12ä½ï¼Œä¹Ÿå°±æ˜¯å˜æˆpage tableçš„ç´¢å¼•å€¼
 static inline uintptr_t
 page2pa(struct Page *page) {
     return page2ppn(page) << PGSHIFT;

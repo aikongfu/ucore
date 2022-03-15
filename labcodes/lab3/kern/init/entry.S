@@ -3,34 +3,34 @@
 
 #define REALLOC(x) (x - KERNBASE)
 
-# kern_entryº¯ÊıµÄÖ÷ÒªÈÎÎñÊÇÎªÖ´ĞĞkern_init½¨Á¢Ò»¸öÁ¼ºÃµÄCÓïÑÔÔËĞĞ»·¾³£¨ÉèÖÃ¶ÑÕ»£©£¬
-# ¶øÇÒÁÙÊ±½¨Á¢ÁËÒ»¸ö¶ÎÓ³Éä¹ØÏµ£¬ÎªÖ®ºó½¨Á¢·ÖÒ³»úÖÆµÄ¹ı³Ì×öÒ»¸ö×¼±¸£¨Ï¸½ÚÔÚ3.5Ğ¡½ÚÓĞ½øÒ»²½²ûÊö£©
+# kern_entryå‡½æ•°çš„ä¸»è¦ä»»åŠ¡æ˜¯ä¸ºæ‰§è¡Œkern_initå»ºç«‹ä¸€ä¸ªè‰¯å¥½çš„Cè¯­è¨€è¿è¡Œç¯å¢ƒï¼ˆè®¾ç½®å †æ ˆï¼‰ï¼Œ
+# è€Œä¸”ä¸´æ—¶å»ºç«‹äº†ä¸€ä¸ªæ®µæ˜ å°„å…³ç³»ï¼Œä¸ºä¹‹åå»ºç«‹åˆ†é¡µæœºåˆ¶çš„è¿‡ç¨‹åšä¸€ä¸ªå‡†å¤‡ï¼ˆç»†èŠ‚åœ¨3.5å°èŠ‚æœ‰è¿›ä¸€æ­¥é˜è¿°ï¼‰
 
-# Ö®Ç°Ö±½Óµ÷ÓÃinit.cµÄkern_init£¬ÏÖÔÚÏÈµ½entry.S
-# ²Î¿¼kernel.ldÀïÃæµÄENTRY(kern_entry)
+# ä¹‹å‰ç›´æ¥è°ƒç”¨init.cçš„kern_initï¼Œç°åœ¨å…ˆåˆ°entry.S
+# å‚è€ƒkernel.ldé‡Œé¢çš„ENTRY(kern_entry)
 
 # (2 << 3) | 0 = 16 = 0x10 = 00010000 = 00000000 00010|0|00 -> Index = 2, GDT, RPL = 0 
 # #define KERNEL_DS    ((GD_KDATA) | DPL_KERNEL)
 .text
 .globl kern_entry
 kern_entry:
-    # µØÖ·Ó³ÉäµÄ¹ı¶É½×¶Î
-    # ÔÚbootasm.SÀïÃæÒÑ¾­ÉèÖÃ¹ıgdtÁË£¬ÕâÀïÖØĞÂÉèÖÃÒ»ÏÂ£¬ÖØ×°Ó³ÉäÎïÀíÄÚ´æ
-    # ĞéµØÖ·µÄ 0~4G = ÏßĞÔµØÖ·&ÎïÀíµØÖ·-KERNBASE ~ 4G-KERNBASE 
+    # åœ°å€æ˜ å°„çš„è¿‡æ¸¡é˜¶æ®µ
+    # åœ¨bootasm.Sé‡Œé¢å·²ç»è®¾ç½®è¿‡gdtäº†ï¼Œè¿™é‡Œé‡æ–°è®¾ç½®ä¸€ä¸‹ï¼Œé‡è£…æ˜ å°„ç‰©ç†å†…å­˜
+    # è™šåœ°å€çš„ 0~4G = çº¿æ€§åœ°å€&ç‰©ç†åœ°å€-KERNBASE ~ 4G-KERNBASE 
     # reload temperate gdt (second time) to remap all physical memory
     # virtual_addr 0~4G=linear_addr&physical_addr -KERNBASE~4G-KERNBASE 
     lgdt REALLOC(__gdtdesc)     # REALLOC(x) (x - KERNBASE)
-    movl $KERNEL_DS, %eax       # ¿ªÊ¼ÉèÖÃÊı¾İ¶Î
+    movl $KERNEL_DS, %eax       # å¼€å§‹è®¾ç½®æ•°æ®æ®µ
     movw %ax, %ds
     movw %ax, %es
     movw %ax, %ss
 
-    ljmp $KERNEL_CS, $relocated    # ljmp $section,$offset¼´Ìø×ªµ½section:offsetµØÖ·¡£
+    ljmp $KERNEL_CS, $relocated    # ljmp $section,$offsetå³è·³è½¬åˆ°section:offsetåœ°å€ã€‚
 
 relocated:
 
     # set ebp, esp
-    movl $0x0, %ebp     # ebp ÉèÖÃÎª0£¬¼´Õ»»ùÖ·¼Ä´æÆ÷ÉèÖÃÎª0 
+    movl $0x0, %ebp     # ebp è®¾ç½®ä¸º0ï¼Œå³æ ˆåŸºå€å¯„å­˜å™¨è®¾ç½®ä¸º0 
     # the kernel stack region is from bootstack -- bootstacktop,
     # the kernel stack size is KSTACKSIZE (8KB)defined in memlayout.h
     movl $bootstacktop, %esp

@@ -76,9 +76,9 @@ pte_t * const vpt = (pte_t *)VPT;
 pde_t * const vpd = (pde_t *)PGADDR(PDX(VPT), PDX(VPT), 0);
 
 /**
- * ×îÖÕ
- * vpt Ò³Ä¿Â¼±íÖĞµÚÒ»¸öÄ¿Â¼±íÏîÖ¸ÏòµÄÒ³±íµÄÆğÊ¼ĞéµØÖ·
- * vpd Ò³Ä¿Â¼±íµÄÆğÊ¼ĞéµØÖ·
+ * æœ€ç»ˆ
+ * vpt é¡µç›®å½•è¡¨ä¸­ç¬¬ä¸€ä¸ªç›®å½•è¡¨é¡¹æŒ‡å‘çš„é¡µè¡¨çš„èµ·å§‹è™šåœ°å€
+ * vpd é¡µç›®å½•è¡¨çš„èµ·å§‹è™šåœ°å€
  * vpt = 1111101011 0000000000 000000000000
  * vpd = 1111101011 1111101011 000000000000
  * 
@@ -220,15 +220,15 @@ nr_free_pages(void) {
     return ret;
 }
 
-// ³õÊ¼»¯ÎïÀíÄÚ´æ
+// åˆå§‹åŒ–ç‰©ç†å†…å­˜
 /* pmm_init - initialize the physical memory management */
 static void
 page_init(void) {
     // KERNBASE = 0xC0000000
-    // ÔÚ½¨Á¢ÁËÁÙÊ±µÄµØÖ·Ó³Éä»úÖÆºó£¬Ô­0x8000Ïàµ±ÓÚ0x8000 + 0xC0000000
-    // ËùÒÔÒª´Ó0x8000 + 0xC0000000¿ªÊ¼À´ÕÒe820mapµÄÊı¾İ
+    // åœ¨å»ºç«‹äº†ä¸´æ—¶çš„åœ°å€æ˜ å°„æœºåˆ¶åï¼ŒåŸ0x8000ç›¸å½“äº0x8000 + 0xC0000000
+    // æ‰€ä»¥è¦ä»0x8000 + 0xC0000000å¼€å§‹æ¥æ‰¾e820mapçš„æ•°æ®
     struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
-    // ×î´óÎïÀíÄÚ´æ
+    // æœ€å¤§ç‰©ç†å†…å­˜
     uint64_t maxpa = 0;
 
     cprintf("e820map:\n");
@@ -243,7 +243,7 @@ page_init(void) {
             }
         }
     }
-    // Í¨¹ıKMEMSIZEÏŞÖÆ×î´óÄÚ´æÎª896M
+    // é€šè¿‡KMEMSIZEé™åˆ¶æœ€å¤§å†…å­˜ä¸º896M
     if (maxpa > KMEMSIZE) {
         maxpa = KMEMSIZE;
     }
@@ -253,19 +253,19 @@ page_init(void) {
     npage = maxpa / PGSIZE;
     pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);
 
-    // ÏÈ°ÑpagesÉèÖÃÎªreserved£¬ºóÃæÔÙ°ÑtypeÎªE820_ARM£¨1£©µÄÉèÖÃÎª¿ÉÓÃ
+    // å…ˆæŠŠpagesè®¾ç½®ä¸ºreservedï¼Œåé¢å†æŠŠtypeä¸ºE820_ARMï¼ˆ1ï¼‰çš„è®¾ç½®ä¸ºå¯ç”¨
     for (i = 0; i < npage; i ++) {
         SetPageReserved(pages + i);
     }
 
-    // ¿ÕÏĞµØÖ·µÄÆğÊ¼µØÖ·
+    // ç©ºé—²åœ°å€çš„èµ·å§‹åœ°å€
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
-    // Ñ­»·´¦ÀíÇ°ÃæÉ¨Ãè³öÀ´µÄ¼¸¿éÄÚÈİÇøÓò
+    // å¾ªç¯å¤„ç†å‰é¢æ‰«æå‡ºæ¥çš„å‡ å—å†…å®¹åŒºåŸŸ
     for (i = 0; i < memmap->nr_map; i ++) {
-        // ÄÚÈİÇøÓòµÄbegin-->end
+        // å†…å®¹åŒºåŸŸçš„begin-->end
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
-        // Èç¹ûÄÚ´æÀàĞÍÊÇE820_ARM£¨¿ÉÓÃ£©£¬±È½Ï
+        // å¦‚æœå†…å­˜ç±»å‹æ˜¯E820_ARMï¼ˆå¯ç”¨ï¼‰ï¼Œæ¯”è¾ƒ
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
@@ -274,11 +274,11 @@ page_init(void) {
                 end = KMEMSIZE;
             }
 
-            // ¶ÔÃ¿Ò»¸öÉ¨³öÀ´µÄÄÚ´æÇøÓò£¬Í¨¹ı beginÏòÉÏÈ¡Õû¶ÔÆë£¬endÏòÏÂÈ¡Õû¶ÔÆë
+            // å¯¹æ¯ä¸€ä¸ªæ‰«å‡ºæ¥çš„å†…å­˜åŒºåŸŸï¼Œé€šè¿‡ beginå‘ä¸Šå–æ•´å¯¹é½ï¼Œendå‘ä¸‹å–æ•´å¯¹é½
             if (begin < end) {
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
-                // ´ËÄÚ´æÇøÓòµÄpageÊıÁ¿£ºn (end - begin) / PGSIZE
+                // æ­¤å†…å­˜åŒºåŸŸçš„pageæ•°é‡ï¼šn (end - begin) / PGSIZE
                 // pa2page:
                 // static inline struct Page *
                 // pa2page(uintptr_t pa) {
@@ -287,11 +287,11 @@ page_init(void) {
                 //     }
                 //     return &pages[PPN(pa)];
                 // }
-                // (begin >> 12)(¸ù¾İÆğÊ¼µØÖ·µÃµ½µÄÒ³Êı) ±ØĞèÒªĞ¡ÓÚ n ---->Ïàµ±ÓÚÊÇ³ıÒÔ4K£¬ÒòÎª2^12=4096=1page´óĞ¡
-                // &pages[PPN(pa)];  PPN(pa) ÁíÒ»¸ö½Ç¶ÈÀ´½²¾ÍÊÇpagesÊı×éÀïµÄindex
-                // pa2page(begin) Í¨¹ıÕâÖÖ·½Ê½£¬¿ÉÒÔ°ÑÒ»¸öphysical address±ä³Épage
+                // (begin >> 12)(æ ¹æ®èµ·å§‹åœ°å€å¾—åˆ°çš„é¡µæ•°) å¿…éœ€è¦å°äº n ---->ç›¸å½“äºæ˜¯é™¤ä»¥4Kï¼Œå› ä¸º2^12=4096=1pageå¤§å°
+                // &pages[PPN(pa)];  PPN(pa) å¦ä¸€ä¸ªè§’åº¦æ¥è®²å°±æ˜¯pagesæ•°ç»„é‡Œçš„index
+                // pa2page(begin) é€šè¿‡è¿™ç§æ–¹å¼ï¼Œå¯ä»¥æŠŠä¸€ä¸ªphysical addresså˜æˆpage
                 if (begin < end) {
-                    // ½Ó×Å¿ªÊ¼³õÊ¼»¯£¨memory map -> page£©
+                    // æ¥ç€å¼€å§‹åˆå§‹åŒ–ï¼ˆmemory map -> pageï¼‰
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
             }
@@ -442,8 +442,8 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     return NULL;          // (8) return page table entry
 #endif
     // typedef uintptr_t pde_t
-    // PDX ×ó±ß10Î»(PDE£©
-    // PTX ÖĞ¼ä10Î»(PTE)
+    // PDX å·¦è¾¹10ä½(PDEï¼‰
+    // PTX ä¸­é—´10ä½(PTE)
     // KADDR - takes a physical address and returns the corresponding kernel virtual address
     // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF) address in page table or page directory entry
     // #define PDE_ADDR(pde)   PTE_ADDR(pde) address in page table or page directory entry
@@ -453,18 +453,18 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
 
     // pgdir:  the kernel virtual base address of PDT
     pdep = &pgdir[pde];
-    // ·ÇpresentÒ²¾ÍÊÇ²»´æÔÚÕâÑùµÄpage£¨È±Ò³£©£¬ĞèÒª·ÖÅäÒ³
+    // épresentä¹Ÿå°±æ˜¯ä¸å­˜åœ¨è¿™æ ·çš„pageï¼ˆç¼ºé¡µï¼‰ï¼Œéœ€è¦åˆ†é…é¡µ
     if (!(*pdep & PTE_P)) {
         struct Page *p;
-        // Èç¹û²»ĞèÒª·ÖÅä»òÕß·ÖÅäµÄÒ³ÎªNULL
+        // å¦‚æœä¸éœ€è¦åˆ†é…æˆ–è€…åˆ†é…çš„é¡µä¸ºNULL
         if (!create || (p = alloc_page()) == NULL) {
             return NULL;
         }
         set_page_ref(p, 1);
-        // page tableµÄË÷ÒıÖµ£¨PTE)
+        // page tableçš„ç´¢å¼•å€¼ï¼ˆPTE)
         // pages: virtual address of physicall page array
-        // page - pagesÏàµ±ÓÚpagesÊı×éµÄË÷ÒıÖµ
-        // µÃµ½Ïà¶ÔpagesÊı×éÆğÊ¼µØÖ·µÄÆ«ÒÆÁ¿£¬ÔÙ×óÒÆ12Î»£¬Ò²¾ÍÊÇ±ä³Épage tableµÄË÷ÒıÖµ
+        // page - pagesç›¸å½“äºpagesæ•°ç»„çš„ç´¢å¼•å€¼
+        // å¾—åˆ°ç›¸å¯¹pagesæ•°ç»„èµ·å§‹åœ°å€çš„åç§»é‡ï¼Œå†å·¦ç§»12ä½ï¼Œä¹Ÿå°±æ˜¯å˜æˆpage tableçš„ç´¢å¼•å€¼
         uintptr_t pti = page2pa(p);
 
         // KADDR: takes a physical address and returns the corresponding kernel virtual address.
@@ -472,30 +472,30 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
         * KADDR - takes a physical address and returns the corresponding kernel virtual
         * address. It panics if you pass an invalid physical address.
         * 
-        * PPN(__m_pa) = __m_pa >> 12, Ò²¾ÍÊÇÔÚpagesÊı×éÖĞµÄË÷Òı 
+        * PPN(__m_pa) = __m_pa >> 12, ä¹Ÿå°±æ˜¯åœ¨pagesæ•°ç»„ä¸­çš„ç´¢å¼• 
         * pa >> 12 + 0xC0000000
         * */
         memset(KADDR(pti), 0, sizeof(struct Page));
 
-        // Ïàµ±ÓÚ°ÑÎïÀíµØÖ·¸øÁËpdep
+        // ç›¸å½“äºæŠŠç‰©ç†åœ°å€ç»™äº†pdep
         // pdep: page directory entry point
         *pdep = pti | PTE_P | PTE_W | PTE_U;
     }
 
-    // ÏÈÕÒµ½pde address
+    // å…ˆæ‰¾åˆ°pde address
     // address in page table or page directory entry
     // 0xFFF = 111111111111
     // ~0xFFF = 1111111111 1111111111 000000000000
     // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF)
     // #define PDE_ADDR(pde)   PTE_ADDR(pde)
     uintptr_t pa = PDE_ADDR(*pdep);
-    // ÔÙ×ª»»ÎªĞéÄâµØÖ·£¨ÏßĞÔµØÖ·£©
+    // å†è½¬æ¢ä¸ºè™šæ‹Ÿåœ°å€ï¼ˆçº¿æ€§åœ°å€ï¼‰
     // KADDR = pa >> 12 + 0xC0000000
     // 0xC0000000 = 11000000 00000000 00000000 00000000
     pte_t *pde_kva = KADDR(pa);
     
-    // ĞèÒªÓ³ÉäµÄÏßĞÔµØÖ·
-    // ÖĞ¼ä10Î»(PTE)
+    // éœ€è¦æ˜ å°„çš„çº¿æ€§åœ°å€
+    // ä¸­é—´10ä½(PTE)
     uintptr_t need_to_map_ptx = PTX(la);
     return &pde_kva[need_to_map_ptx];
 }
