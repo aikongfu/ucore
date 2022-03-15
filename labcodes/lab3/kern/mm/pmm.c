@@ -212,6 +212,7 @@ size_t
 nr_free_pages(void) {
     size_t ret;
     bool intr_flag;
+    // #define local_intr_save(x)      do { x = __intr_save(); } while (0)
     local_intr_save(intr_flag);
     {
         ret = pmm_manager->nr_free_pages();

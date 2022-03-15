@@ -38,8 +38,8 @@ static struct pseudodesc idt_pd = {
 void
 idt_init(void) {
      /* LAB1 YOUR CODE : STEP 2 */
-     /* (1) Where are the entry addrs of each Interrupt Service Routine (ISR)?
-      *     All ISR's entry addrs are stored in __vectors. where is uintptr_t __vectors[] ?
+     /* (1) Where are the entry addrs
+      *     All ISR's entry addrs are stored in __vectors. where is uintptr_t __v of each Interrupt Service Routine (ISR)?ectors[] ?
       *     __vectors[] is in kern/trap/vector.S which is produced by tools/vector.c
       *     (try "make" command in lab1, then you will find vector.S in kern/trap DIR)
       *     You can use  "extern uintptr_t __vectors[];" to define this extern variable which will be used later.
@@ -49,9 +49,9 @@ idt_init(void) {
       *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
-  // 根据提示，首先要__vectors，extern是外部变量声明，__vectors是通过tools/vector.c生成的vectors.S里面定义的
+  // 根据提示，首先要声明__vectors，extern是外部变量声明，__vectors是通过tools/vector.c生成的vectors.S里面定义的
   extern uintptr_t __vectors[];
-  // 对2562个中断向量表初始化
+  // 对256个中断向量表初始化
   int i;
   for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++)
   {
@@ -61,16 +61,16 @@ idt_init(void) {
     // offset设置为__vectors对应的内容
     // DPL设置为0
     SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
-	  // 再把从用户态切换到内核态使用的Segment Descriptor改一下
-  // 需要注意的是，我们使用的segment都是一样的，都是GD_KTEXT
-  // 而有一点不同的是这里的DPL是DPL_USER，即从user->kernel时，需要的该段的权限级别
-  // 因为Privilege Check需要满足：DPL >= max {CPL, RPL} 
-  // 所以如果不单独改这个会造成Privilege Check失败，无法正确处理user->kernel的流程
-  SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
+	// 再把从用户态切换到内核态使用的Segment Descriptor改一下
+    // 需要注意的是，我们使用的segment都是一样的，都是GD_KTEXT
+    // 而有一点不同的是这里的DPL是DPL_USER，即从user->kernel时，需要的该段的权限级别
+    // 因为Privilege Check需要满足：DPL >= max {CPL, RPL} 
+    // 所以如果不单独改这个会造成Privilege Check失败，无法正确处理user->kernel的流程
+    SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
 
-  // 通过lidt加载
-  lidt(&idt_pd);
-  }
+    // 通过lidt加载
+    lidt(&idt_pd);
+    }
 }
 
 static const char *
