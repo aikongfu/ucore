@@ -24,3 +24,5 @@ disk0
 
 learn_list.o.dSYM
 .vscode
+
+*.DS_Store
