@@ -111,14 +111,7 @@ pa2page(uintptr_t pa) {
     return &pages[PPN(pa)];
 }
 
-// #define KADDR(pa) ({                                                    \
-//            uintptr_t __m_pa = (pa);                                    \
-//            size_t __m_ppn = PPN(__m_pa);                               \
-//            if (__m_ppn >= npage) {                                     \
-//                panic("KADDR called with invalid pa %08lx", __m_pa);    \
-//            }                                                           \
-//            (void *) (__m_pa + KERNBASE);                               \
-//        })
+// ((page - pages) << 12) >> 12 + KERNBASE, 
 static inline void *
 page2kva(struct Page *page) {
     return KADDR(page2pa(page));
