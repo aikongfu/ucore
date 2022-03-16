@@ -49,7 +49,10 @@ kern_init(void) {
     cprintf("%s\n\n", "idt_init");
     vmm_init();                 // init virtual memory management
 
+    // ide 初始化
     ide_init();                 // init ide devices
+
+    // swap初始化
     swap_init();                // init swap
     // 初始化时钟中断
     clock_init();               // init clock interrupt
