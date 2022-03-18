@@ -24,7 +24,7 @@
  *              a general list struct to a special struct (such as struct page). You can find some MACRO:
  *              le2page (in memlayout.h), (in future labs: le2vma (in vmm.h), le2proc (in proc.h),etc.
  */
-
+// FIFO可交换页，按照时间顺序排序
 list_entry_t pra_list_head;
 /*
  * (2) _fifo_init_mm: init pra_list_head and let  mm->sm_priv point to the addr of pra_list_head.

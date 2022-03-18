@@ -189,6 +189,8 @@ check_swap(void)
      cprintf("BEGIN check_swap: count %d, total %d\n",count,total);
      
      //now we set the phy pages env     
+     // the control struct for a set of vma using the same PDT
+     // 使用相同PDT的vma集合
      struct mm_struct *mm = mm_create();
      assert(mm != NULL);
 
@@ -200,6 +202,11 @@ check_swap(void)
      pde_t *pgdir = mm->pgdir = boot_pgdir;
      assert(pgdir[0] == 0);
 
+     // vma_create - alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
+     // BEING_CHECK_VALID_VADDR 0X1000
+     // CHECK_VALID_VADDR (CHECK_VALID_VIR_PAGE_NUM+1)*0x1000 = 6 * 0x1000
+     // VM_WRITE | VM_READ (可读，可写)
+     // 0x1000 - 0x5000
      struct vma_struct *vma = vma_create(BEING_CHECK_VALID_VADDR, CHECK_VALID_VADDR, VM_WRITE | VM_READ);
      assert(vma != NULL);
 

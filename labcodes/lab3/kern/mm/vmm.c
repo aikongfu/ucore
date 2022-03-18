@@ -56,6 +56,14 @@ mm_create(void) {
 }
 
 // vma_create - alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
+/**
+ * @brief alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
+ *              分配一块内存给新创建的vma_struct，设置其vm_start, vm_end, vm_flags
+ * @param vm_start 
+ * @param vm_end 
+ * @param vm_flags 权限等（如读、写） 
+ * @return struct vma_struct*  the virtual continuous memory area(vma), [vm_start, vm_end),  addr belong to a vma means  vma.vm_start<= addr <vma.vm_end 
+ */
 struct vma_struct *
 vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags) {
     struct vma_struct *vma = kmalloc(sizeof(struct vma_struct));
