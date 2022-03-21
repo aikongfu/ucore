@@ -384,59 +384,47 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
     *   mm->pgdir : the PDT of these vma
     *
     */
-
-    // 1.ptep
+   
+    // 根据get_pte来获取pte如果不存在，则分配一个新的
     ptep = get_pte(mm->pgdir, addr, 1);
     if (ptep == NULL) {
         cprintf("get_pte in do_pgfault failed\n");
         goto failed;
     }
     struct Page *p;
+    // 如果对应的物理页不存在，分配一个新的页，且把物理地址和逻辑地址映射 
     if (*ptep == 0) {
-        struct Page *p = pgdir_alloc_page(mm->pgdir, addr, perm);
+        p = pgdir_alloc_page(mm->pgdir, addr, perm);
         if (p == NULL) {
-            cprintf("pgdir_alloc_page in do_pgfault failed\n");
+            cprintf("alloc_page in do_pgfault failed\n");
             goto failed;
         }
-        // set_page_ref(p, 1);
-        // // page table的索引值（PTE)
-        // // pages: virtual address of physicall page array
-        // // page - pages相当于pages数组的索引值
-        // // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
-        // uintptr_t pti = page2pa(p);
-
-        // // KADDR: takes a physical address and returns the corresponding kernel virtual address.
-        // /* *
-        // * KADDR - takes a physical address and returns the corresponding kernel virtual
-        // * address. It panics if you pass an invalid physical address.
-        // * 
-        // * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
-        // * pa >> 12 + 0xC0000000
-        // * */
-        // memset(KADDR(pti), 0, sizeof(struct Page));
-
-        // // 相当于把物理地址给了pdep
-        // // pdep: page directory entry point
-        // uintptr_t *pdep = pti | PTE_P | PTE_W | PTE_U;
     } else {
-        if (swap_init_ok) {
+        // 如果不全为0，则可能被交换到了swap磁盘中
+        if(swap_init_ok) {
             struct Page *page=NULL;
-            ret = swap_in(mm, addr, &page);
-            if (ret != 0) {
+            int swapIn;
+            swapIn = swap_in(mm, addr, &page);
+            if (swapIn != 0) {
                 cprintf("swap_in in do_pgfault failed\n");
+                goto failed;
             }
 
-            page_insert(boot_pgdir, p, addr, perm);
+            if (page_insert(mm->pgdir, page, addr, perm) != 0) {
+                cprintf("page_insert in do_pgfault failed\n");
+                goto failed;
+            }
 
-            swap_map_swappable(mm, addr, p, 1);
-
+            swap_map_swappable(mm, addr, page, 1);
             page->pra_vaddr = addr;
         } else {
-            cprintf("no swap_init_ok but ptep is %x, failed\n",*ptep);
+            cprintf("no swap_init_ok, but ptep is %x, failed\n", *ptep);
             goto failed;
         }
     }
-    ret = 0;
+
+
+   ret = 0;
 #if 0
     /*LAB3 EXERCISE 1: YOUR CODE*/
     ptep = ???              //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.

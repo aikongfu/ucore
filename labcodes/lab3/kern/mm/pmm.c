@@ -467,7 +467,25 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
         // page - pages相当于pages数组的索引值
         // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
         uintptr_t pti = page2pa(p);
+        // // page table的索引值（PTE)
+        // // pages: virtual address of physicall page array
+        // // page - pages相当于pages数组的索引值
+        // // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
+        // uintptr_t pti = page2pa(p);
 
+        // // KADDR: takes a physical address and returns the corresponding kernel virtual address.
+        // /* *
+        // * KADDR - takes a physical address and returns the corresponding kernel virtual
+        // * address. It panics if you pass an invalid physical address.
+        // * 
+        // * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
+        // * pa >> 12 + 0xC0000000
+        // * */
+        // memset(KADDR(pti), 0, sizeof(struct Page));
+
+        // // 相当于把物理地址给了pdep
+        // // pdep: page directory entry point
+        // uintptr_t *pdep = pti | PTE_P | PTE_W | PTE_U;
         // KADDR: takes a physical address and returns the corresponding kernel virtual address.
         /* *
         * KADDR - takes a physical address and returns the corresponding kernel virtual
