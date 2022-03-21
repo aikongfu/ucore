@@ -309,10 +309,20 @@ volatile unsigned int pgfault_num=0;
  *         -- The U/S flag (bit 2) indicates whether the processor was executing at user mode (1)
  *            or supervisor mode (0) at the time of the exception.
  */
+
 int
 do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
+    // 页访问异常错误码有32位。
+    // 位0为１表示对应物理页不存在；
+    // 位１为１表示写异常（比如写了只读页；位２为１表示访问权限异常（比如用户态程序访问内核空间的数据）
+    
+    // CR2是页故障线性地址寄存器，保存最后一次出现页故障的全32位线性地址。
+    // CR2用于发生页异常时报告出错信息。当发生页异常时，处理器把引起页异常的线性地址保存在CR2中。
+    // 操作系统中对应的中断服务例程可以检查CR2的内容，从而查出线性地址空间中的哪个页引起本次异常。
     int ret = -E_INVAL;
+
     //try to find a vma which include addr
+    // 根据addr从vma中查找对应的vma_struct
     struct vma_struct *vma = find_vma(mm, addr);
 
     pgfault_num++;
@@ -322,6 +332,8 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
         goto failed;
     }
     //check the error_code
+    // 与 00000011
+    // 
     switch (error_code & 3) {
     default:
             /* error code flag : default is 3 ( W/R=1, P=1): write, present */
@@ -372,6 +384,59 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
     *   mm->pgdir : the PDT of these vma
     *
     */
+
+    // 1.ptep
+    ptep = get_pte(mm->pgdir, addr, 1);
+    if (ptep == NULL) {
+        cprintf("get_pte in do_pgfault failed\n");
+        goto failed;
+    }
+    struct Page *p;
+    if (*ptep == 0) {
+        struct Page *p = pgdir_alloc_page(mm->pgdir, addr, perm);
+        if (p == NULL) {
+            cprintf("pgdir_alloc_page in do_pgfault failed\n");
+            goto failed;
+        }
+        // set_page_ref(p, 1);
+        // // page table的索引值（PTE)
+        // // pages: virtual address of physicall page array
+        // // page - pages相当于pages数组的索引值
+        // // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
+        // uintptr_t pti = page2pa(p);
+
+        // // KADDR: takes a physical address and returns the corresponding kernel virtual address.
+        // /* *
+        // * KADDR - takes a physical address and returns the corresponding kernel virtual
+        // * address. It panics if you pass an invalid physical address.
+        // * 
+        // * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
+        // * pa >> 12 + 0xC0000000
+        // * */
+        // memset(KADDR(pti), 0, sizeof(struct Page));
+
+        // // 相当于把物理地址给了pdep
+        // // pdep: page directory entry point
+        // uintptr_t *pdep = pti | PTE_P | PTE_W | PTE_U;
+    } else {
+        if (swap_init_ok) {
+            struct Page *page=NULL;
+            ret = swap_in(mm, addr, &page);
+            if (ret != 0) {
+                cprintf("swap_in in do_pgfault failed\n");
+            }
+
+            page_insert(boot_pgdir, p, addr, perm);
+
+            swap_map_swappable(mm, addr, p, 1);
+
+            page->pra_vaddr = addr;
+        } else {
+            cprintf("no swap_init_ok but ptep is %x, failed\n",*ptep);
+            goto failed;
+        }
+    }
+    ret = 0;
 #if 0
     /*LAB3 EXERCISE 1: YOUR CODE*/
     ptep = ???              //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.

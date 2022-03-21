@@ -210,6 +210,7 @@ check_swap(void)
      struct vma_struct *vma = vma_create(BEING_CHECK_VALID_VADDR, CHECK_VALID_VADDR, VM_WRITE | VM_READ);
      assert(vma != NULL);
 
+     // insert_vma_struct -insert vma in mm's list link
      insert_vma_struct(mm, vma);
 
      //setup the temp Page Table vaddr 0~4MB

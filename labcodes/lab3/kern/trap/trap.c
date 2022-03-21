@@ -253,6 +253,14 @@ pgfault_handler(struct trapframe *tf) {
     extern struct mm_struct *check_mm_struct;
     print_pgfault(tf);
     if (check_mm_struct != NULL) {
+
+        // 页访问异常错误码有32位。
+        // 位0为１表示对应物理页不存在；
+        // 位１为１表示写异常（比如写了只读页；位２为１表示访问权限异常（比如用户态程序访问内核空间的数据）
+        
+        // CR2是页故障线性地址寄存器，保存最后一次出现页故障的全32位线性地址。
+        // CR2用于发生页异常时报告出错信息。当发生页异常时，处理器把引起页异常的线性地址保存在CR2中。
+        // 操作系统中对应的中断服务例程可以检查CR2的内容，从而查出线性地址空间中的哪个页引起本次异常。
         return do_pgfault(check_mm_struct, tf->tf_err, rcr2());
     }
     panic("unhandled page fault.\n");
