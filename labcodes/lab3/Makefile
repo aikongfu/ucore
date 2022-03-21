@@ -173,20 +173,6 @@ $(kernel): $(KOBJS)
 
 $(call create_target,kernel)
 
-
-# create kernel_nopage target
-kernel_nopage = $(call totarget,kernel_nopage)
-
-$(kernel_nopage): tools/kernel_nopage.ld
-
-$(kernel_nopage): $(KOBJS)
-	@echo + ld $@
-	$(V)$(LD) $(LDFLAGS) -T tools/kernel_nopage.ld -o $@ $(KOBJS)
-	@$(OBJDUMP) -S $@ > $(call asmfile,kernel_nopage)
-	@$(OBJDUMP) -t $@ | $(SED) '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $(call symfile,kernel_nopage)
-
-$(call create_target,kernel)
-
 # -------------------------------------------------------------------
 
 # create bootblock
