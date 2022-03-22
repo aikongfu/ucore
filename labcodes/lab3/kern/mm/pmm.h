@@ -91,18 +91,29 @@ page2ppn(struct Page *page) {
     return page - pages;
 }
 
-// pages: virtual address of physicall page array
-// page - pages相当于pages数组的索引值
-// 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
+/**
+ * pages: virtual address of physicall page array
+ * page - pages相当于pages数组的索引值
+ * 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
+ * @brief (page - pages) << 12
+ * 
+ * @param page 
+ * @return uintptr_t 
+ */
 static inline uintptr_t
 page2pa(struct Page *page) {
     return page2ppn(page) << PGSHIFT;
 }
 
-// page number field of address
-// #define PPN(la) (((uintptr_t)(la)) >> PTXSHIFT)
-// PTXSHIFT = 12
-// 
+/**
+ * page number field of address
+ * #define PPN(la) (((uintptr_t)(la)) >> PTXSHIFT)
+ * PTXSHIFT = 12
+ * @brief page number field of address: &pages[pa >> 12]
+ * 
+ * @param pa 
+ * @return struct Page* 
+ */
 static inline struct Page *
 pa2page(uintptr_t pa) {
     if (PPN(pa) >= npage) {
@@ -122,6 +133,17 @@ kva2page(void *kva) {
     return pa2page(PADDR(kva));
 }
 
+/**
+ * #define PTE_ADDR(pte) ((uintptr_t)(pte) & ~0xFFF)
+ * (pte) & 11111111111111111111 000000000000 
+ * &pages[PPN(pa)]
+ * &pages[((pte) & 11111111111111111111 000000000000) >> 12]
+ * 
+ * @brief TE->Page 相当于  &pages[((pte) & 11111111111111111111 000000000000) >> 12]
+ * 
+ * @param pte 
+ * @return struct Page* 
+ */
 static inline struct Page *
 pte2page(pte_t pte) {
     if (!(pte & PTE_P)) {
