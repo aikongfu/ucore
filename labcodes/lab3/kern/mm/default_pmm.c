@@ -149,9 +149,10 @@ default_free_pages(struct Page *base, size_t n) {
     
     // 先做一些处理（设置flags, ref, 页链表头的property等）
     assert(n > 0);
+    assert(PageReserved(base));
     struct Page *p = base;
     for (; p != base + n; p++) {
-        assert(!PageReserved(p) && !PageProperty(p));
+        // assert(!PageReserved(p) && !PageProperty(p));
         p->flags = 0;
         set_page_ref(p, 0);
     }

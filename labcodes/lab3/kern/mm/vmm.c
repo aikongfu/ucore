@@ -404,12 +404,14 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
         if(swap_init_ok) {
             struct Page *page=NULL;
             int swapIn;
+            // 从磁盘中换出
             swapIn = swap_in(mm, addr, &page);
             if (swapIn != 0) {
                 cprintf("swap_in in do_pgfault failed\n");
                 goto failed;
             }
 
+            // build the map of phy addr of an Page with the linear addr la
             if (page_insert(mm->pgdir, page, addr, perm) != 0) {
                 cprintf("page_insert in do_pgfault failed\n");
                 goto failed;

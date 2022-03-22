@@ -87,6 +87,8 @@ swap_out(struct mm_struct *mm, int n, int in_tick)
           //struct Page **ptr_page=NULL;
           struct Page *page;
           // cprintf("i %d, SWAP: call swap_out_victim\n",i);
+          
+          // Try to swap out a page, return then victim
           int r = sm->swap_out_victim(mm, &page, in_tick);
           if (r != 0) {
                     cprintf("i %d, swap_out: call swap_out_victim failed\n",i);
@@ -116,6 +118,16 @@ swap_out(struct mm_struct *mm, int n, int in_tick)
      return i;
 }
 
+/**
+ * 
+ * 
+ * @brief 根据mm和addr，把数据从磁盘中换出到page
+ * 
+ * @param mm the control struct for a set of vma using the same PDT
+ * @param addr linear address
+ * @param ptr_result 换出到的page指针
+ * @return int 
+ */
 int
 swap_in(struct mm_struct *mm, uintptr_t addr, struct Page **ptr_result)
 {
