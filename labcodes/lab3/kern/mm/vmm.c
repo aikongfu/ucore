@@ -172,8 +172,11 @@ check_vmm(void) {
     size_t nr_free_pages_store = nr_free_pages();
     
     check_vma_struct();
+    cprintf("check_vma_struct end\n");
+    
     check_pgfault();
-
+    cprintf("check_pgfault end\n");
+    
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vmm() succeeded.\n");
@@ -247,6 +250,8 @@ struct mm_struct *check_mm_struct;
 static void
 check_pgfault(void) {
     size_t nr_free_pages_store = nr_free_pages();
+    cprintf("check_pgfault: after size_t nr_free_pages_store = nr_free_pages();\n");\
+    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
     check_mm_struct = mm_create();
     assert(check_mm_struct != NULL);
@@ -272,8 +277,9 @@ check_pgfault(void) {
         sum -= *(char *)(addr + i);
     }
     assert(sum == 0);
-
+    cprintf("pgdir = [%p], addr = [%d]\n, ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
+    cprintf("pgdir[0] = [%d]\n", pgdir[0]);
     free_page(pde2page(pgdir[0]));
     pgdir[0] = 0;
 
@@ -281,6 +287,7 @@ check_pgfault(void) {
     mm_destroy(mm);
     check_mm_struct = NULL;
 
+    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_pgfault() succeeded!\n");
@@ -412,10 +419,11 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
             }
 
             // build the map of phy addr of an Page with the linear addr la
-            if (page_insert(mm->pgdir, page, addr, perm) != 0) {
-                cprintf("page_insert in do_pgfault failed\n");
-                goto failed;
-            }
+            page_insert(mm->pgdir, page, addr, perm);
+            // if (page_insert(mm->pgdir, page, addr, perm) != 0) {
+            //     cprintf("page_insert in do_pgfault failed\n");
+            //     goto failed;
+            // }
 
             swap_map_swappable(mm, addr, page, 1);
             page->pra_vaddr = addr;

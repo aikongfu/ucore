@@ -42,12 +42,13 @@ endif
 
 # define compiler and flags
 
-HOSTCC		:= gcc
+HOSTCC		:= gcc-5
 HOSTCFLAGS	:= -g -Wall -O2
 
 GDB		:= $(GCCPREFIX)gdb
 
-CC		:= $(GCCPREFIX)gcc
+#CC		:= $(GCCPREFIX)gcc
+CC		:= gcc-5
 CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gstabs -nostdinc $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 CTYPE	:= c S
