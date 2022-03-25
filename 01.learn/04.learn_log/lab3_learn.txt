@@ -1,0 +1,305 @@
+(THU.CST) os is loading ...
+
+Special kernel symbols:
+  entry  0xc010002a (phys)
+  etext  0xc01092cf (phys)
+  edata  0xc010ea70 (phys)
+  end    0xc110fc04 (phys)
+Kernel executable memory footprint: 16447KB
+ebp = 0xc010df48         eip = 0xc0100b00
+args:0xc010df50 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc0100aff --
+ebp = 0xc010df58         eip = 0xc010010c
+args:0xc010df60 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc010010b --
+ebp = 0xc010df78         eip = 0xc010012e
+args:0xc010df80 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc010012d --
+ebp = 0xc010df98         eip = 0xc010014b
+args:0xc010dfa0 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc010014a --
+ebp = 0xc010dfb8         eip = 0xc010016c
+args:0xc010dfc0 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc010016b --
+ebp = 0xc010dfd8         eip = 0xc010007a
+args:0xc010dfe0 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc0100079 --
+ebp = 0xc010dff8         eip = 0xc0100028
+args:0xc010e000 0xc010df7c      0x00000020      0xc0108db4
+    <unknow>: -- 0xc0100027 --
+grade_backtrace
+
+memory management: default_pmm_manager
+e820map:
+  memory: 0009fc00, [00000000, 0009fbff], type = 1.
+  memory: 00000400, [0009fc00, 0009ffff], type = 2.
+  memory: 00010000, [000f0000, 000fffff], type = 2.
+  memory: 07ee0000, [00100000, 07fdffff], type = 1.
+  memory: 00020000, [07fe0000, 07ffffff], type = 2.
+  memory: 00040000, [fffc0000, ffffffff], type = 2.
+default_free_pages: page base = [0xc1134200], n = [1]
+default_free_pages: page base = [0xc1134220], n = [1]
+default_free_pages: page base = [0xc1134240], n = [1]
+default_free_pages: page base = [0xc1134200], n = [1]
+default_free_pages: page base = [0xc1134200], n = [1]
+default_free_pages: page base = [0xc1134220], n = [1]
+default_free_pages: page base = [0xc1134240], n = [1]
+default_free_pages: page base = [0xc1134240], n = [3]
+default_free_pages: page base = [0xc1134200], n = [1]
+default_free_pages: page base = [0xc1134240], n = [3]
+default_free_pages: page base = [0xc1134200], n = [1]
+default_free_pages: page base = [0xc1134240], n = [2]
+default_free_pages: page base = [0xc1134220], n = [1]
+default_free_pages: page base = [0xc1134200], n = [5]
+check_alloc_page() succeeded!
+default_free_pages: page base = [0xc1134260], n = [1]
+default_free_pages: page base = [0xc1134220], n = [1]
+default_free_pages: page base = [0xc1134240], n = [1]
+check_pgdir() succeeded!
+default_free_pages: page base = [0xc1135e20], n = [1]
+default_free_pages: page base = [0xc1135e40], n = [1]
+check_boot_pgdir() succeeded!
+-------------------- BEGIN --------------------
+PDE(0e0) c0000000-f8000000 38000000 urw
+  |-- PTE(38000) c0000000-f8000000 38000000 -rw
+PDE(001) fac00000-fb000000 00400000 -rw
+  |-- PTE(000e0) faf00000-fafe0000 000e0000 urw
+  |-- PTE(00001) fafeb000-fafec000 00001000 -rw
+--------------------- END ---------------------
+pmm_init
+
+pic_init
+
+idt_init
+
+default_free_pages: page base = [0xc1135f60], n = [1]
+default_free_pages: page base = [0xc1135f40], n = [1]
+default_free_pages: page base = [0xc1135f20], n = [1]
+default_free_pages: page base = [0xc1135f00], n = [1]
+default_free_pages: page base = [0xc1135ee0], n = [1]
+default_free_pages: page base = [0xc1135ec0], n = [1]
+default_free_pages: page base = [0xc1135ea0], n = [1]
+default_free_pages: page base = [0xc1135e80], n = [1]
+default_free_pages: page base = [0xc1135e60], n = [1]
+default_free_pages: page base = [0xc1135e40], n = [1]
+default_free_pages: page base = [0xc1135f80], n = [1]
+default_free_pages: page base = [0xc1135fa0], n = [1]
+default_free_pages: page base = [0xc1135fc0], n = [1]
+default_free_pages: page base = [0xc1135fe0], n = [1]
+default_free_pages: page base = [0xc1136000], n = [1]
+default_free_pages: page base = [0xc1136020], n = [1]
+default_free_pages: page base = [0xc1136040], n = [1]
+default_free_pages: page base = [0xc1136060], n = [1]
+default_free_pages: page base = [0xc1136080], n = [1]
+default_free_pages: page base = [0xc11360a0], n = [1]
+default_free_pages: page base = [0xc11360c0], n = [1]
+default_free_pages: page base = [0xc11360e0], n = [1]
+default_free_pages: page base = [0xc1136100], n = [1]
+default_free_pages: page base = [0xc1136120], n = [1]
+default_free_pages: page base = [0xc1136140], n = [1]
+default_free_pages: page base = [0xc1136160], n = [1]
+default_free_pages: page base = [0xc1136180], n = [1]
+default_free_pages: page base = [0xc11361a0], n = [1]
+default_free_pages: page base = [0xc11361c0], n = [1]
+default_free_pages: page base = [0xc11361e0], n = [1]
+default_free_pages: page base = [0xc1136200], n = [1]
+default_free_pages: page base = [0xc1136220], n = [1]
+default_free_pages: page base = [0xc1136240], n = [1]
+default_free_pages: page base = [0xc1136260], n = [1]
+default_free_pages: page base = [0xc1136280], n = [1]
+default_free_pages: page base = [0xc11362a0], n = [1]
+default_free_pages: page base = [0xc11362c0], n = [1]
+default_free_pages: page base = [0xc11362e0], n = [1]
+default_free_pages: page base = [0xc1136300], n = [1]
+default_free_pages: page base = [0xc1136320], n = [1]
+default_free_pages: page base = [0xc1136340], n = [1]
+default_free_pages: page base = [0xc1136360], n = [1]
+default_free_pages: page base = [0xc1136380], n = [1]
+default_free_pages: page base = [0xc11363a0], n = [1]
+default_free_pages: page base = [0xc11363c0], n = [1]
+default_free_pages: page base = [0xc11363e0], n = [1]
+default_free_pages: page base = [0xc1136400], n = [1]
+default_free_pages: page base = [0xc1136420], n = [1]
+default_free_pages: page base = [0xc1136440], n = [1]
+default_free_pages: page base = [0xc1136460], n = [1]
+default_free_pages: page base = [0xc1136480], n = [1]
+default_free_pages: page base = [0xc11364a0], n = [1]
+default_free_pages: page base = [0xc11364c0], n = [1]
+default_free_pages: page base = [0xc11364e0], n = [1]
+default_free_pages: page base = [0xc1136500], n = [1]
+default_free_pages: page base = [0xc1136520], n = [1]
+default_free_pages: page base = [0xc1136540], n = [1]
+default_free_pages: page base = [0xc1136560], n = [1]
+default_free_pages: page base = [0xc1136580], n = [1]
+default_free_pages: page base = [0xc11365a0], n = [1]
+default_free_pages: page base = [0xc11365c0], n = [1]
+default_free_pages: page base = [0xc11365e0], n = [1]
+default_free_pages: page base = [0xc1136600], n = [1]
+default_free_pages: page base = [0xc1136620], n = [1]
+default_free_pages: page base = [0xc1136640], n = [1]
+default_free_pages: page base = [0xc1136660], n = [1]
+default_free_pages: page base = [0xc1136680], n = [1]
+default_free_pages: page base = [0xc11366a0], n = [1]
+default_free_pages: page base = [0xc11366c0], n = [1]
+default_free_pages: page base = [0xc11366e0], n = [1]
+default_free_pages: page base = [0xc1136700], n = [1]
+default_free_pages: page base = [0xc1136720], n = [1]
+default_free_pages: page base = [0xc1136740], n = [1]
+default_free_pages: page base = [0xc1136760], n = [1]
+default_free_pages: page base = [0xc1136780], n = [1]
+default_free_pages: page base = [0xc11367a0], n = [1]
+default_free_pages: page base = [0xc11367c0], n = [1]
+default_free_pages: page base = [0xc11367e0], n = [1]
+default_free_pages: page base = [0xc1136800], n = [1]
+default_free_pages: page base = [0xc1136820], n = [1]
+default_free_pages: page base = [0xc1136840], n = [1]
+default_free_pages: page base = [0xc1136860], n = [1]
+default_free_pages: page base = [0xc1136880], n = [1]
+default_free_pages: page base = [0xc11368a0], n = [1]
+default_free_pages: page base = [0xc11368c0], n = [1]
+default_free_pages: page base = [0xc11368e0], n = [1]
+default_free_pages: page base = [0xc1136900], n = [1]
+default_free_pages: page base = [0xc1136920], n = [1]
+default_free_pages: page base = [0xc1136940], n = [1]
+default_free_pages: page base = [0xc1136960], n = [1]
+default_free_pages: page base = [0xc1136980], n = [1]
+default_free_pages: page base = [0xc11369a0], n = [1]
+default_free_pages: page base = [0xc11369c0], n = [1]
+default_free_pages: page base = [0xc11369e0], n = [1]
+default_free_pages: page base = [0xc1136a00], n = [1]
+default_free_pages: page base = [0xc1136a20], n = [1]
+default_free_pages: page base = [0xc1136a40], n = [1]
+default_free_pages: page base = [0xc1136a60], n = [1]
+default_free_pages: page base = [0xc1136a80], n = [1]
+default_free_pages: page base = [0xc1136aa0], n = [1]
+default_free_pages: page base = [0xc1135e20], n = [1]
+check_vma_struct() succeeded!
+check_vma_struct end
+check_pgfault: after size_t nr_free_pages_store = nr_free_pages();
+check_pgfault: nr_free_pages_store = [27887], nr_free_pages() = [27887]
+page fault at 0x00000100: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [100], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [100]
+ret = [0]
+pgdir = [0xc1210000], addr = [256]
+, ROUNDDOWN(addr, PGSIZE) = [0]default_free_pages: page base = [0xc1135e80], n = [1]
+pgdir[0] = [19869735]
+default_free_pages: page base = [0xc1135e60], n = [1]
+default_free_pages: page base = [0xc1135e40], n = [1]
+default_free_pages: page base = [0xc1135e20], n = [1]
+check_pgfault: nr_free_pages_store = [27887], nr_free_pages() = [27887]
+check_pgfault() succeeded!
+check_pgfault end
+check_vmm() succeeded.
+ide 0:      10000(sectors), 'QEMU HARDDISK'.
+ide 1:     262144(sectors), 'QEMU HARDDISK'.
+SWAP: manager = fifo swap manager
+BEGIN check_swap: count 1, total 27887
+setup Page Table for vaddr 0X1000, so alloc a page
+setup Page Table vaddr 0~4MB OVER!
+default_free_pages: page base = [0xc1135e80], n = [1]
+default_free_pages: page base = [0xc1135ea0], n = [1]
+default_free_pages: page base = [0xc1135ec0], n = [1]
+default_free_pages: page base = [0xc1135ee0], n = [1]
+set up init env for check_swap begin!
+page fault at 0x00001000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [1000]
+ret = [0]
+page fault at 0x00002000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [2000]
+ret = [0]
+page fault at 0x00003000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [3000]
+ret = [0]
+page fault at 0x00004000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [4000]
+ret = [0]
+set up init env for check_swap over!
+write Virt Page c in fifo_check_swap
+write Virt Page a in fifo_check_swap
+write Virt Page d in fifo_check_swap
+write Virt Page b in fifo_check_swap
+write Virt Page e in fifo_check_swap
+page fault at 0x00005000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [5000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [5000]
+swap_out: i 0, store page in vaddr 0x1000 to disk swap entry 2
+default_free_pages: page base = [0xc1135e80], n = [1]
+ret = [0]
+write Virt Page b in fifo_check_swap
+write Virt Page a in fifo_check_swap
+page fault at 0x00001000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [1000]
+swap_out: i 0, store page in vaddr 0x2000 to disk swap entry 3
+default_free_pages: page base = [0xc1135ea0], n = [1]
+swap_in: load disk swap entry 2 with swap_page in vadr 0x1000
+ret = [0]
+write Virt Page b in fifo_check_swap
+page fault at 0x00002000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [2000]
+swap_out: i 0, store page in vaddr 0x3000 to disk swap entry 4
+default_free_pages: page base = [0xc1135ec0], n = [1]
+swap_in: load disk swap entry 3 with swap_page in vadr 0x2000
+ret = [0]
+write Virt Page c in fifo_check_swap
+page fault at 0x00003000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [3000]
+swap_out: i 0, store page in vaddr 0x4000 to disk swap entry 5
+default_free_pages: page base = [0xc1135ee0], n = [1]
+swap_in: load disk swap entry 4 with swap_page in vadr 0x3000
+ret = [0]
+write Virt Page d in fifo_check_swap
+page fault at 0x00004000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [4000]
+swap_out: i 0, store page in vaddr 0x5000 to disk swap entry 6
+default_free_pages: page base = [0xc1135e80], n = [1]
+swap_in: load disk swap entry 5 with swap_page in vadr 0x4000
+ret = [0]
+write Virt Page e in fifo_check_swap
+page fault at 0x00005000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [2], addr = [5000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [5000]
+swap_out: i 0, store page in vaddr 0x1000 to disk swap entry 2
+default_free_pages: page base = [0xc1135ea0], n = [1]
+swap_in: load disk swap entry 6 with swap_page in vadr 0x5000
+ret = [0]
+write Virt Page a in fifo_check_swap
+page fault at 0x00001000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f1000], *check_mm_struct = [0xc12f2010]
+do_pgfault|-------> mm = [0xc12f1000], error_code = [0], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f1000], vma = [0xc12f2000], addr = [1000]
+swap_out: i 0, store page in vaddr 0x2000 to disk swap entry 3
+default_free_pages: page base = [0xc1135ec0], n = [1]
+swap_in: load disk swap entry 2 with swap_page in vadr 0x1000
+ret = [0]
+default_free_pages: page base = [0xc1135e80], n = [1]
+default_free_pages: page base = [0xc1135ea0], n = [1]
+default_free_pages: page base = [0xc1135ec0], n = [1]
+default_free_pages: page base = [0xc1135ee0], n = [1]
+default_free_pages: page base = [0xc1135e40], n = [1]
+default_free_pages: page base = [0xc1135e20], n = [1]
+count is 0, total is 7
+check_swap() succeeded!
+++ setup timer interrupts
+100 ticks
+100 ticks
+100 ticks
