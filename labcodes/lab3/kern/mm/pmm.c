@@ -175,6 +175,7 @@ init_memmap(struct Page *base, size_t n) {
 struct Page *
 alloc_pages(size_t n) {
     struct Page *page=NULL;
+    // 保证原子性，在这个过程中防止被中断
     bool intr_flag;
     
     while (1)
@@ -188,7 +189,7 @@ alloc_pages(size_t n) {
          if (page != NULL || n > 1 || swap_init_ok == 0) break;
          
          extern struct mm_struct *check_mm_struct;
-         //cprintf("page %x, call swap_out in alloc_pages %d\n",page, n);
+         cprintf("page %x, call swap_out in alloc_pages %d\n",page, n);
          swap_out(check_mm_struct, n, 0);
     }
     //cprintf("n %d,get page %x, No %d in alloc_pages\n",n,page,(page-pages));
@@ -799,15 +800,31 @@ print_pgdir(void) {
     cprintf("--------------------- END ---------------------\n");
 }
 
+/**
+ * kmalloc
+ * @brief 
+ * 
+ * @param n 
+ * @return void* 
+ */
 void *
 kmalloc(size_t n) {
     void * ptr=NULL;
     struct Page *base=NULL;
+    //最大支持分配 1024*0124 = 126976 == 1F000 个字节（31个page）
     assert(n > 0 && n < 1024*0124);
+    // 需要的页数
+    // 比如n = 为16字节， (n + PGSIZE - 1) / 4096 =  (16 + 4096 - 1) / 4096 = 1
+    // 比如n = 为4095字节， (n + PGSIZE - 1) / 4096 =  (4095 + 4096 - 1) / 4096 = 1
     int num_pages=(n+PGSIZE-1)/PGSIZE;
+    // 分配页
     base = alloc_pages(num_pages);
     assert(base != NULL);
+    // page -> kernel virtual address
+    // 得到内核虚拟地址
+    // ((page - pages) << 12) >> 12 + KERNBASE
     ptr=page2kva(base);
+    // 返回页起始地址
     return ptr;
 }
 

@@ -41,14 +41,17 @@ static void check_pgfault(void);
 // mm_create -  alloc a mm_struct & initialize it.
 struct mm_struct *
 mm_create(void) {
+    // 分配内存给mm_struct结构的mm
     struct mm_struct *mm = kmalloc(sizeof(struct mm_struct));
 
     if (mm != NULL) {
+        // 初始化mm_struct对应的mmap_list
         list_init(&(mm->mmap_list));
         mm->mmap_cache = NULL;
         mm->pgdir = NULL;
         mm->map_count = 0;
 
+        // 只有完成swap manager之后swap_init_ok = 1
         if (swap_init_ok) swap_init_mm(mm);
         else mm->sm_priv = NULL;
     }
@@ -170,12 +173,10 @@ vmm_init(void) {
 static void
 check_vmm(void) {
     size_t nr_free_pages_store = nr_free_pages();
-    
+    // check_mm_struct还未初始化
     check_vma_struct();
-    cprintf("check_vma_struct end\n");
     
     check_pgfault();
-    cprintf("check_pgfault end\n");
     
     assert(nr_free_pages_store == nr_free_pages());
 
@@ -184,8 +185,10 @@ check_vmm(void) {
 
 static void
 check_vma_struct(void) {
+    // 当前总空闲页
     size_t nr_free_pages_store = nr_free_pages();
 
+    // 创建mm
     struct mm_struct *mm = mm_create();
     assert(mm != NULL);
 
