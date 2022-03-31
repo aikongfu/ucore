@@ -192,10 +192,13 @@ check_vma_struct(void) {
     struct mm_struct *mm = mm_create();
     assert(mm != NULL);
 
+    // step1 = 10, step2 = 100
     int step1 = 10, step2 = step1 * 10;
 
     int i;
     for (i = step1; i >= 1; i --) {
+        // vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags)
+        // vma_create(10 * 5 ,10 * 5 + 2, 0);
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
@@ -263,6 +266,8 @@ check_pgfault(void) {
     pde_t *pgdir = mm->pgdir = boot_pgdir;
     assert(pgdir[0] == 0);
 
+    // #define PTSIZE          (PGSIZE * NPTEENTRY)    // bytes mapped by a page directory entry
+    // PTSIZE = 4096 * 1024
     struct vma_struct *vma = vma_create(0, PTSIZE, VM_WRITE);
     assert(vma != NULL);
 
