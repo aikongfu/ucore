@@ -25,13 +25,21 @@ static int _get_dirty_flag(pte_t *pgdir, list_entry_t *le) {
     return (*ptep) & PTE_D;
 }
 
-static int _get_access_flag(pte_t *pgdir, list_entry_t *le) {
+static int _get_accessed_flag(pte_t *pgdir, list_entry_t *le) {
     pte_t *ptep = _get_list_entry_pte(pgdir, le);
     return (*ptep) & PTE_A;
 }
 
-static int
-_extended_clock_init_mm(struct mm_struct *mm)
+static _clear_accessed_flag(pte_t *pgdir, list_entry_t *le) {
+    do {
+        struct Page *p = le2page(le, pra_page_link);
+        pte_t *ptep = get_pte(pgdir, p->pra_vaddr, 0);
+        *ptep = *ptep & ~PTE_A;
+        tlb_invalidate(pgdir, p->pra_vaddr);
+    } while (0);
+}
+
+static int _extended_clock_init_mm(struct mm_struct *mm)
 {   
     mm->sm_priv = NULL;
     return 0;
@@ -63,7 +71,29 @@ _extended_clock_map_swappable(struct mm_struct *mm, uintptr_t addr, struct Page 
 static int
 _extended_clock_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, int in_tick)
 {
+    list_entry_t *head = (list_entry_t *)mm->sm_priv;
+    assert(head != NULL);
+    assert(in_tick == 0);
 
+    list_entry_t *selected = NULL, *p = head;
+
+    // search <0, 0>
+    do {
+        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p) == 0) {
+            selected = p;
+            break;
+        }
+        p = list_next(p);
+    }while (p != head);
+    
+    if (selected == NULL) {
+        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p) == 0) {
+            selected = p;
+            break;
+        }
+        _clear_accessed_flag(mm->pgdir, p);
+        p = list_next(p);
+    }
     
     return 0;
 }
