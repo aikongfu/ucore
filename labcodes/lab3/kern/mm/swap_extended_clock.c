@@ -85,16 +85,44 @@ _extended_clock_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, i
         }
         p = list_next(p);
     }while (p != head);
-    
+    // search <0, 1> and set 'accessed' to 0
     if (selected == NULL) {
-        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p) == 0) {
+        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p)) {
             selected = p;
             break;
         }
         _clear_accessed_flag(mm->pgdir, p);
         p = list_next(p);
     }
-    
+
+    // search <0, 0> again
+    do {
+        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p) == 0) {
+            selected = p;
+            break;
+        }
+        p = list_next(p);
+    }while (p != head);
+    // search <0, 1> and set 'accessed' to 0 again
+    if (selected == NULL) {
+        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p)) {
+            selected = p;
+            break;
+        }
+        _clear_accessed_flag(mm->pgdir, p);
+        p = list_next(p);
+    }
+
+    head = selected;
+    if (list_empty(head)) {
+        mm->sm_priv = NULL;
+    } else {
+        mm->sm_priv = list_next(head);
+        list_del(head);
+    }
+
+    *ptr_page = le2page(head, pra_page_link);
+
     return 0;
 }
 
