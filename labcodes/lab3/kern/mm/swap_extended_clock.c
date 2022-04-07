@@ -77,15 +77,17 @@ _extended_clock_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, i
             break;
         }
         p = list_next(p);
-    }while (p != head);
+    } while (p != head);
     // search <0, 1> and set 'accessed' to 0
     if (selected == NULL) {
-        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p)) {
-            selected = p;
-            break;
-        }
-        _clear_accessed_flag(mm->pgdir, p);
-        p = list_next(p);
+        do {
+            if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p)) {
+                selected = p;
+                break;
+            }
+            _clear_accessed_flag(mm->pgdir, p);
+            p = list_next(p);
+        } while (p != head);
     }
 
     // search <0, 0> again
@@ -98,12 +100,14 @@ _extended_clock_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, i
     }while (p != head);
     // search <0, 1> and set 'accessed' to 0 again
     if (selected == NULL) {
-        if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p)) {
-            selected = p;
-            break;
-        }
-        _clear_accessed_flag(mm->pgdir, p);
-        p = list_next(p);
+        do {
+            if (_get_accessed_flag(mm->pgdir, p) == 0 && _get_dirty_flag(mm->pgdir, p)) {
+                selected = p;
+                break;
+            }
+            _clear_accessed_flag(mm->pgdir, p);
+            p = list_next(p);
+        } while (p != head);
     }
 
     head = selected;
@@ -198,7 +202,7 @@ _extended_clock_tick_event(struct mm_struct *mm)
 { return 0; }
 
 
-struct swap_manager swap_manager_extended_clock =
+struct swap_manager swap_manager_extend_clock =
 {
      .name            = "extended clock swap manager",
      .init            = &_extended_clock_init,

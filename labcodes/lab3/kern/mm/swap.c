@@ -38,7 +38,7 @@ swap_init(void)
      }
      
 
-     sm = &extend_clock_manager_fifo;
+     sm = &swap_manager_extend_clock;
      int r = sm->init();
      
      if (r == 0)
