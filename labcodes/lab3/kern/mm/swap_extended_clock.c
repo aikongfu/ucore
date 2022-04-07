@@ -8,14 +8,27 @@
 
 
 // #define GET_LIST_ENTRY_PTE(pgdir, le) (get_pte(pgdir, le2page((le), pra_page_link)->pra_vaddr, 0))
-// #define GET_DIRTY_FLAG(pgdiri, le) (*GET_LIST_ENTRY_PTE((pgdir), (le)) & PTE_D)
-// #define GET_ACCESS_FLAG(pgdiri, le) (*GET_LIST_ENTRY_PTE((pgdir), (le)) & PTE_A)
+// #define GET_DIRTY_FLAG(pgdir, le) (*GET_LIST_ENTRY_PTE((pgdir), (le)) & PTE_D)
+// #define GET_ACCESS_FLAG(pgdir, le) (*GET_LIST_ENTRY_PTE((pgdir), (le)) & PTE_A)
 
 
 
-// static int _get_list_entry_pte(pte_t *pgdir, list_entry_t *le) {
-//     return NULL;
-// }
+static *pte_t _get_list_entry_pte(pte_t *pgdir, list_entry_t *le) {
+    struct Page *p = le2page(le, pra_page_link);
+    uintptr_t pra_vaddr = p->pra_vaddr;
+    pte_t *ptep = get_pte(pgdir, pra_vaddr, 0);
+    return ptep;
+}
+
+static int _get_dirty_flag(pte_t *pgdir, list_entry_t *le) {
+    pte_t *ptep = _get_list_entry_pte(pgdir, le);
+    return (*ptep) & PTE_D;
+}
+
+static int _get_access_flag(pte_t *pgdir, list_entry_t *le) {
+    pte_t *ptep = _get_list_entry_pte(pgdir, le);
+    return (*ptep) & PTE_A;
+}
 
 static int
 _extended_clock_init_mm(struct mm_struct *mm)
