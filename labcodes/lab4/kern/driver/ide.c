@@ -60,8 +60,8 @@ static const struct {
 static struct ide_device {
     unsigned char valid;        // 0 or 1 (If Device Really Exists)
     unsigned int sets;          // Commend Sets Supported
-    unsigned int size;          // Size in Sectors
-    unsigned char model[41];    // Model in String
+    unsigned int size;          // Size in Sectors 扇区大小
+    unsigned char model[41];    // Model in String 字符串模型
 } ide_devices[MAX_IDE];
 
 static int
@@ -77,12 +77,27 @@ ide_wait_ready(unsigned short iobase, bool check_error) {
 
 void
 ide_init(void) {
+    // SECTSIZE = 512
     static_assert((SECTSIZE % 4) == 0);
     unsigned short ideno, iobase;
+    // MAX_IDE = 4
     for (ideno = 0; ideno < MAX_IDE; ideno ++) {
         /* assume that no device here */
         ide_devices[ideno].valid = 0;
 
+        /**
+        static const struct {
+            unsigned short base;        // I/O Base
+            unsigned short ctrl;        // Control Base
+        } channels[2] = {
+            {IO_BASE0, IO_CTRL0},
+            {IO_BASE1, IO_CTRL1},
+        };
+        */
+
+        // #define IO_BASE(ideno)          (channels[(ideno) >> 1].base)
+        // #define IO_CTRL(ideno)          (channels[(ideno) >> 1].ctrl)
+        // ideno >> 1 = ideno / 2; 0 / 2 = 0, 1 / 2 = 0, 2 / 2 = 1, 3 / 2 = 1
         iobase = IO_BASE(ideno);
 
         /* wait device ready */
@@ -105,19 +120,29 @@ ide_init(void) {
         ide_devices[ideno].valid = 1;
 
         /* read identification space of the device */
+        // 读取设备的标识空间
         unsigned int buffer[128];
+
+        // 结果写到buffer
         insl(iobase + ISA_DATA, buffer, sizeof(buffer) / sizeof(unsigned int));
 
         unsigned char *ident = (unsigned char *)buffer;
         unsigned int sectors;
+        // ident + 164
         unsigned int cmdsets = *(unsigned int *)(ident + IDE_IDENT_CMDSETS);
         /* device use 48-bits or 28-bits addressing */
+        // 1 << 26 = 00000100 00000000 00000000 00000000
+        // 如果第27位为1，则use 48-bits; ident + 200
+        // 否则use 28-bits; ident + 120
         if (cmdsets & (1 << 26)) {
             sectors = *(unsigned int *)(ident + IDE_IDENT_MAX_LBA_EXT);
         }
         else {
             sectors = *(unsigned int *)(ident + IDE_IDENT_MAX_LBA);
         }
+
+        // sets
+        // size 
         ide_devices[ideno].sets = cmdsets;
         ide_devices[ideno].size = sectors;
 
