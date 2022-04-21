@@ -246,6 +246,7 @@ check_vma_struct(void) {
 
     mm_destroy(mm);
 
+	cprintf("nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vma_struct() succeeded!\n");
