@@ -138,14 +138,21 @@ get_proc_name(struct proc_struct *proc) {
 // get_pid - alloc a unique pid for process
 static int
 get_pid(void) {
+    // MAX_PID = 8192
     static_assert(MAX_PID > MAX_PROCESS);
     struct proc_struct *proc;
+    // proc 链表
     list_entry_t *list = &proc_list, *le;
+
+    // next_safe = 8192, last_pid = 8192
     static int next_safe = MAX_PID, last_pid = MAX_PID;
+
+    // first time last_pid = 1
     if (++ last_pid >= MAX_PID) {
         last_pid = 1;
         goto inside;
     }
+
     if (last_pid >= next_safe) {
     inside:
         next_safe = MAX_PID;
@@ -153,6 +160,7 @@ get_pid(void) {
         le = list;
         while ((le = list_next(le)) != list) {
             proc = le2proc(le, list_link);
+            // last_pid 
             if (proc->pid == last_pid) {
                 if (++ last_pid >= next_safe) {
                     if (last_pid >= MAX_PID) {
@@ -318,7 +326,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     // 把设置好的进程控制块放入hash_list和proc_list两个全局进程链表中；
     // 自此，进程已经准备好执行了，把进程状态设置为“就绪”态；
     // 设置返回码为子进程的id号。
-    
+
     if (proc = alloc_proc() == NULL) {
         goto fork_out;
     }
