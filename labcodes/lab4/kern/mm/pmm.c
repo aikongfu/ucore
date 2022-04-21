@@ -47,6 +47,9 @@ uintptr_t boot_cr3;
 // physical memory management
 const struct pmm_manager *pmm_manager;
 
+extern struct proc_struct *page_current;
+extern int extern num_pages[50];
+
 /* *
  * The page directory entry corresponding to the virtual address range
  * [VPT, VPT + PTSIZE) points to the page directory itself. Thus, the page

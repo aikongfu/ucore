@@ -188,6 +188,7 @@ static void
 check_vma_struct(void) {
     // 当前总空闲页
     size_t nr_free_pages_store = nr_free_pages();
+    cprintf("check_vma_struct: begin -> nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
     // 创建mm
     struct mm_struct *mm = mm_create();
@@ -246,7 +247,7 @@ check_vma_struct(void) {
 
     mm_destroy(mm);
 
-	cprintf("nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
+	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vma_struct() succeeded!\n");
