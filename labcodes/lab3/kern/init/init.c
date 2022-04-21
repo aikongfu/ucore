@@ -11,7 +11,6 @@
 #include <vmm.h>
 #include <ide.h>
 #include <swap.h>
-#include <proc.h>
 #include <kmonitor.h>
 
 int kern_init(void) __attribute__((noreturn));
