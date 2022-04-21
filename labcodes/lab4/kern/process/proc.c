@@ -75,9 +75,6 @@ struct proc_struct *initproc = NULL;
 // current proc
 struct proc_struct *current = NULL;
 
-struct proc_struct *page_current;
-int num_pages[50];
-
 static int nr_process = 0;
 
 void kernel_thread_entry(void);
@@ -361,9 +358,7 @@ fork_out:
 bad_fork_cleanup_kstack:
     put_kstack(proc);
 bad_fork_cleanup_proc:
-    page_current = proc;
     kfree(proc);
-    page_current = current;
     goto fork_out;
 }
 
