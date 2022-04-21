@@ -310,17 +310,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    5. insert proc_struct into hash_list && proc_list
     //    6. call wakeup_proc to make the new child process RUNNABLE
     //    7. set ret vaule using child proc's pid
-    struct proc_struct *proc = alloc_proc();
-    setup_kstack(proc);
-    copy_mm(clone_flags, proc);
-    copy_thread(proc, stack, tf);
-    list_add(hash_list, &(proc->hash_link));
-    list_add(proc_list, &(proc->list_link));
-    int pid = get_pid();
-
-    wakeup_proc(proc);
-    return pid;
-
+    
     // 分配并初始化进程控制块（alloc_proc函数）；
     // 分配并初始化内核栈（setup_stack函数）；
     // 根据clone_flag标志复制或共享进程内存管理结构（copy_mm函数）；
@@ -328,6 +318,32 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     // 把设置好的进程控制块放入hash_list和proc_list两个全局进程链表中；
     // 自此，进程已经准备好执行了，把进程状态设置为“就绪”态；
     // 设置返回码为子进程的id号。
+    
+    if (proc = alloc_proc() == NULL) {
+        goto fork_out;
+    }
+
+    proc->parent = current;
+    if (setup_kstack(proc) == -E_NO_MEM) {
+        goto bad_fork_cleanup_kstack;
+    }
+
+    if (copy_mm(clone_flags, proc) != 0) {
+        goto bad_fork_cleanup_proc;
+    }
+
+    copy_thread(proc, stack, tf);
+    
+    int intr_flag;
+    local_intr_save(intr_flag);
+    {
+        proc->pid = get_pid();
+        hash_proc(proc);
+        list_add(&proc_list, &proc->list_link);
+        nr_process++;
+    }
+    local_intr_restore(intr_flag);
+    ret = proc->pid;
 fork_out:
     return ret;
 
