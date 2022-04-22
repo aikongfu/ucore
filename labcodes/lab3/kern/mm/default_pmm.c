@@ -153,11 +153,7 @@ default_free_pages(struct Page *base, size_t n) {
     struct Page *p = base;
     cprintf("default_free_pages: page base = [%p], n = [%d]\n", base, n);
     for (; p != base + n; p++) {
-        cprintf("page p : {\n" 
-            + "ref = [%x]\n", 
-            + "flags = [%x]\n", 
-            + "property = [%x]\n", 
-            + "pra_vaddr = [%x]\n}", 
+        cprintf("page p : {\nref = [%x]\nflags = [%x]\nproperty = [%x]\npra_vaddr = [%x]\n}", 
             p->ref, p->flags, p->property, p->pra_vaddr);
         assert(!PageReserved(p) && !PageProperty(p));
         p->flags = 0;
