@@ -192,6 +192,7 @@ check_vma_struct(void) {
 
     // 创建mm
     struct mm_struct *mm = mm_create();
+    cprintf("check_vma_struct: struct mm_struct *mm = mm_create(); nr_free_pages() = [%d] \n", nr_free_pages());
     assert(mm != NULL);
 
     // step1 = 10, step2 = 100
@@ -246,6 +247,8 @@ check_vma_struct(void) {
     }
 
     mm_destroy(mm);
+
+    cprintf("check_vma_struct: mm: [mm->map_count: %d\n]\n", mm->map_count);
 
 	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());

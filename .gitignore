@@ -26,3 +26,4 @@ learn_list.o.dSYM
 .vscode
 
 *.DS_Store
+.idea
