@@ -287,7 +287,7 @@ check_pgfault(void) {
     assert(sum == 0);
     // cprintf("pgdir = [%p], addr = [%x], ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
     size_t __a = (size_t)(addr);                               \
-    uintptr_t l1 = (typeof(a))(__a - __a % (PGSIZE)); 
+    uintptr_t l1 = (typeof(addr))(__a - __a % (PGSIZE)); 
     // TODO
     cprintf("pgdir = [%p], addr = [%x], l1 = [%x]\n", pgdir, addr, l1);
 
