@@ -288,8 +288,9 @@ check_pgfault(void) {
     // cprintf("pgdir = [%p], addr = [%x], ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
     // TODO
     pte_t *ptep = get_pte(pgdir, ROUNDDOWN(addr, PGSIZE), 0);
-    struct Page *p1 = pte2page(ptep);
+    struct Page *p1 = pte2page(*ptep);
 
+    cprintf("ptep = [0x%x], *ptep = [0x%d]\n", ptep, *ptep);
     cprintf("pgdir = [%p], addr = [%x], p1->flags = [%x]\n", pgdir, addr, p1->flags);
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
     cprintf("pgdir[0] = [%d]\n", pgdir[0]);
