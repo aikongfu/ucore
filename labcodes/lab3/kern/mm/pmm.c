@@ -586,6 +586,8 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
 void
 page_remove(pde_t *pgdir, uintptr_t la) {
     pte_t *ptep = get_pte(pgdir, la, 0);
+    cprintf("page_remove: pgdir = [0x%x], la = [0x%x]\n", *ptep, la);
+    cprintf("page_remove: *ptep = [0x%x]\n", *ptep);
     if (ptep != NULL) {
         page_remove_pte(pgdir, la, ptep);
     }
