@@ -286,12 +286,11 @@ check_pgfault(void) {
     }
     assert(sum == 0);
     // cprintf("pgdir = [%p], addr = [%x], ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
+    size_t __a = (size_t)(addr);                               \
+    uintptr_t l1 = (typeof(a))(__a - __a % (PGSIZE)); 
     // TODO
-    pte_t *ptep = get_pte(pgdir, ROUNDDOWN(addr, PGSIZE), 0);
-    struct Page *p1 = pte2page(*ptep);
+    cprintf("pgdir = [%p], addr = [%x], l1 = [%x]\n", pgdir, addr, l1);
 
-    cprintf("ptep = [0x%x], *ptep = [0x%d]\n", ptep, *ptep);
-    cprintf("pgdir = [%p], addr = [%x], p1->flags = [%x]\n", pgdir, addr, p1->flags);
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
     cprintf("pgdir[0] = [%d]\n", pgdir[0]);
     free_page(pde2page(pgdir[0]));

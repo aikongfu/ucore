@@ -566,6 +566,9 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
 
     if ((*ptep & PTE_P)) {
         struct Page *page = pte2page(*ptep);
+        cprintf("page_remove_pte: *pgdir = [0x%x], *ptep = [0x%x], la = [0x%x], pages = [0x%x], npage = [%d]\n", 
+            *pgdir, *ptep, la, pages, npage);
+        cprintf("page->flags = [%x]\n", page->flags);
         if (page_ref_dec(page) == 0) {
             free_page(page);
         }
