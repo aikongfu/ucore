@@ -279,6 +279,8 @@ check_pgfault(void) {
     int i, sum = 0;
     for (i = 0; i < 100; i ++) {
         *(char *)(addr + i) = i;
+		cprintf("check_pgfault: (char *)(addr + i) = [%d]\n", (char *)(addr + i));
+		cprintf("check_pgfault: *(char *)(addr + i) = [%c]\n", *(char *)(addr + i));
         sum += i;
     }
     for (i = 0; i < 100; i ++) {
