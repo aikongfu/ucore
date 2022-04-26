@@ -11,7 +11,7 @@ void
 swapfs_init(void) {
 
     // 检测一下PGSIZE、SECTSIZE数据有没有问题
-    assert((PGSIZE % SECTSIZE) == 0);
+    static_assert((PGSIZE % SECTSIZE) == 0);
     // static_assert((PGSIZE % SECTSIZE) == 0);
 
     // SWAP_DEV_NO = 1

@@ -72,7 +72,7 @@ kern_init(void) {
     // lab1_switch_test();
 
     /* do nothing */
-    while (1);
+    // while (1);
 }
 
 void __attribute__((noinline))
