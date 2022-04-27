@@ -175,10 +175,13 @@ static void
 check_vmm(void) {
     size_t nr_free_pages_store = nr_free_pages();
     // check_mm_struct还未初始化
+    cprintf("check_vmm|->check_vma_struct| nr_free_pages_store = [%d], nr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     check_vma_struct();
     
+    cprintf("check_vmm|->check_pgfault| nr_free_pages_store = [%d], nr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     check_pgfault();
     
+    cprintf("check_vmm|->nr_free_pages_store = [%d], nr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vmm() succeeded.\n");
