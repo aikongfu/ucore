@@ -186,22 +186,15 @@ check_vmm(void) {
 
 static void
 check_vma_struct(void) {
-    // 当前总空闲页
     size_t nr_free_pages_store = nr_free_pages();
-    cprintf("check_vma_struct: begin -> nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
-    // 创建mm
     struct mm_struct *mm = mm_create();
-    cprintf("check_vma_struct: struct mm_struct *mm = mm_create(); nr_free_pages() = [%d] \n", nr_free_pages());
     assert(mm != NULL);
 
-    // step1 = 10, step2 = 100
     int step1 = 10, step2 = step1 * 10;
 
     int i;
     for (i = step1; i >= 1; i --) {
-        // vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags)
-        // vma_create(10 * 5 ,10 * 5 + 2, 0);
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
@@ -247,11 +240,6 @@ check_vma_struct(void) {
     }
 
     mm_destroy(mm);
-
-    cprintf("check_vma_struct: mm: [mm->map_count: %d\n]\n", mm->map_count);
-
-	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
-    assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vma_struct() succeeded!\n");
 }
