@@ -186,22 +186,31 @@ check_vmm(void) {
 
 static void
 check_vma_struct(void) {
+    // 当前总空闲页
     size_t nr_free_pages_store = nr_free_pages();
+    cprintf("check_vma_struct: begin -> nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
+    // 创建mm
     struct mm_struct *mm = mm_create();
+    cprintf("check_vma_struct: after mm_create, mm = [%p]\t nr_free_pages() = [%d] \n", mm,  nr_free_pages());
     assert(mm != NULL);
 
+    // step1 = 10, step2 = 100
     int step1 = 10, step2 = step1 * 10;
 
     int i;
     for (i = step1; i >= 1; i --) {
+        // vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags)
+        // vma_create(10 * 5 ,10 * 5 + 2, 0);
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
+        cprintf("check_vma_struct: step1, nr_free_pages() = [%d] \n", nr_free_pages());
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
     }
 
     for (i = step1 + 1; i <= step2; i ++) {
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
+        cprintf("check_vma_struct: step2, nr_free_pages() = [%d] \n", nr_free_pages());
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
     }
@@ -239,18 +248,26 @@ check_vma_struct(void) {
         assert(vma_below_5 == NULL);
     }
 
+    cprintf("check_vma_struct: loop assert, nr_free_pages() = [%d] \n", nr_free_pages());
     mm_destroy(mm);
+    cprintf("check_vma_struct: mm_destroy, nr_free_pages() = [%d] \n", nr_free_pages());
+    
+    cprintf("check_vma_struct: mm: [mm->map_count: %d]\n", mm->map_count);
+
+	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
+    assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vma_struct() succeeded!\n");
 }
 
 struct mm_struct *check_mm_struct;
 
-
 // check_pgfault - check correctness of pgfault handler
 static void
 check_pgfault(void) {
     size_t nr_free_pages_store = nr_free_pages();
+    cprintf("check_pgfault: after size_t nr_free_pages_store = nr_free_pages();\n");\
+    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
     check_mm_struct = mm_create();
     assert(check_mm_struct != NULL);
@@ -259,6 +276,8 @@ check_pgfault(void) {
     pde_t *pgdir = mm->pgdir = boot_pgdir;
     assert(pgdir[0] == 0);
 
+    // #define PTSIZE          (PGSIZE * NPTEENTRY)    // bytes mapped by a page directory entry
+    // PTSIZE = 4096 * 1024
     struct vma_struct *vma = vma_create(0, PTSIZE, VM_WRITE);
     assert(vma != NULL);
 
@@ -276,8 +295,9 @@ check_pgfault(void) {
         sum -= *(char *)(addr + i);
     }
     assert(sum == 0);
-
+    cprintf("pgdir = [%p], addr = [%d]\n, ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
+    cprintf("pgdir[0] = [%d]\n", pgdir[0]);
     free_page(pde2page(pgdir[0]));
     pgdir[0] = 0;
 
@@ -285,6 +305,7 @@ check_pgfault(void) {
     mm_destroy(mm);
     check_mm_struct = NULL;
 
+    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_pgfault() succeeded!\n");
