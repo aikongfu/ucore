@@ -247,12 +247,10 @@ check_vma_struct(void) {
         }
         assert(vma_below_5 == NULL);
     }
-
+    cprintf("check_vma_struct: mm: [mm->map_count: %d]\n", mm->map_count);
     cprintf("check_vma_struct: loop assert, nr_free_pages() = [%d] \n", nr_free_pages());
     mm_destroy(mm);
     cprintf("check_vma_struct: mm_destroy, nr_free_pages() = [%d] \n", nr_free_pages());
-    
-    cprintf("check_vma_struct: mm: [mm->map_count: %d]\n", mm->map_count);
 
 	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
