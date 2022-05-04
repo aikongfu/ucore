@@ -41,6 +41,8 @@ swap_init(void)
      sm = &swap_manager_fifo;
      int r = sm->init();
      
+     cprintf("swap_init sm = [%c]\n", sm->name);
+     cprintf("swap_init r = [%d]\n", r);
      if (r == 0)
      {
           swap_init_ok = 1;
