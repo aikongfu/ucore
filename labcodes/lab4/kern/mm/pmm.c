@@ -178,7 +178,7 @@ alloc_pages(size_t n) {
     struct Page *page=NULL;
     // 保证原子性，在这个过程中防止被中断
     bool intr_flag;
-    
+    cprintf("alloc_pages in \n");
     while (1)
     {
         local_intr_save(intr_flag);
