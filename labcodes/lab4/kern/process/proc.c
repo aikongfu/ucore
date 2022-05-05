@@ -327,7 +327,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     // 自此，进程已经准备好执行了，把进程状态设置为“就绪”态；
     // 设置返回码为子进程的id号。
 
-    if (proc = alloc_proc() == NULL) {
+    if ((proc = alloc_proc()) == NULL) {
         goto fork_out;
     }
 
@@ -415,7 +415,7 @@ proc_init(void) {
     }
     cprintf("proc_init| kernel_thread \n");
     initproc = find_proc(pid);
-    set_proc_name(initproc, "init");
+    // set_proc_name(initproc, "init");
     cprintf("proc_init| set_proc_name \n");
     assert(idleproc != NULL && idleproc->pid == 0);
     assert(initproc != NULL && initproc->pid == 1);

@@ -27,3 +27,5 @@ learn_list.o.dSYM
 
 *.DS_Store
 .idea
+
+.settings

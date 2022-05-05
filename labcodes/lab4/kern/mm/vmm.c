@@ -206,14 +206,12 @@ check_vma_struct(void) {
         // vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags)
         // vma_create(10 * 5 ,10 * 5 + 2, 0);
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
-        cprintf("check_vma_struct: step1, nr_free_pages() = [%d] \n", nr_free_pages());
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
     }
 
     for (i = step1 + 1; i <= step2; i ++) {
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
-        cprintf("check_vma_struct: step2, nr_free_pages() = [%d] \n", nr_free_pages());
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
     }
