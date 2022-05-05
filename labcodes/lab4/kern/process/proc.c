@@ -330,22 +330,17 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     if ((proc = alloc_proc()) == NULL) {
         goto fork_out;
     }
-    cprintf("do_fork| alloc_proc\n");
 
     proc->parent = current;
-    cprintf("do_fork| setup_kstack begin\n");
     if (setup_kstack(proc) != 0) {
         goto bad_fork_cleanup_kstack;
     }
-    cprintf("do_fork| setup_kstack end\n");
 
     if (copy_mm(clone_flags, proc) != 0) {
         goto bad_fork_cleanup_proc;
     }
-    cprintf("do_fork| copy_mm\n");
 
     copy_thread(proc, stack, tf);
-    cprintf("do_fork| copy_thread\n");
     
     int intr_flag;
     local_intr_save(intr_flag);
@@ -419,7 +414,7 @@ proc_init(void) {
     }
     cprintf("proc_init| kernel_thread \n");
     initproc = find_proc(pid);
-    set_proc_name(initproc, "init");
+    // set_proc_name(initproc, "init");
     cprintf("proc_init| set_proc_name \n");
     assert(idleproc != NULL && idleproc->pid == 0);
     assert(initproc != NULL && initproc->pid == 1);
