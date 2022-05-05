@@ -333,10 +333,11 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     cprintf("do_fork| alloc_proc\n");
 
     proc->parent = current;
+    cprintf("do_fork| setup_kstack begin\n");
     if (setup_kstack(proc) == -E_NO_MEM) {
         goto bad_fork_cleanup_kstack;
     }
-    cprintf("do_fork| setup_kstack\n");
+    cprintf("do_fork| setup_kstack end\n");
 
     if (copy_mm(clone_flags, proc) != 0) {
         goto bad_fork_cleanup_proc;
