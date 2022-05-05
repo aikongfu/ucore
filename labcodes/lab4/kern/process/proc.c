@@ -386,15 +386,18 @@ void
 proc_init(void) {
     int i;
 
+    cprintf("proc_init in \n");
     list_init(&proc_list);
     for (i = 0; i < HASH_LIST_SIZE; i ++) {
         list_init(hash_list + i);
     }
 
+    cprintf("proc_init| list_init \n");
     if ((idleproc = alloc_proc()) == NULL) {
         panic("cannot alloc idleproc.\n");
     }
 
+    cprintf("proc_init| alloc_proc \n");
     idleproc->pid = 0;
     idleproc->state = PROC_RUNNABLE;
     idleproc->kstack = (uintptr_t)bootstack;
@@ -403,15 +406,15 @@ proc_init(void) {
     nr_process ++;
 
     current = idleproc;
-
+    cprintf("proc_init| set_proc_name \n");
     int pid = kernel_thread(init_main, "Hello world!!", 0);
     if (pid <= 0) {
         panic("create init_main failed.\n");
     }
-
+    cprintf("proc_init| kernel_thread \n");
     initproc = find_proc(pid);
     set_proc_name(initproc, "init");
-
+    cprintf("proc_init| set_proc_name \n");
     assert(idleproc != NULL && idleproc->pid == 0);
     assert(initproc != NULL && initproc->pid == 1);
 }
