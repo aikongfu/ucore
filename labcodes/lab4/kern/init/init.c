@@ -43,24 +43,24 @@ kern_init(void) {
 
     // 初始化中断控制器
     pic_init();                 // init interrupt controller
-    cprintf("%s\n\n", "pic_init");
+    cprintf("%s\n\n", "pic_init end.");
 
     // 初始化中断描述符表
     idt_init();                 // init interrupt descriptor table
-    cprintf("%s\n\n", "idt_init");
+    cprintf("%s\n\n", "idt_init end.");
     vmm_init();                 // init virtual memory management
-    cprintf("%s\n\n", "vmm_init");
+    cprintf("%s\n\n", "vmm_init end.");
     // ide 初始化
     proc_init();                // init process table
-    
+    cprintf("%s\n\n", "proc_init end.");
     ide_init();                 // init ide devices
-    cprintf("%s\n\n", "ide_init");
+    cprintf("%s\n\n", "ide_init end.");
     // swap初始化
     swap_init();                // init swap
-    cprintf("%s\n\n", "swap_init");
+    cprintf("%s\n\n", "swap_init end.");
     // 初始化时钟中断
     clock_init();               // init clock interrupt
-    cprintf("%s\n\n", "clock_init");
+    cprintf("%s\n\n", "clock_init end.");
     // 通过内联汇编调用 "sti" 指令，置中断允许位
     intr_enable();              // enable irq interrupt
 
