@@ -151,7 +151,6 @@ default_free_pages(struct Page *base, size_t n) {
     assert(n > 0);
     // assert(PageReserved(base));
     struct Page *p = base;
-    cprintf("default_free_pages: page base = [%p], n = [%d]\n", base, n);
     for (; p != base + n; p++) {
         assert(!PageReserved(p) && !PageProperty(p));
         p->flags = 0;
