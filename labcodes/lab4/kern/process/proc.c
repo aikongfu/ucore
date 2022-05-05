@@ -334,7 +334,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
 
     proc->parent = current;
     cprintf("do_fork| setup_kstack begin\n");
-    if (setup_kstack(proc) == -E_NO_MEM) {
+    if (setup_kstack(proc) != 0) {
         goto bad_fork_cleanup_kstack;
     }
     cprintf("do_fork| setup_kstack end\n");
