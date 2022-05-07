@@ -31,7 +31,7 @@
  * */
 
 #define SECTSIZE        512
-#define ELFHDR          ((struct elfhdr *)0x10000)      // scratch space
+#define ELFHDR          ((struct elfhdr *)0x10000)      // scratch space 暂存空间
 
 /* waitdisk - wait for disk ready */
 static void
@@ -86,6 +86,7 @@ readseg(uintptr_t va, uint32_t count, uint32_t offset) {
 void
 bootmain(void) {
     // read the 1st page off disk
+    // ?, 读了8个扇区
     readseg((uintptr_t)ELFHDR, SECTSIZE * 8, 0);
 
     // is this a valid ELF?
@@ -104,6 +105,7 @@ bootmain(void) {
 
     // call the entry point from the ELF header
     // note: does not return
+    // e_entry放的是函数入口
     ((void (*)(void))(ELFHDR->e_entry & 0xFFFFFF))();
 
 bad:

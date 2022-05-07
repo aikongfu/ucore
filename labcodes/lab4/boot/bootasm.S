@@ -67,13 +67,13 @@ start_probe:
 cont:
     addw $20, %di           # di + 20,设置下一个BIOS返回的映射地址描述符的起始地址
     incl 0x8000             # 自增指令inc(类似c里的++i),递增struct e820map的成员变量nr_map
-    cmpl $0, %ebx           # 如果INT0x15返回的ebx为零，表示探测结束，否则继续探测,cmpl指令将两个操作数相减，但计算结果并不保存，只是根据计算结果改变eflags寄存器中的标志位。如果两个操作数相等，则计算结果为0，eflags中的ZF位置1。
+    cmpl $0, %ebx           # 如果INT 0x15返回的ebx为零，表示探测结束，否则继续探测,cmpl指令将两个操作数相减，但计算结果并不保存，只是根据计算结果改变eflags寄存器中的标志位。如果两个操作数相等，则计算结果为0，eflags中的ZF位置1。
     jnz start_probe         # JNE/JNZ 不等于时转移.
 finish_probe:
     # 全局描述符表：存放8字节的段描述符，段描述符包含段的属性。
     # 段选择符：总共16位，高13位用作全局描述符表中的索引位，GDT的第一项总是设为0，
-    #   因此孔断选择符的逻辑地址会被认为是无效的，从而引起一个处理器异常。GDT表项
-    #   最大数目是8191个，即2^13 - 1.
+    # 因此段选择符的逻辑地址会被认为是无效的，从而引起一个处理器异常。GDT表项
+    # 最大数目是8191个，即2^13 - 1.
     # Switch from real to protected mode, using a bootstrap GDT
     # and segment translation that makes virtual addresses
     # identical to physical addresses, so that the
