@@ -9,8 +9,15 @@
 # 之前直接调用init.c的kern_init，现在先到entry.S
 # 参考kernel.ld里面的ENTRY(kern_entry)
 
+# (1 << 3) | 0 = 8  = 0x08 = 00001000 = 00000000 00001|0|00 -> Index = 1, GDT, RPL = 0 
+# #define KERNEL_CS    ((GD_KTEXT) | DPL_KERNEL)
 # (2 << 3) | 0 = 16 = 0x10 = 00010000 = 00000000 00010|0|00 -> Index = 2, GDT, RPL = 0 
 # #define KERNEL_DS    ((GD_KDATA) | DPL_KERNEL)
+# (3 << 3) | 3 = 27 = 0x1b = 00011011 = 00000000 00011|0|11 -> Index = 3, GDT, RPL = 3 
+# #define USER_CS        ((GD_UTEXT) | DPL_USER)
+# (4 << 3) | 3 = 35 = 0x23 = 00100011 = 00000000 00100|0|11 -> Index = 4, GDT, RPL = 3 
+# #define USER_DS        ((GD_UDATA) | DPL_USER)
+
 .text
 .globl kern_entry
 kern_entry:
