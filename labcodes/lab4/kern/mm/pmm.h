@@ -54,6 +54,7 @@ void print_pgdir(void);
  * PADDR - takes a kernel virtual address (an address that points above KERNBASE),
  * where the machine's maximum 256MB of physical memory is mapped and returns the
  * corresponding physical address.  It panics if you pass it a non-kernel virtual address.
+ * KERNBASE 0xC0000000 // 3072M
  * */
 #define PADDR(kva) ({                                                   \
             uintptr_t __m_kva = (uintptr_t)(kva);                       \
