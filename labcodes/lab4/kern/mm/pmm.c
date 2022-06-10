@@ -31,6 +31,9 @@
  * contains the new ESP value for CPL = 0. When an interrupt happens in protected
  * mode, the x86 CPU will look in the TSS for SS0 and ESP0 and load their value
  * into SS and ESP respectively.
+ * 
+ * 字段 SS0 包含 CPL = 0 的堆栈段选择器，ESP0 包含 CPL = 0 的新 ESP 值。
+ * 当在保护模式下发生中断时，x86 CPU 将在 TSS 中查找 SS0 和 ESP0 并加载它们的值 分别为 SS 和 ESP
  * */
 static struct taskstate ts = {0};
 
@@ -45,7 +48,7 @@ pde_t *boot_pgdir = NULL;
 uintptr_t boot_cr3;
 
 // physical memory management
-const struct pmm_manager *pmm_manager;
+const struct pmm_manager *pmm_manager; 
 
 /* *
  * The page directory entry corresponding to the virtual address range
@@ -309,7 +312,7 @@ enable_paging(void) {
     lcr0(cr0);
 }
 
-//boot_map_segment - setup&enable the paging mechanism
+// boot_map_segment - setup&enable the paging mechanism
 // parameters
 //  la:   linear address of this memory need to map (after x86 segment map)
 //  size: memory size
@@ -317,7 +320,9 @@ enable_paging(void) {
 //  perm: permission of this memory  
 static void
 boot_map_segment(pde_t *pgdir, uintptr_t la, size_t size, uintptr_t pa, uint32_t perm) {
+    // 页表偏移
     assert(PGOFF(la) == PGOFF(pa));
+    
     size_t n = ROUNDUP(size + PGOFF(la), PGSIZE) / PGSIZE;
     la = ROUNDDOWN(la, PGSIZE);
     pa = ROUNDDOWN(pa, PGSIZE);
