@@ -202,6 +202,7 @@ check_vma_struct(void) {
     int step1 = 10, step2 = step1 * 10;
 
     int i;
+    // i = 10, i >= 1; i--
     for (i = step1; i >= 1; i --) {
         // vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags)
         // vma_create(10 * 5 ,10 * 5 + 2, 0);
@@ -210,6 +211,7 @@ check_vma_struct(void) {
         insert_vma_struct(mm, vma);
     }
 
+    // i = 11; i <= 100; i++
     for (i = step1 + 1; i <= step2; i ++) {
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
         assert(vma != NULL);
@@ -218,6 +220,8 @@ check_vma_struct(void) {
 
     list_entry_t *le = list_next(&(mm->mmap_list));
 
+    // i = 1; i <= 100; i++ 
+    // 全部循环
     for (i = 1; i <= step2; i ++) {
         assert(le != &(mm->mmap_list));
         struct vma_struct *mmap = le2vma(le, list_link);
@@ -225,6 +229,8 @@ check_vma_struct(void) {
         le = list_next(le);
     }
 
+    // i = 5; i <= 500; i+=5
+    // 5, 6, 7, 8, 9...  10, 11, 12, 13, 14...  
     for (i = 5; i <= 5 * step2; i +=5) {
         struct vma_struct *vma1 = find_vma(mm, i);
         assert(vma1 != NULL);
@@ -241,7 +247,7 @@ check_vma_struct(void) {
         assert(vma2->vm_start == i  && vma2->vm_end == i  + 2);
     }
 
-    for (i =4; i>=0; i--) {
+    for (i = 4; i>=0; i--) {
         struct vma_struct *vma_below_5= find_vma(mm,i);
         if (vma_below_5 != NULL ) {
            cprintf("vma_below_5: i %x, start %x, end %x\n",i, vma_below_5->vm_start, vma_below_5->vm_end); 

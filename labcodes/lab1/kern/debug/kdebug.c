@@ -297,6 +297,7 @@ void print_stackframe(void) {
    * ss:[ebp]
    */
   // 调用function，通过内联汇编来读到ebp和eip的值
+  // 这是第一次读EBP和EIP
   uint32_t ebp = read_ebp();
   uint32_t eip = read_eip();
 
@@ -308,12 +309,22 @@ void print_stackframe(void) {
     cprintf("\n");
     // arguments 一般而言，ss:[ebp+4]处为返回地址，ss:[ebp+8]处为第一个参数值
     // 而我们这里uint32_t占4个字节，所以指针+2就可以
+    // 也就是ebp + 8 (8个字节)即在栈里面放EIP的上一个4字节数据里面
+    // var3
+    // var2
+    // var1
+    // EIP
+    // EBP
     uint32_t args[4];
     args[0] = (uint32_t *)ebp + 2;
     cprintf("args:0x%08x\t0x%08x\t0x%08x\t0x%08x\t", args[0], args[1], args[2],args[3]);
     cprintf("\n");
     print_debuginfo(eip - 1);
 
+
+    // ((uint32_t *)ebp)变成一个数组，0为ebp，向上（1）为eip
+    // ebp = ((uint32_t *)ebp)
+    // eip == ((uint32_t *)(ebp + 4))
     ebp = ((uint32_t *)ebp)[0];
     eip = ((uint32_t *)ebp)[1];
   }

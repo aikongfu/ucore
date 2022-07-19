@@ -243,6 +243,7 @@ kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flags) {
 // setup_kstack - alloc pages with size KSTACKPAGE as process kernel stack
 static int
 setup_kstack(struct proc_struct *proc) {
+    // KSTACKPAGE = 2, 也就是只能分配两个page作为运行的stack
     struct Page *page = alloc_pages(KSTACKPAGE);
     if (page != NULL) {
         proc->kstack = (uintptr_t)page2kva(page);
@@ -388,15 +389,31 @@ void
 proc_init(void) {
     int i;
 
+    // init the process set's list
     list_init(&proc_list);
+
+    // HASH_LIST_SIZE = 1 << 10 = 1024
+    // has list for process set based on pid
+    // static list_entry_t hash_list[HASH_LIST_SIZE];
+    // 一个list_entry_t数组
     for (i = 0; i < HASH_LIST_SIZE; i ++) {
         list_init(hash_list + i);
     }
 
+    // alloc_proc - alloc a proc_struct and init all fields of proc_struct
+    // 即相当于初始化idleproc，先分配内存，再赋值
     if ((idleproc = alloc_proc()) == NULL) {
         panic("cannot alloc idleproc.\n");
     }
 
+    // 设置一些属性
+    // bootstack = 0xc010f000
+    //     .align PGSIZE
+    //     .globl bootstack
+    // bootstack:
+    //     .space KSTACKSIZE
+    //     .globl bootstacktop
+    // bootstacktop:
     idleproc->pid = 0;
     idleproc->state = PROC_RUNNABLE;
     idleproc->kstack = (uintptr_t)bootstack;
@@ -404,8 +421,12 @@ proc_init(void) {
     set_proc_name(idleproc, "idle");
     nr_process ++;
 
+    // 设置current = idleproc
     current = idleproc;
 
+    // create a kernel thread using "fn" function
+    // 调用kernel_thread创建一个内核线程
+    // 
     int pid = kernel_thread(init_main, "Hello world!!", 0);
     if (pid <= 0) {
         panic("create init_main failed.\n");
