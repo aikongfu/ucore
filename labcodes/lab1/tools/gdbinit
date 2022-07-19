@@ -1,13 +1,13 @@
 file bin/kernel
+#file bin/bootblock
 target remote :1234
 set architecture i8086
-b *0xffff0
-b *0x7c00
-b lab1_switch_test
-b lab1_switch_to_user
-b lab1_switch_to_kernel
+#b *0xffff0
+#b *0x7c00
+#b lab1_switch_test
+#b lab1_switch_to_user
+#b lab1_switch_to_kernel
 
-# continue
-# x /2i $pc
-# break kern_init
-# continue
+x /2i $pc
+b *0x7c00
+break kern_init

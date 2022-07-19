@@ -29,3 +29,6 @@ learn_list.o.dSYM
 .idea
 
 .settings
+.gdb_history
+peda-session-kernel.txt
+
