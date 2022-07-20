@@ -2,6 +2,7 @@ file bin/kernel
 target remote :1234
 set architecture i8086
 
+b * 0x7c00
 #b print_stackframe
 #b kern_entry
 #b alloc_page
@@ -10,4 +11,5 @@ b kern_init
 #b init_pmm_manager
 #b default_alloc_pages
 #b page_init
+b swap_init
 continue

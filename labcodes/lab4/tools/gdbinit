@@ -1,3 +1,16 @@
+#file bin/bootblock
+#file bin/kernel
+#target remote :1234
 file bin/kernel
 target remote :1234
-break kern_init
+set architecture i8086
+b print_kerninfo
+b *0x7c00
+b bootmain
+b kern_init
+b kern/init/init.c:28
+b cons_init
+b idt_init 
+b proc_init
+b cpu_idle
+#continue
