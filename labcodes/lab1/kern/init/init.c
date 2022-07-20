@@ -9,12 +9,29 @@
 #include <intr.h>
 #include <pmm.h>
 #include <kmonitor.h>
+#include <elf.h>
 int kern_init(void) __attribute__((noreturn));
 void grade_backtrace(void);
 static void lab1_switch_test(void);
 
+#define SECTSIZE        512
+#define ELFHDR          ((struct elfhdr *)0x10000)      // scratch space
+
+
+void disk_test() {
+    cprintf("hello world!, 0x%x\n", ELFHDR->e_magic);
+    cprintf("phnum = %u\n", ELFHDR->e_phnum);
+    struct proghdr *ph, *eph;
+    ph = (struct proghdr *)((uintptr_t)ELFHDR + ELFHDR->e_phoff);
+    eph = ph + ELFHDR->e_phnum;
+    for (; ph < eph; ph++) {
+        cprintf("va = 0x%x memsz = 0x%x offset=0x%x\n",ph->p_va, ph->p_memsz, ph->p_offset);
+    }
+}
+
 int
 kern_init(void) {
+	disk_test();
     extern char edata[], end[];
     memset(edata, 0, end - edata);
 

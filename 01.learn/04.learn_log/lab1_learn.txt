@@ -1,0 +1,22 @@
+(gdb) x /20x $esp
+0x7b68: 0x00007b6c      0x00000000      0x00010094      0x00007bb8
+0x7b78: 0x00007b8c      0x00010094      0x0010370b      0x00000000
+0x7b88: 0x0000001e      0x00000023      0x00000023      0x00000010
+0x7b98: 0x00000010      0x00000078      0x00000000      0x0010024b
+0x7ba8: 0x00000008      0x00000202      0x001036ec      0x34a100a1
+(gdb) si
+trap (tf=0x7b6c) at kern/trap/trap.c:351
+(gdb) p tf
+$2 = (struct trapframe *) 0x7b6c
+
+
+
+50     void trap(struct trapframe *tf)                                                       │
+  >│351     {                                                                                     │
+	  >   │352       // dispatch based on what type of trap occurred                                     │
+		  >      │353       trap_dispatch(tf);                                                                  │
+		  >         │354     }  
+		  >
+		  >
+		  >
+
