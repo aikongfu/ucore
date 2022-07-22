@@ -16,6 +16,8 @@ __alltraps:
     pushal
 
     # load GD_KDATA into %ds and %es to set up data segments for kernel
+    // (2 << 3) = 16    = 00010000
+    // #define GD_KDATA    ((SEG_KDATA) << 3)        // kernel data
     movl $GD_KDATA, %eax
     movw %ax, %ds
     movw %ax, %es
