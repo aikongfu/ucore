@@ -347,5 +347,32 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
+  // 调用function，通过内联汇编来读到ebp和eip的值
+  uint32_t ebp = read_ebp();
+  uint32_t eip = read_eip();
+
+   // STACKFRAME_DEPTH = 20，也就是最多打印20个调用栈,且因为刚开始（第一个）调用开始时ebp = 0，所以这里要保证调用不会溢出
+  int index;
+  for (index = 0; index < STACKFRAME_DEPTH && ebp != 0; index++) {
+
+    // ebp eip
+    
+    cprintf("ebp = 0x%08x\t eip = 0x%08x\t", ebp, eip);
+    cprintf("\n");
+    // arguments 一般而言，ss:[ebp+4]处为返回地址，ss:[ebp+8]处为第一个参数值
+    // 而我们这里uint32_t占4个字节，根据C指针的特性，ebp指针+2就是第一个参数，
+    // 这样我们可以定义一个长度为4的数据，这样依次就对应1、2、3、4参数
+    uint32_t args[4];
+    args[0] = (uint32_t *)ebp + 2;
+    cprintf("args:0x%08x\t0x%08x\t0x%08x\t0x%08x\t", args[0], args[1], args[2],args[3]);
+    cprintf("\n");
+    print_debuginfo(eip - 1);
+    // 如果eip的值转化为指针，那么这个指针指向的就是caller函数（当前函数的调用者）的ebp
+    // 对应的指针+1就是返回值（保存调用者要执行的地址）
+    ebp = ((uint32_t *)ebp)[0];
+    eip = ((uint32_t *)ebp)[1];
+
+  }
+
 }
 

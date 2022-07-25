@@ -87,29 +87,37 @@ static struct proc_struct *
 alloc_proc(void) {
     struct proc_struct *proc = kmalloc(sizeof(struct proc_struct));
     if (proc != NULL) {
-    //LAB4:EXERCISE1 YOUR CODE
-    /*
-     * below fields in proc_struct need to be initialized
-     *       enum proc_state state;                      // Process state
-     *       int pid;                                    // Process ID
-     *       int runs;                                   // the running times of Proces
-     *       uintptr_t kstack;                           // Process kernel stack
-     *       volatile bool need_resched;                 // bool value: need to be rescheduled to release CPU?
-     *       struct proc_struct *parent;                 // the parent process
-     *       struct mm_struct *mm;                       // Process's memory management field
-     *       struct context context;                     // Switch here to run process
-     *       struct trapframe *tf;                       // Trap frame for current interrupt
-     *       uintptr_t cr3;                              // CR3 register: the base addr of Page Directroy Table(PDT)
-     *       uint32_t flags;                             // Process flag
-     *       char name[PROC_NAME_LEN + 1];               // Process name
-     */
-     //LAB5 YOUR CODE : (update LAB4 steps)
-    /*
-     * below fields(add in LAB5) in proc_struct need to be initialized	
-     *       uint32_t wait_state;                        // waiting state
-     *       struct proc_struct *cptr, *yptr, *optr;     // relations between processes
-	 */
+        //LAB4:EXERCISE1 YOUR CODE
+        /*
+        * below fields in proc_struct need to be initialized
+        *       enum proc_state state;                      // Process state
+        *       int pid;                                    // Process ID
+        *       int runs;                                   // the running times of Proces
+        *       uintptr_t kstack;                           // Process kernel stack
+        *       volatile bool need_resched;                 // bool value: need to be rescheduled to release CPU?
+        *       struct proc_struct *parent;                 // the parent process
+        *       struct mm_struct *mm;                       // Process's memory management field
+        *       struct context context;                     // Switch here to run process
+        *       struct trapframe *tf;                       // Trap frame for current interrupt
+        *       uintptr_t cr3;                              // CR3 register: the base addr of Page Directroy Table(PDT)
+        *       uint32_t flags;                             // Process flag
+        *       char name[PROC_NAME_LEN + 1];               // Process name
+        */
+
+        proc->state =  (enum proc_state)PROC_UNINIT;
+        proc->pid = -1;
+        proc->runs = 0;
+        proc->kstack = 0;
+        proc->need_resched = 0;
+        proc->parent = NULL;
+        proc->mm = NULL;
+        memset(&(proc->context), 0, sizeof(struct context));
+        proc->tf = NULL;
+        proc->cr3 = boot_cr3;
+        proc->flags = 0;
+        memset(proc->name, 0, PROC_NAME_LEN);
     }
+    
     return proc;
 }
 
@@ -159,14 +167,21 @@ remove_links(struct proc_struct *proc) {
 // get_pid - alloc a unique pid for process
 static int
 get_pid(void) {
+    // MAX_PID = 8192
     static_assert(MAX_PID > MAX_PROCESS);
     struct proc_struct *proc;
+    // proc 链表
     list_entry_t *list = &proc_list, *le;
+
+    // next_safe = 8192, last_pid = 8192
     static int next_safe = MAX_PID, last_pid = MAX_PID;
+
+    // first time last_pid = 1
     if (++ last_pid >= MAX_PID) {
         last_pid = 1;
         goto inside;
     }
+
     if (last_pid >= next_safe) {
     inside:
         next_safe = MAX_PID;
@@ -174,6 +189,7 @@ get_pid(void) {
         le = list;
         while ((le = list_next(le)) != list) {
             proc = le2proc(le, list_link);
+            // last_pid 
             if (proc->pid == last_pid) {
                 if (++ last_pid >= next_safe) {
                     if (last_pid >= MAX_PID) {
@@ -262,6 +278,7 @@ kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flags) {
 // setup_kstack - alloc pages with size KSTACKPAGE as process kernel stack
 static int
 setup_kstack(struct proc_struct *proc) {
+    // KSTACKPAGE = 2, 也就是只能分配两个page作为运行的stack
     struct Page *page = alloc_pages(KSTACKPAGE);
     if (page != NULL) {
         proc->kstack = (uintptr_t)page2kva(page);
@@ -395,15 +412,42 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    5. insert proc_struct into hash_list && proc_list
     //    6. call wakeup_proc to make the new child process RUNNABLE
     //    7. set ret vaule using child proc's pid
+    
+    // 分配并初始化进程控制块（alloc_proc函数）；
+    // 分配并初始化内核栈（setup_stack函数）；
+    // 根据clone_flag标志复制或共享进程内存管理结构（copy_mm函数）；
+    // 设置进程在内核（将来也包括用户态）正常运行和调度所需的中断帧和执行上下文（copy_thread函数）；
+    // 把设置好的进程控制块放入hash_list和proc_list两个全局进程链表中；
+    // 自此，进程已经准备好执行了，把进程状态设置为“就绪”态；
+    // 设置返回码为子进程的id号。
 
-	//LAB5 YOUR CODE : (update LAB4 steps)
-   /* Some Functions
-    *    set_links:  set the relation links of process.  ALSO SEE: remove_links:  lean the relation links of process 
-    *    -------------------
-	*    update step 1: set child proc's parent to current process, make sure current process's wait_state is 0
-	*    update step 5: insert proc_struct into hash_list && proc_list, set the relation links of process
-    */
-	
+    if ((proc = alloc_proc()) == NULL) {
+        goto fork_out;
+    }
+
+    proc->parent = current;
+    if (setup_kstack(proc) != 0) {
+        goto bad_fork_cleanup_kstack;
+    }
+
+    if (copy_mm(clone_flags, proc) != 0) {
+        goto bad_fork_cleanup_proc;
+    }
+
+    copy_thread(proc, stack, tf);
+    
+    int intr_flag;
+    local_intr_save(intr_flag);
+    {
+        proc->pid = get_pid();
+        hash_proc(proc);
+        list_add(&proc_list, &proc->list_link);
+        nr_process++;
+    }
+    local_intr_restore(intr_flag);
+
+    wakeup_proc(proc);
+    ret = proc->pid;
 fork_out:
     return ret;
 
@@ -813,15 +857,31 @@ void
 proc_init(void) {
     int i;
 
+    // init the process set's list
     list_init(&proc_list);
+
+    // HASH_LIST_SIZE = 1 << 10 = 1024
+    // has list for process set based on pid
+    // static list_entry_t hash_list[HASH_LIST_SIZE];
+    // 一个list_entry_t数组
     for (i = 0; i < HASH_LIST_SIZE; i ++) {
         list_init(hash_list + i);
     }
 
+    // alloc_proc - alloc a proc_struct and init all fields of proc_struct
+    // 即相当于初始化idleproc，先分配内存，再赋值
     if ((idleproc = alloc_proc()) == NULL) {
         panic("cannot alloc idleproc.\n");
     }
 
+    // 设置一些属性
+    // bootstack = 0xc010f000
+    //     .align PGSIZE
+    //     .globl bootstack
+    // bootstack:
+    //     .space KSTACKSIZE
+    //     .globl bootstacktop
+    // bootstacktop:
     idleproc->pid = 0;
     idleproc->state = PROC_RUNNABLE;
     idleproc->kstack = (uintptr_t)bootstack;
@@ -829,6 +889,7 @@ proc_init(void) {
     set_proc_name(idleproc, "idle");
     nr_process ++;
 
+    // 设置current = idleproc
     current = idleproc;
 
     int pid = kernel_thread(init_main, NULL, 0);

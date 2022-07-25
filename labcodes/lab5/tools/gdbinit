@@ -1,3 +1,6 @@
+#file bin/bootblock
+#file bin/kernel
+#target remote :1234
 file bin/kernel
 target remote :1234
 break kern_init

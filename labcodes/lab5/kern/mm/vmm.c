@@ -42,14 +42,17 @@ static void check_pgfault(void);
 // mm_create -  alloc a mm_struct & initialize it.
 struct mm_struct *
 mm_create(void) {
+    // 分配内存给mm_struct结构的mm
     struct mm_struct *mm = kmalloc(sizeof(struct mm_struct));
 
     if (mm != NULL) {
+        // 初始化mm_struct对应的mmap_list
         list_init(&(mm->mmap_list));
         mm->mmap_cache = NULL;
         mm->pgdir = NULL;
         mm->map_count = 0;
 
+        // 只有完成swap manager之后swap_init_ok = 1
         if (swap_init_ok) swap_init_mm(mm);
         else mm->sm_priv = NULL;
         
@@ -60,6 +63,14 @@ mm_create(void) {
 }
 
 // vma_create - alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
+/**
+ * @brief alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
+ *              分配一块内存给新创建的vma_struct，设置其vm_start, vm_end, vm_flags
+ * @param vm_start 
+ * @param vm_end 
+ * @param vm_flags 权限等（如读、写） 
+ * @return struct vma_struct*  the virtual continuous memory area(vma), [vm_start, vm_end),  addr belong to a vma means  vma.vm_start<= addr <vma.vm_end 
+ */
 struct vma_struct *
 vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags) {
     struct vma_struct *vma = kmalloc(sizeof(struct vma_struct));
@@ -267,15 +278,20 @@ check_vma_struct(void) {
     struct mm_struct *mm = mm_create();
     assert(mm != NULL);
 
+    // step1 = 10, step2 = 100
     int step1 = 10, step2 = step1 * 10;
 
     int i;
+    // i = 10, i >= 1; i--
     for (i = step1; i >= 1; i --) {
+        // vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags)
+        // vma_create(10 * 5 ,10 * 5 + 2, 0);
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
         assert(vma != NULL);
         insert_vma_struct(mm, vma);
     }
 
+    // i = 11; i <= 100; i++
     for (i = step1 + 1; i <= step2; i ++) {
         struct vma_struct *vma = vma_create(i * 5, i * 5 + 2, 0);
         assert(vma != NULL);
@@ -284,6 +300,8 @@ check_vma_struct(void) {
 
     list_entry_t *le = list_next(&(mm->mmap_list));
 
+    // i = 1; i <= 100; i++ 
+    // 全部循环
     for (i = 1; i <= step2; i ++) {
         assert(le != &(mm->mmap_list));
         struct vma_struct *mmap = le2vma(le, list_link);
@@ -291,6 +309,8 @@ check_vma_struct(void) {
         le = list_next(le);
     }
 
+    // i = 5; i <= 500; i+=5
+    // 5, 6, 7, 8, 9...  10, 11, 12, 13, 14...  
     for (i = 5; i <= 5 * step2; i +=5) {
         struct vma_struct *vma1 = find_vma(mm, i);
         assert(vma1 != NULL);
@@ -314,8 +334,12 @@ check_vma_struct(void) {
         }
         assert(vma_below_5 == NULL);
     }
-
+    cprintf("check_vma_struct: loop assert, nr_free_pages() = [%d] \n", nr_free_pages());
     mm_destroy(mm);
+    cprintf("check_vma_struct: mm_destroy, nr_free_pages() = [%d] \n", nr_free_pages());
+
+	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
+    // assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_vma_struct() succeeded!\n");
 }
@@ -326,6 +350,8 @@ struct mm_struct *check_mm_struct;
 static void
 check_pgfault(void) {
     size_t nr_free_pages_store = nr_free_pages();
+    cprintf("check_pgfault: after size_t nr_free_pages_store = nr_free_pages();\n");\
+    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
     check_mm_struct = mm_create();
     assert(check_mm_struct != NULL);
@@ -334,6 +360,8 @@ check_pgfault(void) {
     pde_t *pgdir = mm->pgdir = boot_pgdir;
     assert(pgdir[0] == 0);
 
+    // #define PTSIZE          (PGSIZE * NPTEENTRY)    // bytes mapped by a page directory entry
+    // PTSIZE = 4096 * 1024
     struct vma_struct *vma = vma_create(0, PTSIZE, VM_WRITE);
     assert(vma != NULL);
 
@@ -351,8 +379,9 @@ check_pgfault(void) {
         sum -= *(char *)(addr + i);
     }
     assert(sum == 0);
-
+    cprintf("pgdir = [%p], addr = [%d]\n, ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
+    cprintf("pgdir[0] = [%d]\n", pgdir[0]);
     free_page(pde2page(pgdir[0]));
     pgdir[0] = 0;
 
@@ -360,6 +389,7 @@ check_pgfault(void) {
     mm_destroy(mm);
     check_mm_struct = NULL;
 
+    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_pgfault() succeeded!\n");
@@ -388,19 +418,33 @@ volatile unsigned int pgfault_num=0;
  *         -- The U/S flag (bit 2) indicates whether the processor was executing at user mode (1)
  *            or supervisor mode (0) at the time of the exception.
  */
+
 int
 do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
+    // 页访问异常错误码有32位。
+    // 位0为１表示对应物理页不存在；
+    // 位１为１表示写异常（比如写了只读页；位２为１表示访问权限异常（比如用户态程序访问内核空间的数据）
+    
+    // CR2是页故障线性地址寄存器，保存最后一次出现页故障的全32位线性地址。
+    // CR2用于发生页异常时报告出错信息。当发生页异常时，处理器把引起页异常的线性地址保存在CR2中。
+    // 操作系统中对应的中断服务例程可以检查CR2的内容，从而查出线性地址空间中的哪个页引起本次异常。
     int ret = -E_INVAL;
+
     //try to find a vma which include addr
+    // 根据addr从vma中查找对应的vma_struct
+    cprintf("do_pgfault|-------> mm = [%p], error_code = [%x], addr = [%x], ret = [%x]\n", mm, error_code, addr, ret);
     struct vma_struct *vma = find_vma(mm, addr);
 
     pgfault_num++;
     //If the addr is in the range of a mm's vma?
+    cprintf("do_pgfault|-------> mm = [%p], vma = [%p], addr = [%x]\n", mm, vma, addr);
     if (vma == NULL || vma->vm_start > addr) {
         cprintf("not valid addr %x, and  can not find it in vma\n", addr);
         goto failed;
     }
     //check the error_code
+    // 与 00000011
+    // 
     switch (error_code & 3) {
     default:
             /* error code flag : default is 3 ( W/R=1, P=1): write, present */
@@ -451,6 +495,47 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
     *   mm->pgdir : the PDT of these vma
     *
     */
+   
+    // 根据get_pte来获取pte如果不存在，则分配一个新的
+    ptep = get_pte(mm->pgdir, addr, 1);
+    if (ptep == NULL) {
+        cprintf("get_pte in do_pgfault failed\n");
+        goto failed;
+    }
+    struct Page *p;
+    // 如果对应的物理页不存在，分配一个新的页，且把物理地址和逻辑地址映射 
+    if (*ptep == 0) {
+        p = pgdir_alloc_page(mm->pgdir, addr, perm);
+        if (p == NULL) {
+            cprintf("alloc_page in do_pgfault failed\n");
+            goto failed;
+        }
+    } else {
+        // 如果不全为0，则可能被交换到了swap磁盘中
+        if(swap_init_ok) {
+            struct Page *page=NULL;
+            int swapIn;
+            // 从磁盘中换出
+            swapIn = swap_in(mm, addr, &page);
+            if (swapIn != 0) {
+                cprintf("swap_in in do_pgfault failed\n");
+                goto failed;
+            }
+
+            // build the map of phy addr of an Page with the linear addr la
+            page_insert(mm->pgdir, page, addr, perm);
+            // if (page_insert(mm->pgdir, page, addr, perm) != 0) {
+            //     cprintf("page_insert in do_pgfault failed\n");
+            //     goto failed;
+            // }
+
+            swap_map_swappable(mm, addr, page, 1);
+            page->pra_vaddr = addr;
+        } else {
+            cprintf("no swap_init_ok, but ptep is %x, failed\n", *ptep);
+            goto failed;
+        }
+    }
 #if 0
     /*LAB3 EXERCISE 1: YOUR CODE*/
     ptep = ???              //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.

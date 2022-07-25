@@ -55,6 +55,10 @@ typedef size_t ppn_t;
 #define offsetof(type, member)                                      \
     ((size_t)(&((type *)0)->member))
 
+
+// #define le2page(le, member)                 \
+//     to_struct((le), struct Page, member)
+
 /* *
  * to_struct - get the struct from a ptr
  * @ptr:    a struct pointer of member
