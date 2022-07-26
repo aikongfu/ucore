@@ -167,6 +167,16 @@ mm_destroy(struct mm_struct *mm) {
     mm=NULL;
 }
 
+/**
+ * @brief 建立对应的vma结构，并把vma插入到mm结构中
+ * 
+ * @param mm 
+ * @param addr 
+ * @param len 
+ * @param vm_flags 
+ * @param vma_store 
+ * @return int 
+ */
 int
 mm_map(struct mm_struct *mm, uintptr_t addr, size_t len, uint32_t vm_flags,
        struct vma_struct **vma_store) {

@@ -328,7 +328,13 @@ trap_dispatch(struct trapframe *tf) {
         /* you should upate you lab1 code (just add ONE or TWO lines of code):
          *    Every TICK_NUM cycle, you should set current process's current->need_resched = 1
          */
-  
+        // 每个时钟周期，设置当前的process current->need_resched = 1
+        current->need_resched = 1;
+        
+        ticks++;
+        if (ticks % 100 == 0) {
+            print_ticks();
+        }
         break;
     case IRQ_OFFSET + IRQ_COM1:
         c = cons_getc();

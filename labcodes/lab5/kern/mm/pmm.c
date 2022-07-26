@@ -459,6 +459,7 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     // #define PDE_ADDR(pde)   PTE_ADDR(pde) address in page table or page directory entry
     // pdep: page dirtory 
     pde_t *pdep = NULL;
+    // la -> 2进制 -> 前10位 -> 即PDX page dir
     uintptr_t pde = PDX(la);
 
     // pgdir:  the kernel virtual base address of PDT
@@ -616,6 +617,7 @@ exit_range(pde_t *pgdir, uintptr_t start, uintptr_t end) {
 int
 copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
     assert(start % PGSIZE == 0 && end % PGSIZE == 0);
+    // 0x00200000 ~ 0xB0000000
     assert(USER_ACCESS(start, end));
     // copy content by page unit.
     do {
