@@ -653,7 +653,7 @@ load_icode(unsigned char *binary, size_t size) {
     // tf->eip 
     tf->tf_eip = elf->e_entry;
     // tf->eflags
-    tf->tf_eflags |= FL_IOPL_MASK;
+    tf->tf_eflags |= FL_IF;
 
     ret = 0;
 out:
