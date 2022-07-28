@@ -56,21 +56,21 @@ bootstack:
     .globl bootstacktop
 bootstacktop:
 
-@ #define SEG_NULLASM                                             \
-@     .word 0, 0;                                                 \
-@     .byte 0, 0, 0, 0
+# #define SEG_NULLASM                                             \
+#     .word 0, 0;                                                 \
+#     .byte 0, 0, 0, 0
 
-@ gdt:
-@     SEG_NULLASM                                     # null seg
-@     SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff)           # code seg for bootloader and kernel
-@     SEG_ASM(STA_W, 0x0, 0xffffffff)                 # data seg for bootloader and kernel
+# gdt:
+#     SEG_NULLASM                                     # null seg
+#     SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff)           # code seg for bootloader and kernel
+#     SEG_ASM(STA_W, 0x0, 0xffffffff)                 # data seg for bootloader and kernel
 
-@ #define STA_X           0x8         // Executable segment
-@ #define STA_E           0x4         // Expand down (non-executable segments)
-@ #define STA_C           0x4         // Conforming code segment (executable only)
-@ #define STA_W           0x2         // Writeable (non-executable segments)
-@ #define STA_R           0x2         // Readable (executable segments)
-@ #define STA_A           0x1         // Accessed
+# #define STA_X           0x8         // Executable segment
+# #define STA_E           0x4         // Expand down (non-executable segments)
+# #define STA_C           0x4         // Conforming code segment (executable only)
+# #define STA_W           0x2         // Writeable (non-executable segments)
+# #define STA_R           0x2         // Readable (executable segments)
+# #define STA_A           0x1         // Accessed
 // KERNBASE            0xC0000000
 .align 4
 __gdt:
@@ -82,45 +82,36 @@ __gdtdesc:
     .long REALLOC(__gdt)
 
 
-@ #define SEG_ASM(type,base,lim)                                  \
-@     .word (((lim) >> 12) & 0xffff), ((base) & 0xffff);          \
-@     .byte (((base) >> 16) & 0xff), (0x90 | (type)),             \
-@         (0xC0 | (((lim) >> 28) & 0xf)), (((base) >> 24) & 0xff)
+# #define SEG_ASM(type,base,lim)                                  \
+#     .word (((lim) >> 12) & 0xffff), ((base) & 0xffff);          \
+#     .byte (((base) >> 16) & 0xff), (0x90 | (type)),             \
+#         (0xC0 | (((lim) >> 28) & 0xf)), (((base) >> 24) & 0xff)
 
 
-@ STA_X|STA_R = 0x8 | 0x2 = 1000 | 10 = 00001010 = 0xA = 10
-@ STA_W = 0x2 = 00000010
+# STA_X|STA_R = 0x8 | 0x2 = 1000 | 10 = 00001010 = 0xA = 10
+# STA_W = 0x2 = 00000010
 
-@  -0xC0000000 = -3221225472
+#  -0xC0000000 = -3221225472
 
-@ code segment
-@ SEG_ASM(0x0A, -0xC0000000, 0xFFFFFFFF) (type,base,lim)  
-@ (((0xFFFFFFFF) >> 12) & 0xffff), ((-0xC0000000) & 0xffff)
-@ (((-0xC0000000) >> 16) & 0xff), (0x90 | (0x0A)),(0xC0 | (((0xFFFFFFFF) >> 28) & 0xf)), (((-0xC0000000) >> 24) & 0xff)
+# code segment
+# SEG_ASM(0x0A, -0xC0000000, 0xFFFFFFFF) (type,base,lim)  
+# (((base) >> 24 ) & 0xff) | (0xC0 | (((lim) >> 28) & 0xF)) | (0x90 | (type)) | (((base) >> 16) & 0xff)
+# ((base) & 0xffff) | (((lim) >> 12) & 0xffff)
 
-@ 11111111111111111111111111111111 >> 12 &&  1111111111111111, 0
-@ 0, 10011010, 11001111, 01000000
+# (((-0xC0000000) >> 24) & 0xff) | (0xC0 | (((0xFFFFFFFF) >> 28) & 0xf)) | (0x90 | (0x0A)) |(((-0xC0000000) >> 16) & 0xff)
+# ((-0xC0000000) & 0xffff)| (((0xFFFFFFFF) >> 12) & 0xffff)
+# 01000000|11001111|10011010|00000000
+# 00000000 00000000|11111111 11111111
 
-@ 11111111 11111111 00000000 00000000
-@ 00000000 10011010 11001111 01000000
+# # data segment
+# # SEG_ASM(0x0A, -0xC0000000, 0xFFFFFFFF) (type,base,lim)  
+# (((base) >> 24 ) & 0xff) | (0xC0 | (((lim) >> 28) & 0xF)) | (0x90 | (type)) | (((base) >> 16) & 0xff)
+# ((base) & 0xffff) | (((lim) >> 12) & 0xffff)
+# (((-0xC0000000) >> 24) & 0xff) | (0xC0 | (((0xFFFFFFFF) >> 28) & 0xf)) | (0x90 | (0x02)) |(((-0xC0000000) >> 16) & 0xff)
+# ((-0xC0000000) & 0xffff)| (((0xFFFFFFFF) >> 12) & 0xffff)
 
-
-@ data segment
-@ SEG_ASM(0x0A, -0xC0000000, 0xFFFFFFFF) (type,base,lim)  
-@ (((0xFFFFFFFF) >> 12) & 0xffff), ((-0xC0000000) & 0xffff)
-@ (((-0xC0000000) >> 16) & 0xff), (0x90 | (0x2)),(0xC0 | (((0xFFFFFFFF) >> 28) & 0xf)), (((-0xC0000000) >> 24) & 0xff)
-
-@ 11111111111111111111111111111111 >> 12 &&  1111111111111111, 0
-@ 0, 10011010, 11001111, 01000000
-
-@ 00000000 10010010 11001111 01000000
-@ 11111111 11111111 00000000 00000000
+# 01000000|11001111|10010010|00000000
+# 00000000 00000000|11111111 11111111
 
 
-@ 最后得出代码段的结构为：
-@ 11111111 11001111 10011010 11111111
-@ 11111111 11111111 11111111 11111111
-@ 数据段的结构为：
-@ 11111111 11001111 10010010 11111111
-@ 11111111 11111111 11111111 11111111
 
