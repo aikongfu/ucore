@@ -278,6 +278,8 @@ check_vmm(void) {
     check_vma_struct();
     check_pgfault();
 
+//    assert(nr_free_pages_store == nr_free_pages());
+
     cprintf("check_vmm() succeeded.\n");
 }
 
