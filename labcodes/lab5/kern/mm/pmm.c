@@ -766,9 +766,9 @@ check_alloc_page(void) {
 static void
 check_pgdir(void) {
     assert(npage <= KMEMSIZE / PGSIZE);
-    cprintf("|check_pgdir| npage = [%d], KMEMSIZE / PGSIZE = [%d]", npage, KMEMSIZE / PGSIZE);
+    cprintf("|check_pgdir| npage = [%d], KMEMSIZE / PGSIZE = [%d]\n", npage, KMEMSIZE / PGSIZE);
     assert(boot_pgdir != NULL && (uint32_t)PGOFF(boot_pgdir) == 0);
-    cprintf("|check_pgdir| boot_pgdir = [%d], (uint32_t)PGOFF(boot_pgdir) = [%d]", boot_pgdir, (uint32_t)PGOFF(boot_pgdir));
+    cprintf("|check_pgdir| boot_pgdir = [%d], (uint32_t)PGOFF(boot_pgdir) = [%d]\n", boot_pgdir, (uint32_t)PGOFF(boot_pgdir));
     assert(get_page(boot_pgdir, 0x0, NULL) == NULL);
 
     struct Page *p1, *p2;
@@ -777,7 +777,7 @@ check_pgdir(void) {
 
     pte_t *ptep;
     assert((ptep = get_pte(boot_pgdir, 0x0, 0)) != NULL);
-    cprintf("|check_pgdir| ptep = [%d], *ptep = [%d]", ptep, *ptep);
+    cprintf("|check_pgdir| ptep = [%d], *ptep = [%d]\n", ptep, *ptep);
 
     assert(pte2page(*ptep) == p1);
     assert(page_ref(p1) == 1);
