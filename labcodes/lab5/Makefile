@@ -310,12 +310,12 @@ QEMUOPTS = -hda $(UCOREIMG) -drive file=$(SWAPIMG),media=disk,cache=writeback
 
 .PHONY: qemu qemu-nox debug debug-nox
 qemu-mon: $(UCOREIMG) $(SWAPIMG)
-	$(V)$(QEMU) -monitor stdio $(QEMUOPTS) -serial null
+	$(V)$(QEMU)  -no-reboot -monitor stdio $(QEMUOPTS) -serial null
 qemu: $(UCOREIMG) $(SWAPIMG)
-	$(V)$(QEMU) -parallel stdio $(QEMUOPTS) -serial null
+	$(V)$(QEMU)  -no-reboot -parallel stdio $(QEMUOPTS) -serial null
 
 qemu-nox: $(UCOREIMG) $(SWAPIMG)
-	$(V)$(QEMU) -serial mon:stdio $(QEMUOPTS) -nographic
+	$(V)$(QEMU)  -no-reboot -serial mon:stdio $(QEMUOPTS) -nographic
 
 TERMINAL := gnome-terminal
 
@@ -361,9 +361,9 @@ touch:
 print-%:
 	@echo $($(shell echo $(patsubst print-%,%,$@) | $(TR) [a-z] [A-Z]))
 
-.PHONY: clean dist-clean handin packall
+.PHONY: clean dist-clean handin packall tags
 clean:
-	$(V)$(RM) $(GRADE_GDB_IN) $(GRADE_QEMU_OUT)
+	$(V)$(RM) $(GRADE_GDB_IN) $(GRADE_QEMU_OUT) cscope* tags
 	-$(RM) -r $(OBJDIR) $(BINDIR)
 
 dist-clean: clean
