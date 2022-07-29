@@ -48,7 +48,7 @@ pde_t *boot_pgdir = NULL;
 uintptr_t boot_cr3;
 
 // physical memory management
-const struct pmm_manager *pmm_manager; 
+const struct pmm_manager *pmm_manager;
 
 /* *
  * The page directory entry corresponding to the virtual address range
@@ -664,9 +664,9 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
          */
         
         // (1) find src_kvaddr: the kernel virtual address of page
-        uintptr_t *src_kvaddr = (uintptr_t)page2kva(page);
+        void *src_kvaddr = page2kva(page);
         // (2) find dst_kvaddr: the kernel virtual address of npage
-        uintptr_t *dst_kvaddr = (uintptr_t)page2kva(npage);
+        void *dst_kvaddr = page2kva(npage);
         // (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
         memcpy(dst_kvaddr, src_kvaddr, PGSIZE);
         // (4) build the map of phy addr of  nage with the linear addr start

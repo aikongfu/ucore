@@ -116,6 +116,8 @@ alloc_proc(void) {
         proc->cr3 = boot_cr3;
         proc->flags = 0;
         memset(proc->name, 0, PROC_NAME_LEN);
+        proc->wait_state = 0;
+        proc->cptr = proc->optr = proc->yptr = NULL;
     }
     
     return proc;
@@ -426,27 +428,30 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     }
 
     proc->parent = current;
-    if (setup_kstack(proc) != 0) {
-        goto bad_fork_cleanup_kstack;
-    }
+    assert(current->wait_state == 0);
 
-    if (copy_mm(clone_flags, proc) != 0) {
+    if (setup_kstack(proc) != 0) {
         goto bad_fork_cleanup_proc;
     }
 
+    if (copy_mm(clone_flags, proc) != 0) {
+        goto bad_fork_cleanup_kstack;
+    }
     copy_thread(proc, stack, tf);
-    
-    int intr_flag;
+
+    bool intr_flag;
     local_intr_save(intr_flag);
     {
         proc->pid = get_pid();
         hash_proc(proc);
+        // set_links(proc);
         list_add(&proc_list, &proc->list_link);
         nr_process++;
     }
     local_intr_restore(intr_flag);
 
     wakeup_proc(proc);
+
     ret = proc->pid;
 fork_out:
     return ret;
@@ -653,8 +658,7 @@ load_icode(unsigned char *binary, size_t size) {
     // tf->eip 
     tf->tf_eip = elf->e_entry;
     // tf->eflags
-    tf->tf_eflags |= FL_IF;
-
+    tf->tf_eflags = FL_IF;
     ret = 0;
 out:
     return ret;
