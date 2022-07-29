@@ -216,3 +216,25 @@ KERNBASE            0xC0000000
 00000000 00000000|11111111 11111111
 
 
+(gdb) i r cs eip
+cs             0x8      8
+eip            0x100012 0x100012
+(gdb) si
+relocated () at kern/init/entry.S:33
+(gdb) i r cs eip
+cs             0x8      8
+eip            0xc0100019       0xc0100019 <relocated>
+
+(gdb) i r esp ebp
+esp            0x7bcc   0x7bcc
+ebp            0x0      0x0
+(gdb) si
+(gdb) i r esp ebp
+esp            0xc010b000       0xc010b000
+ebp            0x0      0x0
+
+Breakpoint 3, kern_init () at kern/init/init.c:18
+(gdb) i r esp ebp
+esp            0xc010affc       0xc010affc
+ebp            0x0      0x0
+
