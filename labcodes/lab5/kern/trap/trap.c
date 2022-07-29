@@ -72,7 +72,7 @@ void idt_init(void)
         // 因为Privilege Check需要满足：DPL >= max {CPL, RPL}
         // 所以如果不单独改这个会造成Privilege Check失败，无法正确处理user->kernel的流程
         SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
-
+        SETGATE(idt[T_SYSCALL], 1, GD_KTEXT, __vectors[T_SYSCALL], DPL_USER);
         // 通过lidt加载
         lidt(&idt_pd);
     }
@@ -333,8 +333,6 @@ trap_dispatch(struct trapframe *tf) {
         // 设置当前的process current->need_resched = 1
             assert(current != NULL);
             current->need_resched = 1;
-        }
-        if (ticks % 100 == 0) {
             print_ticks();
         }
         break;
