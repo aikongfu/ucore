@@ -340,7 +340,8 @@ print_all_pt(pte_t *pt_base) {
     _NO_LOG_START
     LOG("\n一级页表内容:\n\n");
     LOG_TAB("索引\t二级页表物理基址\t存在位\t读写性\t特权级\n");
-    for(int i = 1023; i >= 0; -- i){
+	int i;
+    for(i = 1023; i >= 0; -- i){
         pde_t *pdep = pt_base + i;
         if(*pdep != 0){
             LOG_TAB("%u", i);

@@ -269,10 +269,6 @@ print_kerninfo(void) {
     LOG_LINE("内核地址空间布局框架");
     LOG_KER_SYM_INFO("end", end);
     LOG_KER_SYM_INFO("edata", edata);
-    LOG_KER_SYM_INFO("[0, 4M) pt end", __boot_pt1 + 1024 * sizeof(uint32_t));
-    LOG_KER_SYM_INFO("[0, 4M) pt begin", __boot_pt1);
-    LOG_KER_SYM_INFO("global pd end", __boot_pt1);
-    LOG_KER_SYM_INFO("global pd begin", __boot_pgdir);    
     LOG_KER_SYM_INFO("bootstacktop", bootstacktop);    
     LOG_KER_SYM_INFO("bootstack", bootstack);    
     LOG_KER_SYM_INFO("etext", etext);
