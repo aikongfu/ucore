@@ -283,8 +283,10 @@ debug-nox: $(UCOREIMG)
 	$(V)$(QEMU) -S -s -serial mon:stdio $(QEMUOPTS) -nographic &
 	$(V)sleep 2
 	$(V)$(TERMINAL) -e "$(GDB) -q -x tools/gdbinit"
-debug-gdb: $(UCOREIMG) $(SWAPIMG) $(SFSIMG)
-    $(V)$(TERMINAL) -c "$(GDB) -q -x tools/gdbinit"
+
+#debug-gdb: $(UCOREIMG) $(SWAPIMG) $(SFSIMG)
+#    $(V)$(TERMINAL) -c "$(GDB) -q -x tools/gdbinit"
+
 .PHONY: grade touch
 
 GRADE_GDB_IN	:= .gdb.in
