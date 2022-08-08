@@ -275,7 +275,7 @@ qemu-nox: targets
 TERMINAL := gnome-terminal
 
 debug: $(UCOREIMG)
-	$(V)$(QEMU) -S -s -parallel stdio $(QEMUOPTS) -serial null &
+	$(V)$(QEMU) -S -s -d -parallel stdio $(QEMUOPTS) -serial null &
 	$(V)sleep 2
 	$(V)$(TERMINAL) -e "$(GDB) -q -x tools/gdbinit"
 
