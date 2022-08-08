@@ -5,8 +5,6 @@
 #include <string.h>
 #include <memlayout.h>
 #include <sync.h>
-#include <vmm.h>
-#include <proc.h>
 #include <kdebug.h>
 #include <kmonitor.h>
 #include <assert.h>
