@@ -8,6 +8,7 @@
 #include <default_pmm.h>
 #include <sync.h>
 #include <error.h>
+#include <kdebug.h>
 
 /* *
  * Task State Segment:
@@ -248,6 +249,7 @@ page_init(void) {
     // 空闲地址的起始地址
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
+    LOG_TAB("npage = [%d], pages = [%d], freemem = [%d]\n", npage, pages, freemem);
     // 循环处理前面扫描出来的几块内容区域
     for (i = 0; i < memmap->nr_map; i ++) {
         // 内容区域的begin-->end
@@ -263,6 +265,7 @@ page_init(void) {
 
             // 对每一个扫出来的内存区域，通过 begin向上取整对齐，end向下取整对齐
             if (begin < end) {
+                LOG_TAB("begin = [%d], end = [%d]\n", begin, end);
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
                 // 此内存区域的page数量：n (end - begin) / PGSIZE
@@ -277,8 +280,11 @@ page_init(void) {
                 // (begin >> 12)(根据起始地址得到的页数) 必需要小于 n ---->相当于是除以4K，因为2^12=4096=1page大小
                 // &pages[PPN(pa)];  PPN(pa) 另一个角度来讲就是pages数组里的index
                 // pa2page(begin) 通过这种方式，可以把一个physical address变成page
+                
                 if (begin < end) {
                     // 接着开始初始化（memory map -> page）
+                    LOG_TAB("begin = [%d], end = [%d], pa2page(begin) = [%d], (end - begin) / PGSIZE = [%d],\n",
+                    begin, end, pa2page(begin), (end - begin) / PGSIZE);
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
             }
@@ -328,6 +334,27 @@ boot_alloc_page(void) {
     return page2kva(p);
 }
 
+
+void
+print_all_pt(pte_t *pt_base) {
+    _NO_LOG_START
+    LOG("\n一级页表内容:\n\n");
+    LOG_TAB("索引\t二级页表物理基址\t存在位\t读写性\t特权级\n");
+    for(int i = 1023; i >= 0; -- i){
+        pde_t *pdep = pt_base + i;
+        if(*pdep != 0){
+            LOG_TAB("%u", i);
+            LOG_TAB("0x%08lx", (*pdep) & ~0xFFF );
+            LOG_TAB("\t%u",(*pdep) & 1);
+            LOG_TAB("%s",((*pdep) & 1<<1) == 0 ? "r":"rw");
+            LOG_TAB("%s\n",((*pdep) & 1<<2) == 0 ? "s":"u");
+        }
+    }
+    LOG("\n");
+    _NO_LOG_END
+}
+
+
 //pmm_init - setup a pmm to manage physical memory, build PDT&PT to setup paging mechanism 
 //         - check the correctness of pmm & paging mechanism, print PDT&PT
 void
@@ -338,18 +365,24 @@ pmm_init(void) {
     //Then pmm can alloc/free the physical memory. 
     //Now the first_fit/best_fit/worst_fit/buddy_system pmm are available.
     init_pmm_manager();
+    LOG_TAB("物理内存管理器实例- %s 初始化完毕.\n",pmm_manager->name);
 
     // detect physical memory space, reserve already used memory,
     // then use pmm->init_memmap to create free page list
     page_init();
+    LOG_TAB("page_init 初始化完毕\n");
 
     //use pmm->check to verify the correctness of the alloc/free function in a pmm
     check_alloc_page();
+    LOG_TAB("check_alloc_page 初始化完毕\n");
 
     // create boot_pgdir, an initial page directory(Page Directory Table, PDT)
     boot_pgdir = boot_alloc_page();
     memset(boot_pgdir, 0, PGSIZE);
     boot_cr3 = PADDR(boot_pgdir);
+
+    LOG_TAB("已维护内核页表物理地址;当前页表只临时维护了 KERNBASE 起的 4M 映射,页表内容:\n");
+    print_all_pt(boot_pgdir);
 
     check_pgdir();
 
@@ -357,7 +390,14 @@ pmm_init(void) {
 
     // recursively insert boot_pgdir in itself
     // to form a virtual page table at virtual address VPT
+    // boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
+
+    LOG("\n开始建立一级页表自映射: [VPT, VPT + 4MB) => [PADDR(boot_pgdir), PADDR(boot_pgdir) + 4MB).\n");
     boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
+    LOG("\n自映射完毕.\n");
+    //print_pgdir();
+    print_all_pt(boot_pgdir);
+
 
     // map all physical memory to linear memory with base linear addr KERNBASE
     //linear_addr KERNBASE~KERNBASE+KMEMSIZE = phy_addr 0~KMEMSIZE
@@ -365,7 +405,8 @@ pmm_init(void) {
     boot_map_segment(boot_pgdir, KERNBASE, KMEMSIZE, 0, PTE_W);
 
     //temporary map: 
-    //virtual_addr 3G~3G+4M = linear_addr 0~4M = linear_addr 3G~3G+4M = phy_addr 0~4M     
+    //virtual_addr 3G~3G+4M = linear_addr 0~4M = linear_addr 3G~3G+4M = phy_addr 0~4M
+
     boot_pgdir[0] = boot_pgdir[PDX(KERNBASE)];
 
     enable_paging();
