@@ -254,7 +254,8 @@ page_init(void) {
     for (i = 0; i < memmap->nr_map; i ++) {
         // 内容区域的begin-->end
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
-        // 如果内存类型是E820_ARM（可用），比较
+        // 如果内存类型是E820_ARM（可用），比较、
+        cprintf("begin = [0x%x], end = [0x%x]\n", begin, end-1);
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
@@ -265,7 +266,6 @@ page_init(void) {
 
             // 对每一个扫出来的内存区域，通过 begin向上取整对齐，end向下取整对齐
             if (begin < end) {
-                cprintf("begin = [0x%x], end = [0x%x]\n", begin, end);
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
                 // 此内存区域的page数量：n (end - begin) / PGSIZE
@@ -380,6 +380,9 @@ pmm_init(void) {
     memset(boot_pgdir, 0, PGSIZE);
     boot_cr3 = PADDR(boot_pgdir);
 
+    cprintf("boot_pgdir = [0x%x]\n", boot_pgdir);
+    cprintf("boot_cr3 = [0x%x]\n", boot_cr3);
+
     cprintf("已维护内核页表物理地址;当前页表只临时维护了 KERNBASE 起的 4M 映射,页表内容:\n");
     print_all_pt(boot_pgdir);
 
@@ -394,6 +397,8 @@ pmm_init(void) {
     cprintf("\n开始建立一级页表自映射: [VPT, VPT + 4MB) => [PADDR(boot_pgdir), PADDR(boot_pgdir) + 4MB).\n");
     boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
     cprintf("\n自映射完毕.\n");
+    cprintf("VPT = [0x%x], PDX(VPT) = [0x%x], boot_pgdir[PDX(VPT)] = [0x%x], boot_pgdir = [0x%x], PADDR(boot_pgdir) = [0x%x]\n", 
+        VPT, PDX(VPT), boot_pgdir[PDX(VPT)], boot_pgdir, PADDR(boot_pgdir));    
     //print_pgdir();
     print_all_pt(boot_pgdir);
 
@@ -407,7 +412,8 @@ pmm_init(void) {
     //virtual_addr 3G~3G+4M = linear_addr 0~4M = linear_addr 3G~3G+4M = phy_addr 0~4M
 
     boot_pgdir[0] = boot_pgdir[PDX(KERNBASE)];
-
+    cprintf("boot_pgdir[0] = [0x%x], KERNBASE = [0x%x], PDX(KERNBASE) = [0x%x], boot_pgdir[PDX(KERNBASE)] = [0x%x]",
+        boot_pgdir[0], KERNBASE, PDX(KERNBASE), boot_pgdir[PDX(KERNBASE)]);
     enable_paging();
 
     //reload gdt(third time,the last time) to map all physical memory
