@@ -123,7 +123,7 @@ lgdt(struct pseudodesc *pd) {
     asm volatile ("movw %%ax, %%gs" :: "a" (USER_DS));
     asm volatile ("movw %%ax, %%fs" :: "a" (USER_DS));
     asm volatile ("movw %%ax, %%es" :: "a" (KERNEL_DS));
-    asm volatile ("movw %%ax, %%ds" :: "a" (KERNEL_DS));
+    asm volatile ("movw %%ax, %0x%11xs" :: "a" (KERNEL_DS));
     asm volatile ("movw %%ax, %%ss" :: "a" (KERNEL_DS));
     // reload cs
     asm volatile ("ljmp %0, $1f\n 1:\n" :: "i" (KERNEL_CS));
@@ -223,7 +223,7 @@ page_init(void) {
     int i;
     for (i = 0; i < memmap->nr_map; i ++) {
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
-        cprintf("  memory: %08llx, [%08llx, %08llx], type = %d.\n",
+        cprintf("  memory: %08llx, [%08llx, %08llx], type = 0x%11x.\n",
                 memmap->map[i].size, begin, end - 1, memmap->map[i].type);
         if (memmap->map[i].type == E820_ARM) {
             if (maxpa < end && begin < KMEMSIZE) {
@@ -249,7 +249,7 @@ page_init(void) {
     // 空闲地址的起始地址
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
-    cprintf("npage = [%d], pages = [%d], freemem = [%d]\n", npage, pages, freemem);
+    cprintf("npage = [0x%llx], pages = [0x%p], freemem = [0x%11x]\n", npage, pages, freemem);
     // 循环处理前面扫描出来的几块内容区域
     for (i = 0; i < memmap->nr_map; i ++) {
         // 内容区域的begin-->end
@@ -265,7 +265,7 @@ page_init(void) {
 
             // 对每一个扫出来的内存区域，通过 begin向上取整对齐，end向下取整对齐
             if (begin < end) {
-                cprintf("begin = [%d], end = [%d]\n", begin, end);
+                cprintf("begin = [0x%11x], end = [0x%11x]\n", begin, end);
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
                 // 此内存区域的page数量：n (end - begin) / PGSIZE
@@ -283,7 +283,7 @@ page_init(void) {
                 
                 if (begin < end) {
                     // 接着开始初始化（memory map -> page）
-                    cprintf("begin = [%d], end = [%d], pa2page(begin) = [%d], (end - begin) / PGSIZE = [%d],\n",
+                    cprintf("begin = [0x%11x], end = [0x%11x], pa2page(begin) = [0x%11x], (end - begin) / PGSIZE = [0x%11x],\n",
                     begin, end, pa2page(begin), (end - begin) / PGSIZE);
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
