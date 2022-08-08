@@ -434,7 +434,8 @@ static struct log_ctl_entry*
 get_ctl_entry(const char *mod_name){
     if((!mod_name) || (!IS_LOG_GLOBAL_ENABLE)) return NULL;
     struct log_ctl_entry *e = NULL;
-    for(int i = 0; i < sizeof(log_ctl_tb)/sizeof(struct log_ctl_entry); ++i ){
+    int i = 0;
+    for(i = 0; i < sizeof(log_ctl_tb)/sizeof(struct log_ctl_entry); ++i ){
         if(!strncmp(log_ctl_tb[i].mod_name, mod_name, strlen(log_ctl_tb[i].mod_name))){
             return &log_ctl_tb[i];// lookup the table above
         }
