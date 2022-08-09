@@ -380,7 +380,7 @@ pmm_init(void) {
     memset(boot_pgdir, 0, PGSIZE);
     boot_cr3 = PADDR(boot_pgdir);
 
-    cprintf("boot_pgdir = [0x%x]\n", boot_pgdir);
+    cprintf("boot_pgdir = [0x%x], *boot_pgdir = [0x%x]\n", boot_pgdir, *boot_pgdir);
     cprintf("boot_cr3 = [0x%x]\n", boot_cr3);
 
     cprintf("已维护内核页表物理地址;当前页表只临时维护了 KERNBASE 起的 4M 映射,页表内容:\n");
@@ -393,7 +393,9 @@ pmm_init(void) {
     // recursively insert boot_pgdir in itself
     // to form a virtual page table at virtual address VPT
     // boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
-
+    // [0xFAC00000, 0xFAC00000 + 4MB) => [0x11ae000,  0x11ae000 + 4MB)
+    // 1111101011 0000000000 000000000000
+    // 0001000110 1011100000 000000000000
     cprintf("\n开始建立一级页表自映射: [VPT, VPT + 4MB) => [PADDR(boot_pgdir), PADDR(boot_pgdir) + 4MB).\n");
     boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
     cprintf("\n自映射完毕.\n");
