@@ -249,13 +249,13 @@ page_init(void) {
     // 空闲地址的起始地址
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
-    cprintf("npage = [0x%x], pages = [0x%p], freemem = [0x%x]\n", npage, pages, freemem);
+    cprintf("npage = [0x%x], pages = [%p], freemem = [0x%x]\n", npage, pages, freemem);
     // 循环处理前面扫描出来的几块内容区域
     for (i = 0; i < memmap->nr_map; i ++) {
         // 内容区域的begin-->end
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
         // 如果内存类型是E820_ARM（可用），比较、
-        cprintf("begin = [0x%x], end = [0x%x]\n", begin, end-1);
+        cprintf("begin = [0x%x], end = [0x%x]\n", begin, end);
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
