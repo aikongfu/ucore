@@ -380,6 +380,11 @@ pmm_init(void) {
     memset(boot_pgdir, 0, PGSIZE);
     boot_cr3 = PADDR(boot_pgdir);
 
+    // boot_pgdir = 0xc11ae000
+    // boot_cr3 = 0x11ae000 = 0xc11ae000 - 0xC0000000
+    // VPT 0xfac00000
+    // 1111101011 0000000000 000000000000
+
     cprintf("boot_pgdir = [0x%x], *boot_pgdir = [0x%x]\n", boot_pgdir, *boot_pgdir);
     cprintf("boot_cr3 = [0x%x]\n", boot_cr3);
 
@@ -774,6 +779,15 @@ get_pgtable_items(size_t left, size_t right, size_t start, uintptr_t *table, siz
     }
     return 0;
 }
+
+/**
+ * 最终
+ * vpt 页目录表中第一个目录表项指向的页表的起始虚地址
+ * vpd 页目录表的起始虚地址
+ * vpt = 1111101011 0000000000 000000000000
+ * vpd = 1111101011 1111101011 000000000000
+ * 
+ */
 
 //print_pgdir - print the PDT&PT
 void

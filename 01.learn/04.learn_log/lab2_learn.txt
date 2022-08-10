@@ -216,6 +216,8 @@ KERNBASE            0xC0000000
 00000000 00000000|11111111 11111111
 
 
+
+
 (gdb) i r cs eip
 cs             0x8      8
 eip            0x100012 0x100012
@@ -237,4 +239,71 @@ Breakpoint 3, kern_init () at kern/init/init.c:18
 (gdb) i r esp ebp
 esp            0xc010affc       0xc010affc
 ebp            0x0      0x0
+
+eax            0x100000 1048576
+ecx            0x0      0
+edx            0x1f0    496
+ebx            0x10074  65652
+esp            0x7bcc   0x7bcc
+ebp            0x7bf8   0x7bf8
+esi            0x0      0
+edi            0x1      1
+eip            0x100000 0x100000
+eflags         0x6      [ PF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x10     16
+gs             0x10     16
+
+
+eax            0x100000 1048576
+ecx            0x0      0
+edx            0x1f0    496
+ebx            0x10074  65652
+esp            0x7bcc   0x7bcc
+ebp            0x7bf8   0x7bf8
+esi            0x0      0
+edi            0x1      1
+eip            0x100007 0x100007
+eflags         0x6      [ PF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x10     16
+gs             0x10     16
+
+
+cr0 -> 0x10 -> 00010000
+
+(gdb) i r cs eip
+cs             0x8      8
+eip            0x100010 0x100010
+
+(gdb) i r cs eip
+cs             0x8      8
+eip            0xc0100019       0xc0100019 <relocated>
+
+eax            0x10     16
+ecx            0x0      0
+edx            0x1f0    496
+ebx            0x10074  65652
+esp            0x7bcc   0x7bcc
+ebp            0x7bf8   0x7bf8
+esi            0x0      0
+edi            0x1      1
+eip            0xc0100019       0xc0100019 <relocated>
+eflags         0x6      [ PF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x10     16
+gs             0x10     16
+
+
+线性地址已经变了
+已经加了0xc0000000 -> 0xc0100019
 
