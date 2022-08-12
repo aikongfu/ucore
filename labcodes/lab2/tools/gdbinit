@@ -16,6 +16,8 @@ break kern_init
 b check_pgdir
 b enable_paging
 b gdt_init
+b check_boot_pgdir
+b print_pgdir
 
 
 #file bin/kernel
@@ -30,4 +32,4 @@ b gdt_init
 #b init_pmm_manager
 #b default_alloc_pages
 #b page_init
-# continue
+continue
