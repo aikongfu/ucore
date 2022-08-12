@@ -341,7 +341,8 @@ boot_alloc_page(void) {
 
 void
 print_all_pt(pte_t *pt_base) {
-    boot_pgdir;
+	cprintf("------------------------------------------------\n");
+	cprintf("boot_pgdir = [0x%08x]\n", boot_pgdir);	
     cprintf("\n一级页表内容:\n\n");
     cprintf("索引\t二级页表物理基址\t存在位\t读写性\t特权级\n");
     int i;
@@ -349,14 +350,15 @@ print_all_pt(pte_t *pt_base) {
         // *pdep即对应的页表项的指针 
         pde_t *pdep = pt_base + i;
         if (*pdep != 0) {
-            cprintf("%u", i);
-            cprintf("0x%08lx", (*pdep) & ~0xFFF );
-            cprintf("\t%u",(*pdep) & 1);
-            cprintf("%s",((*pdep) & 1<<1) == 0 ? "r":"rw");
+            cprintf("%u\t", i);
+            cprintf("0x%08lx\t", (*pdep) & ~0xFFF );
+            cprintf("\t%u\t",(*pdep) & 1);
+            cprintf("%s\t",((*pdep) & 1<<1) == 0 ? "r":"rw");
             cprintf("%s\n",((*pdep) & 1<<2) == 0 ? "s":"u");
         }
     }
     cprintf("\n");
+	cprintf("------------------------------------------------\n");
 }
 
 // void
@@ -442,10 +444,14 @@ pmm_init(void) {
     //temporary map: 
     //virtual_addr 3G~3G+4M = linear_addr 0~4M = linear_addr 3G~3G+4M = phy_addr 0~4M
 
+	print_all_pt(boot_pgdir);
     boot_pgdir[0] = boot_pgdir[PDX(KERNBASE)];
     cprintf("boot_pgdir[0] = [0x%08x], KERNBASE = [0x%08x], PDX(KERNBASE) = [0x%08x], boot_pgdir[PDX(KERNBASE)] = [0x%08x]",
         boot_pgdir[0], KERNBASE, PDX(KERNBASE), boot_pgdir[PDX(KERNBASE)]);
-    enable_paging();
+    
+	print_all_pt(boot_pgdir);
+    
+	enable_paging();
 
     //reload gdt(third time,the last time) to map all physical memory
     //virtual_addr 0~4G=liear_addr 0~4G
