@@ -346,7 +346,6 @@ void print_pte_0(pde_t *p0) {
     cprintf("pt_0 = [0x%08x]\n", *p0);	
     cprintf("\n第0个页表内容:\n\n");
     cprintf("索引\t页表项指向的物理基址\t存在位\t读写性\t特权级\n");
-    PADDR(*p0);
     int i;
     for (i = 1023; i >= 0; --i) {
         // *ptep即对应的页表项的指针 
@@ -478,9 +477,10 @@ pmm_init(void) {
     
     pde_t *p0 = boot_pgdir[0];
 
-    print_pte_0(p0);
-
-    DEBUG("boot_pgdir[0][0] = [0x%08x]\n", boot_pgdir[0][0]);
+    // print_pte_0(p0);
+	// *p0 -> physic
+	DEBUG("PADDR(KADDR(*p0)) = [0x%08x]\n", PADDR(KADDR(*p0)));
+	DEBUG("(unit32_t *)(0xC11af000) = [0x%08x]\n", *(uint32_t *)(0x011af000));
 
 	enable_paging();
 
