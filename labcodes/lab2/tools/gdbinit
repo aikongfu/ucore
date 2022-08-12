@@ -13,6 +13,10 @@ b *0x7c85
 b *0x7d70
 b *0x7d80
 break kern_init
+b check_pgdir
+b enable_paging
+b gdt_init
+
 
 #file bin/kernel
 #target remote :1234
