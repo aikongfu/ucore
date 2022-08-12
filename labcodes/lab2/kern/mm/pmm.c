@@ -339,6 +339,14 @@ boot_alloc_page(void) {
     return page2kva(p);
 }
 
+void print_pte_0(pde_t *p0) {
+    cprintf("------------------------------------------------\n");
+    cprintf("pt_0 = [0x%08x]\n", *p0);	
+    cprintf("\n第0个页表内容:\n\n");
+    cprintf("索引\t页表项指向的物理基址\t存在位\t读写性\t特权级\n");
+    int i;
+}
+
 void
 print_all_pt(pte_t *pt_base) {
 	cprintf("------------------------------------------------\n");
@@ -451,6 +459,13 @@ pmm_init(void) {
     
 	print_all_pt(boot_pgdir);
     
+    pde_t *p0 = boot_pgdir[0];
+
+    // print_pte_0(p0);
+    DEBUG("boot_pgdir[0] = [0x%08x]\n",boot_pgdir[0]);
+    pde_t *pde_t0 = boot_pgdir[0][0];
+    DEBUG("boot_pgdir[0][0] = [0x%08x]\n", boot_pgdir[0][0]);
+
 	enable_paging();
 
     //reload gdt(third time,the last time) to map all physical memory
