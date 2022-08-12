@@ -340,11 +340,28 @@ boot_alloc_page(void) {
 }
 
 void print_pte_0(pde_t *p0) {
-    cprintf("------------------------------------------------\n");
+    // cprintf("------------------------------------------------\n");
+    cprintf("boot_pgdir[0] = [0x%08x]\n",*p0);
+    pte_t *pte0 = KADDR(boot_pgdir[0]);
     cprintf("pt_0 = [0x%08x]\n", *p0);	
     cprintf("\n第0个页表内容:\n\n");
     cprintf("索引\t页表项指向的物理基址\t存在位\t读写性\t特权级\n");
+    PADDR(*p0);
     int i;
+    for (i = 1023; i >= 0; --i) {
+        // *ptep即对应的页表项的指针 
+        pte_t *ptep = pte0 + i;
+        if (*ptep != 0) {
+            cprintf("%u\t", i);
+            cprintf("0x%08lx\t", (*ptep) & ~0xFFF );
+            cprintf("\t%u\t",(*ptep) & 1);
+            cprintf("%s\t",((*ptep) & 1<<1) == 0 ? "r":"rw");
+            cprintf("%s\n",((*ptep) & 1<<2) == 0 ? "s":"u");
+        }
+    }
+    cprintf("\n");
+	cprintf("------------------------------------------------\n");
+    
 }
 
 void
@@ -461,9 +478,8 @@ pmm_init(void) {
     
     pde_t *p0 = boot_pgdir[0];
 
-    // print_pte_0(p0);
-    DEBUG("boot_pgdir[0] = [0x%08x]\n",boot_pgdir[0]);
-    pde_t *pde_t0 = boot_pgdir[0][0];
+    print_pte_0(p0);
+
     DEBUG("boot_pgdir[0][0] = [0x%08x]\n", boot_pgdir[0][0]);
 
 	enable_paging();
