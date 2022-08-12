@@ -364,7 +364,8 @@ pmm_init(void) {
     //Then pmm can alloc/free the physical memory. 
     //Now the first_fit/best_fit/worst_fit/buddy_system pmm are available.
     init_pmm_manager();
-    cprintf("物理内存管理器实例- %s 初始化完毕.\n",pmm_manager->name);
+    DEBUG("物理内存管理器实例- %s 初始化完毕.\n",pmm_manager->name);
+    
 
     // detect physical memory space, reserve already used memory,
     // then use pmm->init_memmap to create free page list
