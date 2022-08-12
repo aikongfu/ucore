@@ -236,10 +236,15 @@ page_init(void) {
         maxpa = KMEMSIZE;
     }
 
+    DEBUG("maxpa = [0x%08x] \n", maxpa);
     extern char end[];
-
+    DEBUG("end = [0x%08x] \n", end);
     npage = maxpa / PGSIZE;
+    DEBUG("npage = [0x%08x] \n", npage);
     pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);
+
+    DEBUG("ROUNDUP((void *)end, PGSIZE) = [0x%08x] \n", ROUNDUP((void *)end, PGSIZE));
+    DEBUG("pages = [0x%08x], struct page_size = [%d]\n", pages, sizeof(struct Page));
 
     // 先把pages设置为reserved，后面再把type为E820_ARM（1）的设置为可用
     for (i = 0; i < npage; i ++) {
@@ -249,13 +254,12 @@ page_init(void) {
     // 空闲地址的起始地址
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
-    cprintf("npage = [0x%x], pages = [%p], freemem = [0x%x]\n", npage, pages, freemem);
+    DEBUG("freemem = [0x%08x]\n", freemem);
     // 循环处理前面扫描出来的几块内容区域
     for (i = 0; i < memmap->nr_map; i ++) {
         // 内容区域的begin-->end
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
         // 如果内存类型是E820_ARM（可用），比较、
-        cprintf("begin = [0x%x], end = [0x%x]\n", begin, end);
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
@@ -283,8 +287,9 @@ page_init(void) {
                 
                 if (begin < end) {
                     // 接着开始初始化（memory map -> page）
-                    cprintf("begin = [0x%x], end = [0x%x], pa2page(begin) = [0x%x], (end - begin) / PGSIZE = [0x%x],\n",
-                    begin, end, pa2page(begin), (end - begin) / PGSIZE);
+                    cprintf("begin = [0x%08x], end = [0x%08x]\n", begin, end);
+                    cprintf("pa2page(begin) = [0x%08x], (end - begin) / PGSIZE = [0x%08x],\n",
+                            pa2page(begin), (end - begin) / PGSIZE);
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
             }
@@ -334,15 +339,16 @@ boot_alloc_page(void) {
     return page2kva(p);
 }
 
-
 void
 print_all_pt(pte_t *pt_base) {
+    boot_pgdir;
     cprintf("\n一级页表内容:\n\n");
     cprintf("索引\t二级页表物理基址\t存在位\t读写性\t特权级\n");
-	int i;
-    for(i = 1023; i >= 0; -- i){
+    int i;
+    for (i = 1023; i >= 0; --i) {
+        // *pdep即对应的页表项的指针 
         pde_t *pdep = pt_base + i;
-        if(*pdep != 0){
+        if (*pdep != 0) {
             cprintf("%u", i);
             cprintf("0x%08lx", (*pdep) & ~0xFFF );
             cprintf("\t%u",(*pdep) & 1);
@@ -352,6 +358,24 @@ print_all_pt(pte_t *pt_base) {
     }
     cprintf("\n");
 }
+
+// void
+// print_all_pt(pte_t *pt_base) {
+//     cprintf("\n一级页表内容:\n\n");
+//     cprintf("索引\t二级页表物理基址\t存在位\t读写性\t特权级\n");
+// 	int i;
+//     for(i = 1023; i >= 0; -- i){
+//         pde_t *pdep = pt_base + i;
+//         if(*pdep != 0){
+//             cprintf("%u", i);
+//             cprintf("0x%08lx", (*pdep) & ~0xFFF );
+//             cprintf("\t%u",(*pdep) & 1);
+//             cprintf("%s",((*pdep) & 1<<1) == 0 ? "r":"rw");
+//             cprintf("%s\n",((*pdep) & 1<<2) == 0 ? "s":"u");
+//         }
+//     }
+//     cprintf("\n");
+// }
 
 
 //pmm_init - setup a pmm to manage physical memory, build PDT&PT to setup paging mechanism 
@@ -370,11 +394,11 @@ pmm_init(void) {
     // detect physical memory space, reserve already used memory,
     // then use pmm->init_memmap to create free page list
     page_init();
-    cprintf("page_init 初始化完毕\n");
+    DEBUG("page_init 初始化完毕\n");
 
     //use pmm->check to verify the correctness of the alloc/free function in a pmm
     check_alloc_page();
-    cprintf("check_alloc_page 初始化完毕\n");
+    DEBUG("check_alloc_page 初始化完毕\n");
 
     // create boot_pgdir, an initial page directory(Page Directory Table, PDT)
     boot_pgdir = boot_alloc_page();
@@ -386,10 +410,9 @@ pmm_init(void) {
     // VPT 0xfac00000
     // 1111101011 0000000000 000000000000
 
-    cprintf("boot_pgdir = [0x%x], *boot_pgdir = [0x%x]\n", boot_pgdir, *boot_pgdir);
-    cprintf("boot_cr3 = [0x%x]\n", boot_cr3);
+    DEBUG("boot_pgdir = [0x%08x], *boot_pgdir = [0x%08x]\n", boot_pgdir, *boot_pgdir);
+    DEBUG("boot_cr3 = [0x%08x]\n", boot_cr3);
 
-    cprintf("已维护内核页表物理地址;当前页表只临时维护了 KERNBASE 起的 4M 映射,页表内容:\n");
     print_all_pt(boot_pgdir);
 
     check_pgdir();
@@ -405,7 +428,7 @@ pmm_init(void) {
     cprintf("\n开始建立一级页表自映射: [VPT, VPT + 4MB) => [PADDR(boot_pgdir), PADDR(boot_pgdir) + 4MB).\n");
     boot_pgdir[PDX(VPT)] = PADDR(boot_pgdir) | PTE_P | PTE_W;
     cprintf("\n自映射完毕.\n");
-    cprintf("VPT = [0x%x], PDX(VPT) = [0x%x], boot_pgdir[PDX(VPT)] = [0x%x], boot_pgdir = [0x%x], PADDR(boot_pgdir) = [0x%x]\n", 
+    cprintf("VPT = [0x%08x], PDX(VPT) = [0x%08x], boot_pgdir[PDX(VPT)] = [0x%08x], boot_pgdir = [0x%08x], PADDR(boot_pgdir) = [0x%08x]\n", 
         VPT, PDX(VPT), boot_pgdir[PDX(VPT)], boot_pgdir, PADDR(boot_pgdir));    
     //print_pgdir();
     print_all_pt(boot_pgdir);
@@ -420,7 +443,7 @@ pmm_init(void) {
     //virtual_addr 3G~3G+4M = linear_addr 0~4M = linear_addr 3G~3G+4M = phy_addr 0~4M
 
     boot_pgdir[0] = boot_pgdir[PDX(KERNBASE)];
-    cprintf("boot_pgdir[0] = [0x%x], KERNBASE = [0x%x], PDX(KERNBASE) = [0x%x], boot_pgdir[PDX(KERNBASE)] = [0x%x]",
+    cprintf("boot_pgdir[0] = [0x%08x], KERNBASE = [0x%08x], PDX(KERNBASE) = [0x%08x], boot_pgdir[PDX(KERNBASE)] = [0x%08x]",
         boot_pgdir[0], KERNBASE, PDX(KERNBASE), boot_pgdir[PDX(KERNBASE)]);
     enable_paging();
 
