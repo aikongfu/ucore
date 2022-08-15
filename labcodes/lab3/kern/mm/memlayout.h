@@ -11,15 +11,15 @@
 #define SEG_TSS     5
 
 /* global descriptor numbers */
-// (1 << 3) = 8     = 1000
+// (1 << 3) = 8     = 0000000000001|0|00
 #define GD_KTEXT    ((SEG_KTEXT) << 3)        // kernel text
-// (2 << 3) = 16    = 00010000
+// (2 << 3) = 16    = 0000000000010|0|00
 #define GD_KDATA    ((SEG_KDATA) << 3)        // kernel data
-// (3 << 3) = 24    = 00011000
+// (3 << 3) = 24    = 0000000000011|0|00
 #define GD_UTEXT    ((SEG_UTEXT) << 3)        // user text
-// (4 << 3) = 32    = 00100000
+// (4 << 3) = 32    = 0000000000100|0|00
 #define GD_UDATA    ((SEG_UDATA) << 3)        // user data
-// (5 << 3) = 40    = 00101000
+// (5 << 3) = 40    = 0000000000101|0|00
 #define GD_TSS        ((SEG_TSS) << 3)        // task segment selector
 
 #define DPL_KERNEL  (0)
@@ -80,7 +80,8 @@
  * table, which maps all the PTEs (Page Table Entry) containing the page mappings
  * for the entire virtual address space into that 4 Meg region starting at VPT.
  * */
-#define VPT                 0xFAC00000
+#define VPT                 0xFAC00000 // 1111101011 0000000000 000000000000
+
 
 #define KSTACKPAGE          2                           // # of pages in kernel stack
 #define KSTACKSIZE          (KSTACKPAGE * PGSIZE)       // sizeof kernel stack

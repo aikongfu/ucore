@@ -13,7 +13,7 @@
  * --------------------------------------------
  *           24 bits            7 bits    1 bit
  * */
-
+// 16777216 0x1000000  1 00000000 00000000 00000000
 #define MAX_SWAP_OFFSET_LIMIT                   (1 << 24)
 
 extern size_t max_swap_offset;

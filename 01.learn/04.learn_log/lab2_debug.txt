@@ -1,7 +1,6 @@
-
 (THU.CST) os is loading ...
 
-ebp:0xc010bf38 eip:0xc0101064 args:0xc010808b 0xc0107c08 0xc010bf68 0xc0100111
+ebp:0xc010bf38 eip:0xc0101064 args:0xc010810b 0xc0107c88 0xc010bf68 0xc0100111
     <unknow>: -- 0xc0101063 --
 ebp:0xc010bf48 eip:0xc0101445 args:0x00000000 0x00000000 0x00000000 0x00000009
     <unknow>: -- 0xc0101444 --
@@ -11,7 +10,7 @@ ebp:0xc010bf88 eip:0xc010013a args:0x00000000 0xffff0000 0xc010bfc8 0xc0100f80
     <unknow>: -- 0xc0100139 --
 ebp:0xc010bfa8 eip:0xc0100158 args:0x00000000 0xc010002a 0xffff0000 0x0000001d
     <unknow>: -- 0xc0100157 --
-ebp:0xc010bfc8 eip:0xc010017d args:0xc0107afc 0xc0107ae0 0x01000fa8 0x00000000
+ebp:0xc010bfc8 eip:0xc010017d args:0xc0107b7c 0xc0107b60 0x01000fa8 0x00000000
     <unknow>: -- 0xc010017c --
 ebp:0xc010bff8 eip:0xc010007f args:0x00000000 0x00000000 0x0000ffff 0x40cf9a00
     <unknow>: -- 0xc010007e --
@@ -544,6 +543,14 @@ boot_pgdir = [0xc11ae000]
 
 (483)-<pmm_init>: (unit32_t *)(0xC11af000) = [0x00000000]
 
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af000], la = [0xc0000000], PTE_ADDR(*ptep) = [0x00000000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af004], la = [0xc0001000], PTE_ADDR(*ptep) = [0x00001000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af008], la = [0xc0002000], PTE_ADDR(*ptep) = [0x00002000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af00c], la = [0xc0003000], PTE_ADDR(*ptep) = [0x00003000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af010], la = [0xc0004000], PTE_ADDR(*ptep) = [0x00004000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af014], la = [0xc0005000], PTE_ADDR(*ptep) = [0x00005000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af018], la = [0xc0006000], PTE_ADDR(*ptep) = [0x00006000]
+(775)-<check_boot_pgdir>: boot_pgdir = [0xc11ae000], ptep = [0xc11af01c], la = [0xc0007000], PTE_ADDR(*ptep) = [0x00007000]
 check_boot_pgdir() succeeded!
 -------------------- BEGIN --------------------
 PDE(0e0) c0000000-f8000000 38000000 urw
@@ -566,6 +573,9 @@ idt_init
 0:  ss = 10
 +++ switch to  user  mode +++
 100 ticks
+100 ticks
+100 ticks
+
 qemu-system-i386: terminating on signal 2
 
 

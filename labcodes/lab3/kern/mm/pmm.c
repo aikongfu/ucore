@@ -601,23 +601,34 @@ page_remove(pde_t *pgdir, uintptr_t la) {
 //  perm:  the permission of this Page which is setted in related pte
 // return value: always 0
 //note: PT is changed, so the TLB need to be invalidate 
+// 建立一个页的物理地址和线性地址（ucore里面虚地址=线性地址）的映射
+// 即建立page和根据la得到的ptep对应的关系，也就是*ptep = page的物理地址
 int
 page_insert(pde_t *pgdir, struct Page *page, uintptr_t la, uint32_t perm) {
+    // 根据pgdirt和la获取一个ptep
     pte_t *ptep = get_pte(pgdir, la, 1);
     if (ptep == NULL) {
         return -E_NO_MEM;
     }
+    // page引用+1
     page_ref_inc(page);
+    // 如果*ptep指向的物理页存在，则需要处理一平
     if (*ptep & PTE_P) {
+        // 根据*ptep获取对应的page
+        // pte2page PTE->Page 相当于  &pages[((pte) & 11111111111111111111 000000000000) >> 12]
         struct Page *p = pte2page(*ptep);
         if (p == page) {
+            // 如果pte指向的page和要映射的page相同，ref减一
             page_ref_dec(page);
         }
         else {
+            // 不相同，则根据ptep释放对应的Page页
             page_remove_pte(pgdir, la, ptep);
         }
     }
+    // *ptep和page的物理地址建立映射，后几位为权限和标志位
     *ptep = page2pa(page) | PTE_P | perm;
+    // 更新tlb
     tlb_invalidate(pgdir, la);
     return 0;
 }
@@ -642,8 +653,13 @@ pgdir_alloc_page(pde_t *pgdir, uintptr_t la, uint32_t perm) {
             free_page(page);
             return NULL;
         }
+        // 如果swap(换页机制初始化成功)
         if (swap_init_ok){
+            // 即把page加入到mm->sm_priv 的页链表的尾端
+            // According FIFO PRA, we should link the most recent arrival page 
+            // at the back of pra_list_head qeueue
             swap_map_swappable(check_mm_struct, la, page, 0);
+            // 对应此页在链表节点(page replace algorithm)对应的虚地址为la
             page->pra_vaddr=la;
             assert(page_ref(page) == 1);
             //cprintf("get No. %d  page: pra_vaddr %x, pra_link.prev %x, pra_link_next %x in pgdir_alloc_page\n", (page-pages), page->pra_vaddr,page->pra_page_link.prev, page->pra_page_link.next);
