@@ -509,6 +509,7 @@ pmm_init(void) {
 // return vaule: the kernel virtual address of this pte
 pte_t *
 get_pte(pde_t *pgdir, uintptr_t la, bool create) {
+    DEBUG("pgdir =[%p], la = [0x%08x], create = [%d]\n", pgdir, la, create);
     /* LAB2 EXERCISE 2: YOUR CODE
      *
      * If you need to visit a physical address, please use KADDR()
@@ -598,7 +599,10 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     // 需要映射的线性地址
     // 中间10位(PTE)
     uintptr_t need_to_map_ptx = PTX(la);
-    return &pde_kva[need_to_map_ptx];
+
+    pte_t * result = &pde_kva[need_to_map_ptx];
+    DEBUG("pte = [%p]\n", result);
+    return result;
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
