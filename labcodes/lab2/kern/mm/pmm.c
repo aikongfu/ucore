@@ -509,7 +509,7 @@ pmm_init(void) {
 // return vaule: the kernel virtual address of this pte
 pte_t *
 get_pte(pde_t *pgdir, uintptr_t la, bool create) {
-    DEBUG("pgdir =[%p], la = [0x%08x], create = [%d]\n", pgdir, la, create);
+    // DEBUG("pgdir =[%p], la = [0x%08x], create = [%d]\n", pgdir, la, create);
     /* LAB2 EXERCISE 2: YOUR CODE
      *
      * If you need to visit a physical address, please use KADDR()
@@ -601,7 +601,7 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     uintptr_t need_to_map_ptx = PTX(la);
 
     pte_t * result = &pde_kva[need_to_map_ptx];
-    DEBUG("pte = [%p]\n", result);
+    // DEBUG("pte = [%p]\n", result);
     return result;
 }
 
@@ -771,6 +771,8 @@ check_boot_pgdir(void) {
     int i;
     for (i = 0; i < npage; i += PGSIZE) {
         assert((ptep = get_pte(boot_pgdir, (uintptr_t)KADDR(i), 0)) != NULL);
+        DEBUG("boot_pgdir = [%p], ptep = [%p], la = [0x%08x], PTE_ADDR(*ptep) = [0x%08x]", 
+            boot_pgdir, ptep, (uintptr_t)KADDR(i), PTE_ADDR(*ptep));
         assert(PTE_ADDR(*ptep) == i);
     }
 
