@@ -7,6 +7,7 @@
 #include <pmm.h>
 #include <x86.h>
 #include <swap.h>
+#include <kdebug.h>
 
 /* 
   vmm design include two parts: mm_struct (mm) & vma_struct (vma)
