@@ -47,6 +47,7 @@ kern_init(void) {
     // 初始化中断描述符表
     idt_init();                 // init interrupt descriptor table
     cprintf("%s\n\n", "idt_init");
+    
     vmm_init();                 // init virtual memory management
     cprintf("%s\n\n", "vmm_init");
     // ide 初始化

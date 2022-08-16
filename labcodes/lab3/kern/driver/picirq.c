@@ -33,6 +33,8 @@ pic_init(void) {
     did_init = 1;
 
     // mask all interrupts
+    // IO_PIC1             0x20    // Master (IRQs 0-7)
+    // IO_PIC2             0xA0    // Slave (IRQs 8-15)
     outb(IO_PIC1 + 1, 0xFF);
     outb(IO_PIC2 + 1, 0xFF);
 

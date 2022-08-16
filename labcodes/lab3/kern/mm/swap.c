@@ -27,9 +27,11 @@ unsigned int swap_in_seq_no[MAX_SEQ_NO],swap_out_seq_no[MAX_SEQ_NO];
 
 static void check_swap(void);
 
+// swap初始化
 int
 swap_init(void)
 {
+     // swap 文件系统初始化
      swapfs_init();
 
      if (!(1024 <= max_swap_offset && max_swap_offset < MAX_SWAP_OFFSET_LIMIT))

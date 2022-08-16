@@ -256,8 +256,8 @@ struct mm_struct *check_mm_struct;
 static void
 check_pgfault(void) {
     size_t nr_free_pages_store = nr_free_pages();
-    cprintf("check_pgfault: after size_t nr_free_pages_store = nr_free_pages();\n");\
-    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
+    DEBUG("check_pgfault: after size_t nr_free_pages_store = nr_free_pages();\n");\
+    DEBUG("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
     check_mm_struct = mm_create();
     assert(check_mm_struct != NULL);
@@ -279,8 +279,8 @@ check_pgfault(void) {
     int i, sum = 0;
     for (i = 0; i < 100; i ++) {
         *(char *)(addr + i) = i;
-		cprintf("check_pgfault: (char *)(addr + i) = [%d]\n", (char *)(addr + i));
-		cprintf("check_pgfault: *(char *)(addr + i) = [%c]\n", *(char *)(addr + i));
+		DEBUG("check_pgfault: (char *)(addr + i) = [%d]\n", (char *)(addr + i));
+		DEBUG("check_pgfault: *(char *)(addr + i) = [%c]\n", *(char *)(addr + i));
         sum += i;
     }
     for (i = 0; i < 100; i ++) {
@@ -291,10 +291,10 @@ check_pgfault(void) {
     size_t __a = (size_t)(addr);                               \
     uintptr_t l1 = (typeof(addr))(__a - __a % (PGSIZE)); 
     // TODO
-    cprintf("pgdir = [%p], addr = [%x], l1 = [%x]\n", pgdir, addr, l1);
+    DEBUG("pgdir = [%p], addr = [%x], l1 = [%x]\n", pgdir, addr, l1);
 
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
-    cprintf("pgdir[0] = [%d]\n", pgdir[0]);
+    DEBUG("pgdir[0] = [%d]\n", pgdir[0]);
     free_page(pde2page(pgdir[0]));
     pgdir[0] = 0;
 
@@ -302,7 +302,7 @@ check_pgfault(void) {
     mm_destroy(mm);
     check_mm_struct = NULL;
 
-    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
+    DEBUG("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_pgfault() succeeded!\n");
