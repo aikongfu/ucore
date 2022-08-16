@@ -79,6 +79,10 @@ static int nr_process = 0;
 
 void kernel_thread_entry(void);
 void forkrets(struct trapframe *tf);
+
+// switch_to的功能就是保留current线程的上下文至from上下文结构中，
+// 即把当前正在运行线性的寄存器的值保存到from的context中
+// 并将to上下文结构context中的内容加载到CPU的各个寄存器中，恢复新线程的执行流上下文现场。
 void switch_to(struct context *from, struct context *to);
 
 // alloc_proc - alloc a proc_struct and init all fields of proc_struct

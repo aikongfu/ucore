@@ -2,6 +2,17 @@
 .globl switch_to
 switch_to:                      # switch_to(from, to)
 
+@ struct context {
+@     uint32_t eip;
+@     uint32_t esp;
+@     uint32_t ebx;
+@     uint32_t ecx;
+@     uint32_t edx;
+@     uint32_t esi;
+@     uint32_t edi;
+@     uint32_t ebp;
+@ };
+
     # save from's registers
     movl 4(%esp), %eax          # eax points to from
     popl 0(%eax)                # save eip !popl

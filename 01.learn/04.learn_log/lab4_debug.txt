@@ -1,0 +1,534 @@
+Special kernel symbols:
+  entry  0xc010002a (phys)
+  etext  0xc010b9bd (phys)
+  edata  0xc0111ab0 (phys)
+  end    0xc1114c6c (phys)
+Kernel executable memory footprint: 16468KB
+ebp = 0xc0110f38         eip = 0xc0100b93
+args:0xc0110f40 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc0100b92 --
+ebp = 0xc0110f48         eip = 0xc0100187
+args:0xc0110f50 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc0100186 --
+ebp = 0xc0110f68         eip = 0xc01001b0
+args:0xc0110f70 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc01001af --
+ebp = 0xc0110f88         eip = 0xc01001ce
+args:0xc0110f90 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc01001cd --
+ebp = 0xc0110fa8         eip = 0xc01001f3
+args:0xc0110fb0 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc01001f2 --
+ebp = 0xc0110fc8         eip = 0xc010007f
+args:0xc0110fd0 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc010007e --
+ebp = 0xc0110ff8         eip = 0xc0100028
+args:0xc0111000 0xffffffff      0x00000020      0xc010b42a
+    <unknow>: -- 0xc0100027 --
+grade_backtrace
+
+memory management: default_pmm_manager
+e820map:
+  memory: 0009fc00, [00000000, 0009fbff], type = 1.
+  memory: 00000400, [0009fc00, 0009ffff], type = 2.
+  memory: 00010000, [000f0000, 000fffff], type = 2.
+  memory: 07ee0000, [00100000, 07fdffff], type = 1.
+  memory: 00020000, [07fe0000, 07ffffff], type = 2.
+  memory: 00040000, [fffc0000, ffffffff], type = 2.
+check_alloc_page() succeeded!
+check_pgdir() succeeded!
+check_boot_pgdir() succeeded!
+-------------------- BEGIN --------------------
+PDE(0e0) c0000000-f8000000 38000000 urw
+  |-- PTE(38000) c0000000-f8000000 38000000 -rw
+PDE(001) fac00000-fb000000 00400000 -rw
+  |-- PTE(000e0) faf00000-fafe0000 000e0000 urw
+  |-- PTE(00001) fafeb000-fafec000 00001000 -rw
+--------------------- END ---------------------
+use SLOB allocator
+kmalloc_init() succeeded!
+pmm_init
+
+pic_init end.
+
+idt_init end.
+
+check_vmm|->check_vma_struct| nr_free_pages_store = [27882], nr_free_pages() = [27882]
+check_vma_struct: begin -> nr_free_pages_store = [27882], nr_free_pages() = [27882]
+check_vma_struct: after mm_create, mm = [0xc12f6008]     nr_free_pages() = [27881]
+check_vma_struct: loop assert, nr_free_pages() = [27881]
+check_vma_struct: mm_destroy, nr_free_pages() = [27881]
+check_vma_struct: end-> nr_free_pages_store = [27882]   nr_free_pages() = [27881]
+check_vma_struct() succeeded!
+check_vmm|->check_pgfault| nr_free_pages_store = [27882], nr_free_pages() = [27881]
+check_pgfault: after size_t nr_free_pages_store = nr_free_pages();
+check_pgfault: nr_free_pages_store = [27881], nr_free_pages() = [27881]
+page fault at 0x00000100: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f6008], *check_mm_struct = [0xc12f6038]
+do_pgfault|-------> mm = [0xc12f6008], error_code = [2], addr = [100], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f6008], vma = [0xc12f6028], addr = [100]
+ret = [0]
+pgdir = [0xc1215000], addr = [256]
+, ROUNDDOWN(addr, PGSIZE) = [0]pgdir[0] = [19886119]
+check_pgfault: nr_free_pages_store = [27881], nr_free_pages() = [27881]
+check_pgfault() succeeded!
+check_vmm|->nr_free_pages_store = [27882], nr_free_pages() = [27881]
+check_vmm() succeeded.
+vmm_init end.
+
+proc_init end.
+
+ide 0:      10000(sectors), 'QEMU HARDDISK'.
+ide 1:     262144(sectors), 'QEMU HARDDISK'.
+ide_init end.
+
+swap_init sm = [a]
+swap_init r = [0]
+SWAP: manager = fifo swap manager
+BEGIN check_swap: count 1, total 27879
+setup Page Table for vaddr 0X1000, so alloc a page
+setup Page Table vaddr 0~4MB OVER!
+set up init env for check_swap begin!
+page fault at 0x00001000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [1000]
+ret = [0]
+page fault at 0x00002000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [2000]
+ret = [0]
+page fault at 0x00003000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [3000]
+ret = [0]
+page fault at 0x00004000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [4000]
+ret = [0]
+set up init env for check_swap over!
+write Virt Page c in fifo_check_swap
+write Virt Page a in fifo_check_swap
+write Virt Page d in fifo_check_swap
+write Virt Page b in fifo_check_swap
+write Virt Page e in fifo_check_swap
+page fault at 0x00005000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [5000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [5000]
+swap_out: i 0, store page in vaddr 0x1000 to disk swap entry 2
+ret = [0]
+write Virt Page b in fifo_check_swap
+write Virt Page a in fifo_check_swap
+page fault at 0x00001000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [1000]
+swap_out: i 0, store page in vaddr 0x2000 to disk swap entry 3
+swap_in: load disk swap entry 2 with swap_page in vadr 0x1000
+ret = [0]
+write Virt Page b in fifo_check_swap
+page fault at 0x00002000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [2000]
+swap_out: i 0, store page in vaddr 0x3000 to disk swap entry 4
+swap_in: load disk swap entry 3 with swap_page in vadr 0x2000
+ret = [0]
+write Virt Page c in fifo_check_swap
+page fault at 0x00003000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [3000]
+swap_out: i 0, store page in vaddr 0x4000 to disk swap entry 5
+swap_in: load disk swap entry 4 with swap_page in vadr 0x3000
+ret = [0]
+write Virt Page d in fifo_check_swap
+page fault at 0x00004000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [4000]
+swap_out: i 0, store page in vaddr 0x5000 to disk swap entry 6
+swap_in: load disk swap entry 5 with swap_page in vadr 0x4000
+ret = [0]
+write Virt Page e in fifo_check_swap
+page fault at 0x00005000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [2], addr = [5000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [5000]
+swap_out: i 0, store page in vaddr 0x1000 to disk swap entry 2
+swap_in: load disk swap entry 6 with swap_page in vadr 0x5000
+ret = [0]
+write Virt Page a in fifo_check_swap
+page fault at 0x00001000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f60e8], *check_mm_struct = [0xc12f6118]
+do_pgfault|-------> mm = [0xc12f60e8], error_code = [0], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f60e8], vma = [0xc12f6108], addr = [1000]
+swap_out: i 0, store page in vaddr 0x2000 to disk swap entry 3
+swap_in: load disk swap entry 2 with swap_page in vadr 0x1000
+ret = [0]
+count is 0, total is 5
+check_swap() succeeded!
+swap_init end.
+
+++ setup timer interrupts
+clock_init end.
+
+build02@ubuntu:/data/code/01.learn/01.os/01.ucore/labcodes/lab4$
+build02@ubuntu:/data/code/01.learn/01.os/01.ucore/labcodes/lab4$ this initproc, pid = 1, name = "init"
+To U: "Hello world!!".
+To U: "en.., Bye, Bye. :)"
+kernel panic at kern/process/proc.c:375:
+    process exit!!.
+
+Welcome to the kernel debug monitor!!
+Type 'help' for a list of commands.
+
+
+
+
+
+
+
+
+
+
+
+switch_to(&(prev->context), &(next->context));                                                           │
+
+   │0xc010a59d <proc_run+99>        call   0xc010a177 <switch_to>                                                 │
+   │0xc010a5a2 <proc_run+104>       mov    -0x14(%ebp),%eax
+
+eax            0xc12f6024       -1053859804
+ecx            0x0      0
+edx            0xc12f6094       -1053859692
+ebx            0x10074  65652
+esp            0xc0110f50       0xc0110f50
+ebp            0xc0110f78       0xc0110f78
+esi            0x0      0
+edi            0x1      1
+eip            0xc010a59d       0xc010a59d <proc_run+99>
+eflags         0x96     [ PF AF SF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x23     35
+gs             0x23     35
+
+(gdb) x /10x $esp
+0xc0110f50:     0xc12f6024      0xc12f6094      0xc0110f78      0xc010ac57
+0xc0110f60:     0x01215000      0x00000000      0xc12f6078      0xc12f6008
+0xc0110f70:     0xc0100339      0xc0110f8c
+
+(gdb) p /x *prev
+$8 = {state = 0x2, pid = 0x0, runs = 0x0, kstack = 0xc010f000, need_resched = 0x0, parent = 0x0, mm = 0x0,
+  context = {eip = 0x0, esp = 0x0, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}, tf = 0x0,
+  cr3 = 0x1215000, flags = 0x0, name = {0x69, 0x64, 0x6c, 0x65, 0x0, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77,
+    0x6f, 0x72, 0x6c, 0x0}, list_link = {prev = 0x20, next = 0xc12f6ca0}, hash_link = {prev = 0xc12f6008,
+    next = 0x28}}
+(gdb) p /x prev->context
+$9 = {eip = 0x0, esp = 0x0, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+(gdb) p /x &(prev->context)
+$10 = 0xc12f6024
+(gdb) p /x *next
+$11 = {state = 0x2, pid = 0x1, runs = 0x1, kstack = 0xc12f7000, need_resched = 0x0, parent = 0xc12f6008, 
+  mm = 0x0, context = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0,
+    ebp = 0x0}, tf = 0xc12f8fb4, cr3 = 0x1215000, flags = 0x0, name = {0x69, 0x6e, 0x69, 0x74, 0x0, 0x0, 0x0, 
+    0x0, 0x69, 0x64, 0x6c, 0x65, 0x70, 0x72, 0x6f, 0x0}, list_link = {prev = 0xc1114c64, next = 0xc1114c64},
+  hash_link = {prev = 0xc0113ec0, next = 0xc0113ec0}}
+(gdb) p /x next->context
+$12 = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+(gdb) p /x &(next->context)
+$13 = 0xc12f6094
+
+switch_to(0xc12f6024, 0xc12f6094)
+   │0xc010a59d <proc_run+99>        call   0xc010a177 <switch_to>    
+
+6           movl 4(%esp), %eax          # eax points to from  
+
+(gdb) x /10x $esp
+0xc0110f4c:     0xc010a5a2      0xc12f6024      0xc12f6094      0xc0110f78
+0xc0110f5c:     0xc010ac57      0x01215000      0x00000000      0xc12f6078
+0xc0110f6c:     0xc12f6008      0xc0100339
+
+
+
+   │6           movl 4(%esp), %eax          # eax points to from                                                  │
+  >│7           popl 0(%eax)   
+0xc0110f4c:     0xc010a5a2      0xc12f6024      0xc12f6094      0xc0110f78
+0xc0110f5c:     0xc010ac57      0x01215000      0x00000000      0xc12f6078
+0xc0110f6c:     0xc12f6008      0xc0100339
+
+(gdb) i r eax
+eax            0xc12f6024       -1053859804
+
+
+   │6           movl 4(%esp), %eax          # eax points to from                                                  │
+   │7           popl 0(%eax)                # save eip !popl                                                      │
+  >│8           movl %esp, 4(%eax)
+(gdb) i r eax
+eax            0xc12f6024       -1053859804
+(gdb) i r cs eip
+cs             0x8      8
+eip            0xc010a17d       0xc010a17d <switch_to+6>
+(gdb) x /10x $esp
+0xc0110f50:     0xc12f6024      0xc12f6094      0xc0110f78      0xc010ac57
+0xc0110f60:     0x01215000      0x00000000      0xc12f6078      0xc12f6008
+0xc0110f70:     0xc0100339      0xc0110f8c
+
+可以看到将0xc010a5a2 pop出来了，放到0xc12f6024这个地方了
+(gdb) p /x (struct context *)0xc12f6024
+$15 = 0xc12f6024
+(gdb) p /x *(struct context *)0xc12f6024
+$16 = {eip = 0xc010a5a2, esp = 0x0, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+
+   |0xc010a17a <switch_to+3>        add    $0x8f,%al                                                              │
+   │0xc010a17c <switch_to+5>        add    %cl,0x460(%bx,%di)                                                     │
+  >│0xc010a180 <switch_to+9>        mov    %bx,0x8(%bx,%si)                                                       │
+   │0xc010a183 <switch_to+12>       mov    %cx,0xc(%bx,%si)
+
+(gdb) p /x *(struct context *)0xc12f6024
+$17 = {eip = 0xc010a5a2, esp = 0xc0110f50, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+
+   |14          movl %ebp, 28(%eax)                                                                               │
+   │15                                                                                                            │
+   │16          # restore to's registers                                                                          │
+  >│17          movl 4(%esp), %eax          # not 8(%esp): popped return address already 
+(gdb) p /x *(struct context *)0xc12f6024
+$18 = {eip = 0xc010a5a2, esp = 0xc0110f50, ebx = 0x10074, ecx = 0x0, edx = 0xc12f6094, esi = 0x0, edi = 0x1,
+  ebp = 0xc0110f78}
+
+eax            0xc12f6024       -1053859804
+ecx            0x0      0
+edx            0xc12f6094       -1053859692
+ebx            0x10074  65652
+esp            0xc0110f50       0xc0110f50
+ebp            0xc0110f78       0xc0110f78
+esi            0x0      0
+edi            0x1      1
+eip            0xc010a192       0xc010a192 <switch_to+27>
+eflags         0x96     [ PF AF SF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x23     35
+gs             0x23     35
+
+
+(gdb) p /x *(struct context *)0xc12f6094
+$20 = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+
+   │18                                      # eax now points to to                                                │
+  >│19          movl 28(%eax), %ebp                                                                               │
+   │20          movl 24(%eax), %edi  
+(gdb) p /x $eax
+$23 = 0xc12f6094
+
+(gdb) x /x $esp
+0xc0110f50:     0xc12f6024
+(gdb) x /x $esp + 4
+0xc0110f54:     0xc12f6094
+
+(gdb) p /x *(struct context *)0xc12f6094
+$20 = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+(gdb) i r
+eax            0xc12f6094       -1053859692
+ecx            0x0      0
+edx            0x0      0
+ebx            0x0      0
+esp            0xc12f8fb4       0xc12f8fb4
+ebp            0x0      0x0
+esi            0x0      0
+edi            0x0      0
+eip            0xc010a1ab       0xc010a1ab <switch_to+52>
+eflags         0x96     [ PF AF SF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x23     35
+gs             0x23     35
+
+eip            0xc010a1ab 
+
+   |0xc010a1a8 <switch_to+49>       mov    0x4(%eax),%esp                                                         │
+  >│0xc010a1ab <switch_to+52>       pushl  (%eax)                                                                 │
+   │0xc010a1ad <switch_to+54>       ret  
+
+(gdb) i r eip
+eip            0xc010a1ab       0xc010a1ab <switch_to+52>
+
+   │27          pushl 0(%eax)               # push eip                                                            │
+   │28                                                                                                            │
+  >│29          ret                                                                                               │
+   │30         
+(gdb) si
+switch_to () at kern/process/switch.S:29
+(gdb) i r eip
+eip            0xc010a1ad       0xc010a1ad <switch_to+54>
+
+pushl 0(%eax)
+将eax指向的内容压入当前的栈中
+(gdb) x /10x $esp
+0xc12f8fb0:     0xc010a5af      0x00000000      0x00000000      0x00000000
+0xc12f8fc0:     0x00000000      0xc010aa0b      0xc010e500      0x00000000
+0xc12f8fd0:     0x00000000      0x00000000
+(gdb) p /x *(struct context *)0xc12f6094
+$20 = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0, ebp = 0x0}
+(gdb) x /10x $eax + 0
+0xc12f6094:     0xc010a5af      0xc12f8fb4      0x00000000      0x00000000
+0xc12f60a4:     0x00000000      0x00000000      0x00000000      0x00000000
+0xc12f60b4:     0xc12f8fb4      0x01215000
+即0xc010a5af压入栈中（即为next->contex的eip的值），也就是ret后会跳转到的执行地址（eip）
+
+   │0xc010a1ab <switch_to+52>       pushl  (%eax)                                                                 │
+  >│0xc010a1ad <switch_to+54>       ret                                                                           │
+   │0xc010a1ae <__intr_save>        push   %ebp                                                                   │
+   │0xc010a1af <__intr_save+1>      mov    %esp,%ebp                                                              │
+   │0xc010a1b1 <__intr_save+3>      sub    $0x18,%esp 
+
+-->
+  >│204     forkret(void) {                                                                                       │
+   │205         forkrets(current->tf);                                                                            │
+   │206     }                                                                                                     │
+   │207                                                                                                           │
+   │208     // hash_proc - add proc into proc hash_list                                                           │
+   ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  >│0xc010a5af <forkret>    push   %bp                                                                            │
+   │0xc010a5b0 <forkret+1>  mov    %sp,%bp                                                                        │
+   │0xc010a5b2 <forkret+3>  sub    $0x18,%sp                                                                      │
+   │0xc010a5b5 <forkret+6>  mov    0x2ae8,%ax                                                                     │
+   │0xc010a5b8 <forkret+9>  adc    %ax,%ax                                                                        │
+   │0xc010a5ba <forkret+11> mov    0x3c(%bx,%si),%ax                                                              │
+   │0xc010a5bd <forkret+14> mov    %ax,(%si)                                                                      │
+   │0xc010a5bf <forkret+16> and    $0xe8,%al 
+
+   |204     forkret(void) {                                                                                       │
+  >│205         forkrets(current->tf);                                                                            │
+   │206     }                                                                                                     │
+   │207                                                                                                           │
+   │208     // hash_proc - add proc into proc hash_list                                                           │
+   ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+   │0xc010a5af <forkret>    push   %bp                                                                            │
+   │0xc010a5b0 <forkret+1>  mov    %sp,%bp                                                                        │
+   │0xc010a5b2 <forkret+3>  sub    $0x18,%sp                                                                      │
+  >│0xc010a5b5 <forkret+6>  mov    0x2ae8,%ax   
+   
+(gdb) p /x *current
+$25 = {state = 0x2, pid = 0x1, runs = 0x1, kstack = 0xc12f7000, need_resched = 0x0, parent = 0xc12f6008, 
+  mm = 0x0, context = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0,
+    ebp = 0x0}, tf = 0xc12f8fb4, cr3 = 0x1215000, flags = 0x0, name = {0x69, 0x6e, 0x69, 0x74, 0x0, 0x0, 0x0, 
+    0x0, 0x69, 0x64, 0x6c, 0x65, 0x70, 0x72, 0x6f, 0x0}, list_link = {prev = 0xc1114c64, next = 0xc1114c64},
+  hash_link = {prev = 0xc0113ec0, next = 0xc0113ec0}}
+(gdb) p /x *current->tf
+$27 = {tf_regs = {reg_edi = 0x0, reg_esi = 0x0, reg_ebp = 0x0, reg_oesp = 0x0, reg_ebx = 0xc010aa0b,
+    reg_edx = 0xc010e500, reg_ecx = 0x0, reg_eax = 0x0}, tf_gs = 0x0, tf_padding0 = 0x0, tf_fs = 0x0,
+  tf_padding1 = 0x0, tf_es = 0x10, tf_padding2 = 0x0, tf_ds = 0x10, tf_padding3 = 0x0, tf_trapno = 0x0,
+  tf_err = 0x0, tf_eip = 0xc010a16e, tf_cs = 0x8, tf_padding4 = 0x0, tf_eflags = 0x200, tf_esp = 0x0, 
+  tf_ss = 0x10, tf_padding5 = 0x0}
+
+跳转到trapentry.S
+.globl forkrets
+forkrets:
+    # set stack to this new process's trapframe
+    movl 4(%esp), %esp
+    jmp __trapret
+
+   |46      forkrets:                                                                                             │
+   │47          # set stack to this new process's trapframe                                                       │
+  >│48          movl 4(%esp), %esp                                                                                │
+   │49          jmp __trapret  
+
+eax            0xc12f8fb4       -1053847628
+ecx            0x0      0
+edx            0x0      0
+ebx            0x0      0
+esp            0xc12f8f94       0xc12f8f94
+ebp            0xc12f8fb0       0xc12f8fb0
+esi            0x0      0
+edi            0x0      0
+eip            0xc01034c9       0xc01034c9 <forkrets>
+eflags         0x92     [ AF SF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x23     35
+gs             0x23     35
+
+(gdb) x /x $esp + 4 
+0xc12f8f98:     0xc12f8fb4
+
+(gdb) x /x $esp
+0xc12f8f94:     0xc010a5c5
+(gdb) p /x *current
+$25 = {state = 0x2, pid = 0x1, runs = 0x1, kstack = 0xc12f7000, need_resched = 0x0, parent = 0xc12f6008, 
+  mm = 0x0, context = {eip = 0xc010a5af, esp = 0xc12f8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0, edi = 0x0,
+    ebp = 0x0}, tf = 0xc12f8fb4, cr3 = 0x1215000, flags = 0x0, name = {0x69, 0x6e, 0x69, 0x74, 0x0, 0x0, 0x0, 
+    0x0, 0x69, 0x64, 0x6c, 0x65, 0x70, 0x72, 0x6f, 0x0}, list_link = {prev = 0xc1114c64, next = 0xc1114c64},
+  hash_link = {prev = 0xc0113ec0, next = 0xc0113ec0}}
+(gdb) p /x *current->tf
+$27 = {tf_regs = {reg_edi = 0x0, reg_esi = 0x0, reg_ebp = 0x0, reg_oesp = 0x0, reg_ebx = 0xc010aa0b,
+    reg_edx = 0xc010e500, reg_ecx = 0x0, reg_eax = 0x0}, tf_gs = 0x0, tf_padding0 = 0x0, tf_fs = 0x0,
+  tf_padding1 = 0x0, tf_es = 0x10, tf_padding2 = 0x0, tf_ds = 0x10, tf_padding3 = 0x0, tf_trapno = 0x0,
+  tf_err = 0x0, tf_eip = 0xc010a16e, tf_cs = 0x8, tf_padding4 = 0x0, tf_eflags = 0x200, tf_esp = 0x0, 
+  tf_ss = 0x10, tf_padding5 = 0x0}
+
+  从前面可以知道0xc12f8fb4就是指向当前tf
+然后执行到__trapret
+即之前的中断返回
+会把寄存器恢复为当前tf的值，然后跳转tf指向的eip的地方执行
+    从kernel_thread可以看到
+    tf.tf_regs.reg_ebx = (uint32_t)fn;
+    tf.tf_regs.reg_edx = (uint32_t)arg;
+    tf.tf_eip = (uint32_t)kernel_thread_entry;
+会跳转到kernel_thread_entry方法
+   |4                                                                                                             │
+  >│5           pushl %edx              # push arg                                                                │
+   │6           call *%ebx              # call fn                                                                 │
+   │7                                                                                                             │
+   │8           pushl %eax              # save the return value of fn(arg)                                        │
+   │9           call do_exit            # call do_exit to terminate current thread    
+
+设置参数(参数入栈)，调用将要执行的方法fn
+
+ pushl %eax              # save the return value of fn(arg)
+
+  >│8           pushl %eax              # save the return value of fn(arg)                                        │
+   │9           call do_exit            # call do_exit to terminate current thread                                │
+   │10                                                                                                            │
+   │11                                                                                                            │
+   │12                                                                                                            │
+   ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+   │0xc010a16e <kernel_thread_entry>        push   %dx                                                            │
+   │0xc010a16f <kernel_thread_entry+1>      call   *%bx                                                           │
+  >│0xc010a171 <kernel_thread_entry+3>      push   %ax  
+
+(gdb) x /4x $esp
+0xc12f8ff4:     0xc010e500      0x00000000      0x00000010      0x00000000
+   │0xc010a171 <kernel_thread_entry+3>      push   %ax                                                            │
+  >│0xc010a172 <kernel_thread_entry+4>      call   0xc010a9e7 <do_fork+329> 
+(gdb) x /4x $esp
+0xc12f8ff0:     0x00000000      0xc010e500      0x00000000      0x00000010
+(gdb) i r
+eax            0x0      0
+ecx            0x0      0
+edx            0xc010e4e3       -1072634653
+ebx            0xc010aa0b       -1072649717
+esp            0xc12f8ff4       0xc12f8ff4
+ebp            0x0      0x0
+esi            0x0      0
+edi            0x0      0
+eip            0xc010a171       0xc010a171 <kernel_thread_entry+3>
+eflags         0x282    [ SF IF ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x0      0
+gs             0x0      0
