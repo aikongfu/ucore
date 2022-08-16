@@ -1,0 +1,775 @@
+(THU.CST) os is loading ...
+
+Special kernel symbols:
+  entry  0xc010002a (phys)
+  etext  0xc010a88c (phys)
+  edata  0xc0110a88 (phys)
+  end    0xc1111c04 (phys)
+Kernel executable memory footprint: 16455KB
+ebp = 0xc010ff38         eip = 0xc0100b77
+args:0xc010ff40 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc0100b76 --
+ebp = 0xc010ff48         eip = 0xc010016b
+args:0xc010ff50 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc010016a --
+ebp = 0xc010ff68         eip = 0xc0100194
+args:0xc010ff70 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc0100193 --
+ebp = 0xc010ff88         eip = 0xc01001b2
+args:0xc010ff90 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc01001b1 --
+ebp = 0xc010ffa8         eip = 0xc01001d7
+args:0xc010ffb0 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc01001d6 --
+ebp = 0xc010ffc8         eip = 0xc010007f
+args:0xc010ffd0 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc010007e --
+ebp = 0xc010fff8         eip = 0xc0100028
+args:0xc0110000 0xffffffff      0x00000020      0xc010a31e
+    <unknow>: -- 0xc0100027 --
+grade_backtrace
+
+memory management: default_pmm_manager
+e820map:
+  memory: 0009fc00, [00000000, 0009fbff], type = 1.
+  memory: 00000400, [0009fc00, 0009ffff], type = 2.
+  memory: 00010000, [000f0000, 000fffff], type = 2.
+  memory: 07ee0000, [00100000, 07fdffff], type = 1.
+  memory: 00020000, [07fe0000, 07ffffff], type = 2.
+  memory: 00040000, [fffc0000, ffffffff], type = 2.
+default_free_pages: page base = [0xc1136240], n = [1]
+default_free_pages: page base = [0xc1136260], n = [1]
+default_free_pages: page base = [0xc1136280], n = [1]
+default_free_pages: page base = [0xc1136240], n = [1]
+default_free_pages: page base = [0xc1136240], n = [1]
+default_free_pages: page base = [0xc1136260], n = [1]
+default_free_pages: page base = [0xc1136280], n = [1]
+default_free_pages: page base = [0xc1136280], n = [3]
+default_free_pages: page base = [0xc1136240], n = [1]
+default_free_pages: page base = [0xc1136280], n = [3]
+default_free_pages: page base = [0xc1136240], n = [1]
+default_free_pages: page base = [0xc1136280], n = [2]
+default_free_pages: page base = [0xc1136260], n = [1]
+default_free_pages: page base = [0xc1136240], n = [5]
+check_alloc_page() succeeded!
+page_remove_pte: *pgdir = [0x1214007], *ptep = [0x1215007], la = [0x1000], pages = [0xc1112000], npage = [32736]
+page->flags = [0]
+default_free_pages: page base = [0xc11362a0], n = [1]
+page_remove: pgdir = [0x1213001], la = [0x0]
+page_remove: *ptep = [0x1213001]
+page_remove_pte: *pgdir = [0x1214007], *ptep = [0x1213001], la = [0x0], pages = [0xc1112000], npage = [32736]
+page->flags = [0]
+page_remove: pgdir = [0x1213001], la = [0x1000]
+page_remove: *ptep = [0x1213001]
+page_remove_pte: *pgdir = [0x1214007], *ptep = [0x1213001], la = [0x1000], pages = [0xc1112000], npage = [32736]
+page->flags = [0]
+default_free_pages: page base = [0xc1136260], n = [1]
+default_free_pages: page base = [0xc1136280], n = [1]
+check_pgdir() succeeded!
+default_free_pages: page base = [0xc1137e60], n = [1]
+default_free_pages: page base = [0xc1137e80], n = [1]
+check_boot_pgdir() succeeded!
+-------------------- BEGIN --------------------
+PDE(0e0) c0000000-f8000000 38000000 urw
+  |-- PTE(38000) c0000000-f8000000 38000000 -rw
+PDE(001) fac00000-fb000000 00400000 -rw
+  |-- PTE(000e0) faf00000-fafe0000 000e0000 urw
+  |-- PTE(00001) fafeb000-fafec000 00001000 -rw
+--------------------- END ---------------------
+pmm_init
+
+pic_init
+
+idt_init
+
+default_free_pages: page base = [0xc1137fa0], n = [1]
+default_free_pages: page base = [0xc1137f80], n = [1]
+default_free_pages: page base = [0xc1137f60], n = [1]
+default_free_pages: page base = [0xc1137f40], n = [1]
+default_free_pages: page base = [0xc1137f20], n = [1]
+default_free_pages: page base = [0xc1137f00], n = [1]
+default_free_pages: page base = [0xc1137ee0], n = [1]
+default_free_pages: page base = [0xc1137ec0], n = [1]
+default_free_pages: page base = [0xc1137ea0], n = [1]
+default_free_pages: page base = [0xc1137e80], n = [1]
+default_free_pages: page base = [0xc1137fc0], n = [1]
+default_free_pages: page base = [0xc1137fe0], n = [1]
+default_free_pages: page base = [0xc1138000], n = [1]
+default_free_pages: page base = [0xc1138020], n = [1]
+default_free_pages: page base = [0xc1138040], n = [1]
+default_free_pages: page base = [0xc1138060], n = [1]
+default_free_pages: page base = [0xc1138080], n = [1]
+default_free_pages: page base = [0xc11380a0], n = [1]
+default_free_pages: page base = [0xc11380c0], n = [1]
+default_free_pages: page base = [0xc11380e0], n = [1]
+default_free_pages: page base = [0xc1138100], n = [1]
+default_free_pages: page base = [0xc1138120], n = [1]
+default_free_pages: page base = [0xc1138140], n = [1]
+default_free_pages: page base = [0xc1138160], n = [1]
+default_free_pages: page base = [0xc1138180], n = [1]
+default_free_pages: page base = [0xc11381a0], n = [1]
+default_free_pages: page base = [0xc11381c0], n = [1]
+default_free_pages: page base = [0xc11381e0], n = [1]
+default_free_pages: page base = [0xc1138200], n = [1]
+default_free_pages: page base = [0xc1138220], n = [1]
+default_free_pages: page base = [0xc1138240], n = [1]
+default_free_pages: page base = [0xc1138260], n = [1]
+default_free_pages: page base = [0xc1138280], n = [1]
+default_free_pages: page base = [0xc11382a0], n = [1]
+default_free_pages: page base = [0xc11382c0], n = [1]
+default_free_pages: page base = [0xc11382e0], n = [1]
+default_free_pages: page base = [0xc1138300], n = [1]
+default_free_pages: page base = [0xc1138320], n = [1]
+default_free_pages: page base = [0xc1138340], n = [1]
+default_free_pages: page base = [0xc1138360], n = [1]
+default_free_pages: page base = [0xc1138380], n = [1]
+default_free_pages: page base = [0xc11383a0], n = [1]
+default_free_pages: page base = [0xc11383c0], n = [1]
+default_free_pages: page base = [0xc11383e0], n = [1]
+default_free_pages: page base = [0xc1138400], n = [1]
+default_free_pages: page base = [0xc1138420], n = [1]
+default_free_pages: page base = [0xc1138440], n = [1]
+default_free_pages: page base = [0xc1138460], n = [1]
+default_free_pages: page base = [0xc1138480], n = [1]
+default_free_pages: page base = [0xc11384a0], n = [1]
+default_free_pages: page base = [0xc11384c0], n = [1]
+default_free_pages: page base = [0xc11384e0], n = [1]
+default_free_pages: page base = [0xc1138500], n = [1]
+default_free_pages: page base = [0xc1138520], n = [1]
+default_free_pages: page base = [0xc1138540], n = [1]
+default_free_pages: page base = [0xc1138560], n = [1]
+default_free_pages: page base = [0xc1138580], n = [1]
+default_free_pages: page base = [0xc11385a0], n = [1]
+default_free_pages: page base = [0xc11385c0], n = [1]
+default_free_pages: page base = [0xc11385e0], n = [1]
+default_free_pages: page base = [0xc1138600], n = [1]
+default_free_pages: page base = [0xc1138620], n = [1]
+default_free_pages: page base = [0xc1138640], n = [1]
+default_free_pages: page base = [0xc1138660], n = [1]
+default_free_pages: page base = [0xc1138680], n = [1]
+default_free_pages: page base = [0xc11386a0], n = [1]
+default_free_pages: page base = [0xc11386c0], n = [1]
+default_free_pages: page base = [0xc11386e0], n = [1]
+default_free_pages: page base = [0xc1138700], n = [1]
+default_free_pages: page base = [0xc1138720], n = [1]
+default_free_pages: page base = [0xc1138740], n = [1]
+default_free_pages: page base = [0xc1138760], n = [1]
+default_free_pages: page base = [0xc1138780], n = [1]
+default_free_pages: page base = [0xc11387a0], n = [1]
+default_free_pages: page base = [0xc11387c0], n = [1]
+default_free_pages: page base = [0xc11387e0], n = [1]
+default_free_pages: page base = [0xc1138800], n = [1]
+default_free_pages: page base = [0xc1138820], n = [1]
+default_free_pages: page base = [0xc1138840], n = [1]
+default_free_pages: page base = [0xc1138860], n = [1]
+default_free_pages: page base = [0xc1138880], n = [1]
+default_free_pages: page base = [0xc11388a0], n = [1]
+default_free_pages: page base = [0xc11388c0], n = [1]
+default_free_pages: page base = [0xc11388e0], n = [1]
+default_free_pages: page base = [0xc1138900], n = [1]
+default_free_pages: page base = [0xc1138920], n = [1]
+default_free_pages: page base = [0xc1138940], n = [1]
+default_free_pages: page base = [0xc1138960], n = [1]
+default_free_pages: page base = [0xc1138980], n = [1]
+default_free_pages: page base = [0xc11389a0], n = [1]
+default_free_pages: page base = [0xc11389c0], n = [1]
+default_free_pages: page base = [0xc11389e0], n = [1]
+default_free_pages: page base = [0xc1138a00], n = [1]
+default_free_pages: page base = [0xc1138a20], n = [1]
+default_free_pages: page base = [0xc1138a40], n = [1]
+default_free_pages: page base = [0xc1138a60], n = [1]
+default_free_pages: page base = [0xc1138a80], n = [1]
+default_free_pages: page base = [0xc1138aa0], n = [1]
+default_free_pages: page base = [0xc1138ac0], n = [1]
+default_free_pages: page base = [0xc1138ae0], n = [1]
+default_free_pages: page base = [0xc1137e60], n = [1]
+check_vma_struct() succeeded!
+(260)-<check_pgfault>: check_pgfault: after size_t nr_free_pages_store = nr_free_pages();
+
+(261)-<check_pgfault>: check_pgfault: nr_free_pages_store = [27885], nr_free_pages() = [27885]
+
+page fault at 0x00000100: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [100], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [100]
+ret = [0]
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [256]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [257]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [258]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [259]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [260]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [261]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [262]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [263]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [264]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = ]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [265]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [   ]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [266]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [
+]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [267]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [
+                                                             ]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [268]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [
+]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [269]
+
+]284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [270]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [271]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [272]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [273]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [274]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [275]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [276]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [277]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [278]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [279]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [280]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [281]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [282]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [283]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [
+
+
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [285]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [286]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [287]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [288]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [ ]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [289]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [!]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [290]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = ["]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [291]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [#]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [292]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [$]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [293]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [%]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [294]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [&]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [295]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [']
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [296]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [(]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [297]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [)]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [298]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [*]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [299]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [+]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [300]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [,]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [301]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [-]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [302]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [.]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [303]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [/]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [304]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [0]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [305]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [1]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [306]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [2]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [307]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [3]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [308]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [4]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [309]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [5]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [310]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [6]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [311]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [7]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [312]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [8]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [313]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [9]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [314]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [:]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [315]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [;]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [316]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [<]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [317]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [=]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [318]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [>]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [319]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [?]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [320]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [@]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [321]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [A]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [322]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [B]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [323]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [C]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [324]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [D]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [325]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [E]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [326]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [F]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [327]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [G]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [328]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [H]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [329]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [I]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [330]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [J]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [331]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [K]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [332]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [L]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [333]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [M]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [334]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [N]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [335]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [O]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [336]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [P]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [337]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [Q]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [338]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [R]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [339]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [S]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [340]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [T]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [341]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [U]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [342]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [V]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [343]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [W]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [344]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [X]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [345]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [Y]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [346]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [Z]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [347]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [[]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [348]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [\]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [349]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = []]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [350]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [^]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [351]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [_]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [352]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [`]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [353]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [a]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [354]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [b]
+
+(283)-<check_pgfault>: check_pgfault: (char *)(addr + i) = [355]
+
+(284)-<check_pgfault>: check_pgfault: *(char *)(addr + i) = [c]
+
+(295)-<check_pgfault>: pgdir = [0xc1212000], addr = [100], l1 = [0]
+
+page_remove: pgdir = [0x12f6067], la = [0x0]
+page_remove: *ptep = [0x12f6067]
+page_remove_pte: *pgdir = [0x12f5027], *ptep = [0x12f6067], la = [0x0], pages = [0xc1112000], npage = [32736]
+page->flags = [0]
+default_free_pages: page base = [0xc1137ec0], n = [1]
+(298)-<check_pgfault>: pgdir[0] = [19877927]
+
+default_free_pages: page base = [0xc1137ea0], n = [1]
+default_free_pages: page base = [0xc1137e80], n = [1]
+default_free_pages: page base = [0xc1137e60], n = [1]
+(306)-<check_pgfault>: check_pgfault: nr_free_pages_store = [27885], nr_free_pages() = [27885]
+
+check_pgfault() succeeded!
+check_vmm() succeeded.
+vmm_init
+
+ide 0:      10000(sectors), 'QEMU HARDDISK'.
+ide 1:     262144(sectors), 'QEMU HARDDISK'.
+ide_init
+
+SWAP: manager = extended clock swap manager
+BEGIN check_swap: count 1, total 27885
+setup Page Table for vaddr 0X1000, so alloc a page
+setup Page Table vaddr 0~4MB OVER!
+default_free_pages: page base = [0xc1137ec0], n = [1]
+default_free_pages: page base = [0xc1137ee0], n = [1]
+default_free_pages: page base = [0xc1137f00], n = [1]
+default_free_pages: page base = [0xc1137f20], n = [1]
+set up init env for check_swap begin!
+page fault at 0x00001000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [1000]
+ret = [0]
+page fault at 0x00002000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [2000]
+ret = [0]
+page fault at 0x00003000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [3000]
+ret = [0]
+page fault at 0x00004000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [4000]
+ret = [0]
+set up init env for check_swap over!
+write Virt Page c in fifo_check_swap
+write Virt Page a in fifo_check_swap
+write Virt Page d in fifo_check_swap
+write Virt Page b in fifo_check_swap
+write Virt Page e in fifo_check_swap
+page fault at 0x00005000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [5000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [5000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x1000 to disk swap entry 2
+default_free_pages: page base = [0xc1137ec0], n = [1]
+ret = [0]
+write Virt Page b in fifo_check_swap
+write Virt Page a in fifo_check_swap
+page fault at 0x00001000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [1000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x3000 to disk swap entry 4
+default_free_pages: page base = [0xc1137f00], n = [1]
+swap_in: load disk swap entry 2 with swap_page in vadr 0x1000
+ret = [0]
+write Virt Page b in fifo_check_swap
+write Virt Page c in fifo_check_swap
+page fault at 0x00003000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [3000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x4000 to disk swap entry 5
+default_free_pages: page base = [0xc1137f20], n = [1]
+swap_in: load disk swap entry 4 with swap_page in vadr 0x3000
+ret = [0]
+write Virt Page d in fifo_check_swap
+page fault at 0x00004000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [4000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x5000 to disk swap entry 6
+default_free_pages: page base = [0xc1137ec0], n = [1]
+swap_in: load disk swap entry 5 with swap_page in vadr 0x4000
+ret = [0]
+write Virt Page e in fifo_check_swap
+page fault at 0x00005000: K/W [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [2], addr = [5000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [5000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x2000 to disk swap entry 3
+default_free_pages: page base = [0xc1137ee0], n = [1]
+swap_in: load disk swap entry 6 with swap_page in vadr 0x5000
+ret = [0]
+write Virt Page a in fifo_check_swap
+read Virt Page b in fifo_check_swap
+page fault at 0x00002000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [0], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [2000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x3000 to disk swap entry 4
+default_free_pages: page base = [0xc1137f20], n = [1]
+swap_in: load disk swap entry 3 with swap_page in vadr 0x2000
+ret = [0]
+read Virt Page c in fifo_check_swap
+page fault at 0x00003000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [0], addr = [3000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [3000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x1000 to disk swap entry 2
+default_free_pages: page base = [0xc1137f00], n = [1]
+swap_in: load disk swap entry 4 with swap_page in vadr 0x3000
+ret = [0]
+read Virt Page a in fifo_check_swap
+page fault at 0x00001000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [0], addr = [1000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [1000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x4000 to disk swap entry 5
+default_free_pages: page base = [0xc1137ec0], n = [1]
+swap_in: load disk swap entry 2 with swap_page in vadr 0x1000
+ret = [0]
+read Virt Page d in fifo_check_swap
+page fault at 0x00004000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [0], addr = [4000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [4000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x2000 to disk swap entry 3
+default_free_pages: page base = [0xc1137f20], n = [1]
+swap_in: load disk swap entry 5 with swap_page in vadr 0x4000
+ret = [0]
+read Virt Page b in fifo_check_swap
+page fault at 0x00002000: K/R [no page found].
+pgfault_handler: check_mm_struct = [0xc12f3000], *check_mm_struct = [0xc12f4010]
+do_pgfault|-------> mm = [0xc12f3000], error_code = [0], addr = [2000], ret = [fffffffd]
+do_pgfault|-------> mm = [0xc12f3000], vma = [0xc12f4000], addr = [2000]
+page 0, call swap_out in alloc_pages 1
+swap_out: i 0, store page in vaddr 0x3000 to disk swap entry 4
+default_free_pages: page base = [0xc1137f00], n = [1]
+swap_in: load disk swap entry 3 with swap_page in vadr 0x2000
+ret = [0]
+default_free_pages: page base = [0xc1137ec0], n = [1]
+default_free_pages: page base = [0xc1137ee0], n = [1]
+default_free_pages: page base = [0xc1137f00], n = [1]
+default_free_pages: page base = [0xc1137f20], n = [1]
+default_free_pages: page base = [0xc1137e80], n = [1]
+default_free_pages: page base = [0xc1137e60], n = [1]
+count is 0, total is 7
+check_swap() succeeded!
+swap_init
+
+++ setup timer interrupts
+clock_init
+
+100 ticks
+End of Test.
+kernel panic at kern/trap/trap.c:22:
+    EOT: kernel seems ok.
+Welcome to the kernel debug monitor!!
+Type 'help' for a list of commands.

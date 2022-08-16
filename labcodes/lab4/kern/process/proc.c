@@ -188,6 +188,7 @@ proc_run(struct proc_struct *proc) {
         local_intr_save(intr_flag);
         {
             current = proc;
+            // next->kstack + KSTACKSIZE(2*4KB = 2*4096)
             load_esp0(next->kstack + KSTACKSIZE);
             lcr3(next->cr3);
             switch_to(&(prev->context), &(next->context));
