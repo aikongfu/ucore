@@ -199,7 +199,7 @@ Type 'help' for a list of commands.
 
 switch_to(&(prev->context), &(next->context));                                                           │
 
-   │0xc010a59d <proc_run+99>        call   0xc010a177 <switch_to>                                                 │
+   │0xc010a59d <proc_run+99>        call   0xc010a177 <switch_to>
    │0xc010a5a2 <proc_run+104>       mov    -0x14(%ebp),%eax
 
 eax            0xc12f6024       -1053859804
@@ -532,3 +532,68 @@ ds             0x10     16
 es             0x10     16
 fs             0x0      0
 gs             0x0      0
+
+
+
+   |0xc010a177 <switch_to>          mov    0x4(%esp),%eax                                                         │
+   │0xc010a17b <switch_to+4>        popl   (%eax)                                                                 │
+   │0xc010a17d <switch_to+6>        mov    %esp,0x4(%eax)                                                         │
+   │0xc010a180 <switch_to+9>        mov    %ebx,0x8(%eax)                                                         │
+   │0xc010a183 <switch_to+12>       mov    %ecx,0xc(%eax)                                                         │
+   │0xc010a186 <switch_to+15>       mov    %edx,0x10(%eax)                                                        │
+   │0xc010a189 <switch_to+18>       mov    %esi,0x14(%eax)                                                        │
+   │0xc010a18c <switch_to+21>       mov    %edi,0x18(%eax)   
+   |0xc010a18f <switch_to+24>       mov    %ebp,0x1c(%eax)                                                        │
+   │0xc010a192 <switch_to+27>       mov    0x4(%esp),%eax                                                         │
+   │0xc010a196 <switch_to+31>       mov    0x1c(%eax),%ebp                                                        │
+   │0xc010a199 <switch_to+34>       mov    0x18(%eax),%edi                                                        │
+   │0xc010a19c <switch_to+37>       mov    0x14(%eax),%esi                                                        │
+   │0xc010a19f <switch_to+40>       mov    0x10(%eax),%edx                                                        │
+   │0xc010a1a2 <switch_to+43>       mov    0xc(%eax),%ecx                                                         │
+   │0xc010a1a5 <switch_to+46>       mov    0x8(%eax),%ebx                                                         │
+   │0xc010a1a8 <switch_to+49>       mov    0x4(%eax),%esp                                                         │
+   │0xc010a1ab <switch_to+52>       pushl  (%eax)                                                                 │
+   │0xc010a1ad <switch_to+54>       ret 
+
+
+(gdb) i r eip esp ebx ecx edx esi edi ebp 
+eip            0xc010a177       0xc010a177 <switch_to>
+esp            0xc0110f4c       0xc0110f4c
+ebx            0x10074  65652
+ecx            0x0      0
+edx            0xc12f6094       -1053859692
+esi            0x0      0
+edi            0x1      1
+ebp            0xc0110f78       0xc0110f78
+
+(gdb) i r eip esp ebx ecx edx esi edi ebp 
+eip            0xc010a17d       0xc010a17d <switch_to+6>
+esp            0xc0110f50       0xc0110f50
+ebx            0x10074  65652
+ecx            0x0      0
+edx            0xc12f6094       -1053859692
+esi            0x0      0
+edi            0x1      1
+ebp            0xc0110f78       0xc0110f78
+
+(gdb) i r eip esp ebx ecx edx esi edi ebp 
+eip            0xc010a1ad       0xc010a1ad <switch_to+54>
+esp            0xc12f8fb0       0xc12f8fb0
+ebx            0x0      0
+ecx            0x0      0
+edx            0x0      0
+esi            0x0      0
+edi            0x0      0
+ebp            0x0      0x0
+
+|----------------------------|
+|eip|0xc010a17d|->|0xc010a1ad|
+|esp|0xc0110f50|->|0xc12f8fb0|
+|ebx|0x10074   |->|0x0       |
+|ecx|0x0       |->|0x0       |
+|edx|0xc12f6094|->|0x0       |
+|esi|0x0       |->|0x0       |
+|edi|0x1       |->|0x0       |
+|ebp|0xc0110f78|->|0x0       |
+|----------------------------|
+
