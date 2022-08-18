@@ -58,24 +58,27 @@ void idt_init(void)
     extern uintptr_t __vectors[];
     // 对256个中断向量表初始化
     int i;
-    for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++)
-    {
+    for (i = 0; i < (sizeof(idt) / (sizeof(struct gatedesc))); i++) {
         // idt数据里面的每一个，也可以用指针表示，
         // 0表示是一个interrupt gate
         // segment selector设置为GD_KTEXT（代码段）
         // offset设置为__vectors对应的内容
         // DPL设置为0
         SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
+    }
+
         // 再把从用户态切换到内核态使用的Segment Descriptor改一下
         // 需要注意的是，我们使用的segment都是一样的，都是GD_KTEXT
         // 而有一点不同的是这里的DPL是DPL_USER，即从user->kernel时，需要的该段的权限级别
         // 因为Privilege Check需要满足：DPL >= max {CPL, RPL}
         // 所以如果不单独改这个会造成Privilege Check失败，无法正确处理user->kernel的流程
-        SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
+
+        // lab1后可能已经用不到了
+        // SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
+        // lab5补充，从用户态切换到内核态的idt设置
         SETGATE(idt[T_SYSCALL], 1, GD_KTEXT, __vectors[T_SYSCALL], DPL_USER);
         // 通过lidt加载
         lidt(&idt_pd);
-    }
 }
 
 static const char *
@@ -332,6 +335,7 @@ trap_dispatch(struct trapframe *tf) {
         if (ticks % TICK_NUM == 0) {
         // 设置当前的process current->need_resched = 1
             assert(current != NULL);
+            // 设置need_resched = 1
             current->need_resched = 1;
             print_ticks();
         }

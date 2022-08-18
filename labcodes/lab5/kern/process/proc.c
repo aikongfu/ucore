@@ -116,7 +116,9 @@ alloc_proc(void) {
         proc->cr3 = boot_cr3;
         proc->flags = 0;
         memset(proc->name, 0, PROC_NAME_LEN);
-        proc->wait_state = 0;
+        //PCB新增的条目，初始化进程等待状态
+        proc->wait_state = 0; 
+        // 新proc相关的proc
         proc->cptr = proc->optr = proc->yptr = NULL;
     }
     
@@ -141,9 +143,15 @@ get_proc_name(struct proc_struct *proc) {
 // set_links - set the relation links of process
 static void
 set_links(struct proc_struct *proc) {
+    // 加入进程链表
     list_add(&proc_list, &(proc->list_link));
+    // proc进程的younger sibling为空
     proc->yptr = NULL;
+    // proc进程的old sibling设置为proc的parent的最新的child proc
     if ((proc->optr = proc->parent->cptr) != NULL) {
+        // proc的old sibling的younger sibling为proc
+        // 即原proc的parent的最新的child proc的younger sibing为proc
+        // 也就是proc变成parent最新的child  
         proc->optr->yptr = proc;
     }
     proc->parent->cptr = proc;
@@ -428,7 +436,9 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     }
 
     proc->parent = current;
-    assert(current->wait_state == 0);
+    
+    // 确保进程在等待
+    assert(current->wait_state == 0); 
 
     if (setup_kstack(proc) != 0) {
         goto bad_fork_cleanup_proc;
@@ -444,9 +454,10 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     {
         proc->pid = get_pid();
         hash_proc(proc);
-        // set_links(proc);
-        list_add(&proc_list, &proc->list_link);
-        nr_process++;
+        // 设置进程链接
+        set_links(proc);
+        // list_add(&proc_list, &proc->list_link);
+        // nr_process++;
     }
     local_intr_restore(intr_flag);
 

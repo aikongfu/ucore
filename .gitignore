@@ -32,3 +32,4 @@ learn_list.o.dSYM
 .gdb_history
 peda-session-kernel.txt
 
+*.und
