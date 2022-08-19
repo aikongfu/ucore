@@ -595,9 +595,13 @@ failed:
     return ret;
 }
 
+// user_mem_check查询进程对应的用户态空间的
 bool
 user_mem_check(struct mm_struct *mm, uintptr_t addr, size_t len, bool write) {
+    // 如果mm不空为，是用户太的空间
     if (mm != NULL) {
+        // check 0x00200000 <= addr < addr + len <= 0xB0000000
+        // 是逻辑地址（虚拟地址）
         if (!USER_ACCESS(addr, addr + len)) {
             return 0;
         }
@@ -610,6 +614,7 @@ user_mem_check(struct mm_struct *mm, uintptr_t addr, size_t len, bool write) {
             if (!(vma->vm_flags & ((write) ? VM_WRITE : VM_READ))) {
                 return 0;
             }
+            // VM_STACK 0x00000008 00001000
             if (write && (vma->vm_flags & VM_STACK)) {
                 if (start < vma->vm_start + PGSIZE) { //check stack start & size
                     return 0;
@@ -619,6 +624,8 @@ user_mem_check(struct mm_struct *mm, uintptr_t addr, size_t len, bool write) {
         }
         return 1;
     }
+    // 内核态
+    // 0xC0000000 <= addr < addr + len <= 0xC0000000 + 0x38000000 = 0xF8000000
     return KERN_ACCESS(addr, addr + len);
 }
 

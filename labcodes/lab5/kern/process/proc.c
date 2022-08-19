@@ -683,11 +683,13 @@ bad_mm:
     goto out;
 }
 
+// sys_exec -> do_execve
 // do_execve - call exit_mmap(mm)&put_pgdir(mm) to reclaim memory space of current process
 //           - call load_icode to setup new memory space accroding binary prog.
 int
 do_execve(const char *name, size_t len, unsigned char *binary, size_t size) {
     struct mm_struct *mm = current->mm;
+    // memery check
     if (!user_mem_check(mm, (uintptr_t)name, len, 0)) {
         return -E_INVAL;
     }

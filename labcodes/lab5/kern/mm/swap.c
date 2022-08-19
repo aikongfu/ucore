@@ -81,12 +81,12 @@ swap_set_unswappable(struct mm_struct *mm, uintptr_t addr)
 
 volatile unsigned int swap_out_num=0;
 
+// 换出
 int
 swap_out(struct mm_struct *mm, int n, int in_tick)
 {
      int i;
-     for (i = 0; i != n; ++ i)
-     {
+     for (i = 0; i != n; ++ i) {
           uintptr_t v;
           //struct Page **ptr_page=NULL;
           struct Page *page;
@@ -95,8 +95,8 @@ swap_out(struct mm_struct *mm, int n, int in_tick)
           // Try to swap out a page, return then victim
           int r = sm->swap_out_victim(mm, &page, in_tick);
           if (r != 0) {
-                    cprintf("i %d, swap_out: call swap_out_victim failed\n",i);
-                  break;
+               cprintf("i %d, swap_out: call swap_out_victim failed\n",i);
+               break;
           }          
           //assert(!PageReserved(page));
 
