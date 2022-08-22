@@ -74,8 +74,9 @@ void idt_init(void)
         // 所以如果不单独改这个会造成Privilege Check失败，无法正确处理user->kernel的流程
 
         // lab1后可能已经用不到了
-        // SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
+        SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
         // lab5补充，从用户态切换到内核态的idt设置
+        // SETGATE(idt[T_SYSCALL], 1, GD_KTEXT, __vectors[T_SYSCALL], DPL_USER);
         SETGATE(idt[T_SYSCALL], 1, GD_KTEXT, __vectors[T_SYSCALL], DPL_USER);
         // 通过lidt加载
         lidt(&idt_pd);
@@ -337,7 +338,7 @@ trap_dispatch(struct trapframe *tf) {
             assert(current != NULL);
             // 设置need_resched = 1
             current->need_resched = 1;
-            print_ticks();
+            // print_ticks();
         }
         break;
     case IRQ_OFFSET + IRQ_COM1:
