@@ -8,6 +8,7 @@
 #include <x86.h>
 #include <swap.h>
 #include <kmalloc.h>
+#include <kdebug.h>
 
 /* 
   vmm design include two parts: mm_struct (mm) & vma_struct (vma)
@@ -449,12 +450,12 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
 
     //try to find a vma which include addr
     // 根据addr从vma中查找对应的vma_struct
-    cprintf("do_pgfault|-------> mm = [%p], error_code = [%x], addr = [%x], ret = [%x]\n", mm, error_code, addr, ret);
+    DEBUG("mm = [%p], error_code = [%x], addr = [%x]", mm, error_code, addr);
     struct vma_struct *vma = find_vma(mm, addr);
 
     pgfault_num++;
     //If the addr is in the range of a mm's vma?
-    cprintf("do_pgfault|-------> mm = [%p], vma = [%p], addr = [%x]\n", mm, vma, addr);
+    DEBUG("mm = [%p], vma = [%p], addr = [%x]\n", mm, vma, addr);
     if (vma == NULL || vma->vm_start > addr) {
         cprintf("not valid addr %x, and  can not find it in vma\n", addr);
         goto failed;
