@@ -170,17 +170,19 @@ mm_destroy(struct mm_struct *mm) {
 /**
  * @brief 建立对应的vma结构，并把vma插入到mm结构中
  * 
- * @param mm 
- * @param addr 
- * @param len 
- * @param vm_flags 
- * @param vma_store 
+ * @param mm mm
+ * @param addr 线性地址
+ * @param len 长度
+ * @param vm_flags vm_flags 
+ * @param vma_store vma_store映射后的vma_struct
  * @return int 
  */
 int
 mm_map(struct mm_struct *mm, uintptr_t addr, size_t len, uint32_t vm_flags,
        struct vma_struct **vma_store) {
+    // 分别向下，向上取整
     uintptr_t start = ROUNDDOWN(addr, PGSIZE), end = ROUNDUP(addr + len, PGSIZE);
+    // USERBASE, USERTOP比较
     if (!USER_ACCESS(start, end)) {
         return -E_INVAL;
     }
@@ -190,14 +192,17 @@ mm_map(struct mm_struct *mm, uintptr_t addr, size_t len, uint32_t vm_flags,
     int ret = -E_INVAL;
 
     struct vma_struct *vma;
+    // 从mm查找vma,找到则直接返回
     if ((vma = find_vma(mm, start)) != NULL && end > vma->vm_start) {
         goto out;
     }
     ret = -E_NO_MEM;
 
+    // 没找到，创建新的vma
     if ((vma = vma_create(start, end, vm_flags)) == NULL) {
         goto out;
     }
+    // 将vma插入mm
     insert_vma_struct(mm, vma);
     if (vma_store != NULL) {
         *vma_store = vma;

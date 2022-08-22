@@ -333,6 +333,7 @@ copy_mm(uint32_t clone_flags, struct proc_struct *proc) {
     if (oldmm == NULL) {
         return 0;
     }
+    // 如果是CLONE_VM，则是进程共享的mm
     if (clone_flags & CLONE_VM) {
         mm = oldmm;
         goto good_mm;
