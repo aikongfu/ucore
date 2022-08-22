@@ -46,33 +46,33 @@ endif
 
 # define compiler and flags
 # ifndef  USELLVM
-HOSTCC		:= gcc-4.8
-HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
-# CC		:= $(GCCPREFIX)gcc
-CC		:= gcc-4.8
-CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gdwarf-2 -g3 -nostdinc -fno-pic $(DEFS)
-CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
-else
-HOSTCC		:= gcc-4.8
-HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
-CC		:= gcc-4.8
-CFLAGS	:= -fno-builtin -Wall -g -m32 -mno-sse -g3 -nostdinc  -fno-pic $(DEFS)
-CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
-endif
-
-# HOSTCC		:= gcc
-# HOSTCFLAGS	:= -g -Wall -O2
-
-# GDB		:= $(GCCPREFIX)gdb
-
-# CC		:= $(GCCPREFIX)gcc
-# CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gstabs -nostdinc $(DEFS)
+# HOSTCC		:= gcc-4.8
+# HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
+# # CC		:= $(GCCPREFIX)gcc
+# CC		:= gcc-4.8
+# CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gdwarf-2 -g3 -nostdinc -fno-pic $(DEFS)
 # CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
-# CTYPE	:= c S
+# else
+# HOSTCC		:= gcc-4.8
+# HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
+# CC		:= gcc-4.8
+# CFLAGS	:= -fno-builtin -Wall -g -m32 -mno-sse -g3 -nostdinc  -fno-pic $(DEFS)
+# CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+# endif
 
-# LD      := $(GCCPREFIX)ld
-# LDFLAGS	:= -m $(shell $(LD) -V | grep elf_i386 2>/dev/null)
-# LDFLAGS	+= -nostdlib
+HOSTCC		:= gcc-4.8
+HOSTCFLAGS	:= -g -Wall -O2 -s -gdwarf-2 -g3
+
+GDB		:= $(GCCPREFIX)gdb
+
+CC		:= $(GCCPREFIX)gcc
+CFLAGS	:= -fno-builtin -Wall -ggdb -m32 -gdwarf-2 -g3 -gstabs -nostdinc $(DEFS)
+CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+CTYPE	:= c S
+
+LD      := $(GCCPREFIX)ld
+LDFLAGS	:= -m $(shell $(LD) -V | grep elf_i386 2>/dev/null)
+LDFLAGS	+= -nostdlib
 
 OBJCOPY := $(GCCPREFIX)objcopy
 OBJDUMP := $(GCCPREFIX)objdump
