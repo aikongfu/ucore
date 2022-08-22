@@ -395,10 +395,14 @@ volatile unsigned int pgfault_num=0;
 int
 do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
     int ret = -E_INVAL;
+
+    cprintf("do_pgfault|-> mm = [%p], error_code = [%x], addr = [%x]", mm, error_code, addr);
     //try to find a vma which include addr
     struct vma_struct *vma = find_vma(mm, addr);
 
     pgfault_num++;
+
+    cprintf("do_pgfault|-> mm = [%p], vma = [%p], addr = [%x]\n", mm, vma, addr);
     //If the addr is in the range of a mm's vma?
     if (vma == NULL || vma->vm_start > addr) {
         cprintf("not valid addr %x, and  can not find it in vma\n", addr);
