@@ -67,7 +67,7 @@ GDB		:= $(GCCPREFIX)gdb
 
 CC		:= $(GCCPREFIX)gcc
 #CFLAGS	:= -fno-builtin -Wall -ggdb -m32  -g3 -gstabs -nostdinc $(DEFS)
-CFLAGS	:= -fno-builtin -Wall -ggdb -m32  -g3 dd-nostdinc $(DEFS)
+CFLAGS	:= -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc $(DEFS)
 CFLAGS	+= $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 CTYPE	:= c S
 
