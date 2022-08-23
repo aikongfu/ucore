@@ -94,6 +94,98 @@ gs             0x0      0
 do_execve
 
 
+   │638       pushl $0                                                                                            │
+   │639       pushl $128                                                                                          │
+  >│640       jmp __alltraps                                                                                      │
+   │641     .globl vector129 
+
+   |0xc0103160 <vector128+2>        push   $0x80                                                                  │
+  >│0xc0103165 <vector128+7>        jmp    0xc010375e <__alltraps>                                                │
+   │0xc010316a <vector129>          push   $0x0                                                                   │
+   │0xc010316c <vector129+2>        push   $0x81    
+
+407     trap(struct trapframe *tf) 
+   |0xc0102c59 <trap>       push   %ebp                                                                           │
+  >│0xc0102c5a <trap+1>     mov    %esp,%ebp                                                                      │
+   │0xc0102c5c <trap+3>     sub    $0x18,%esp                                                                     │
+   │0xc0102c5f <trap+6>     mov    0xc019af48,%eax
+(gdb) p /x tf
+$2 = 0xc13a8f60
+(gdb) p /x *tf
+$1 = {tf_regs = {reg_edi = 0x8f60, reg_esi = 0x8f60, reg_ebp = 0xc13a8fcc, reg_oesp = 0xc13a8f80,
+    reg_ebx = 0xc014960c, reg_edx = 0xc010fade, reg_ecx = 0x4, reg_eax = 0x4}, tf_gs = 0x0, tf_padding0 = 0x0,
+  tf_fs = 0x0, tf_padding1 = 0x0, tf_es = 0x10, tf_padding2 = 0x0, tf_ds = 0x10, tf_padding3 = 0x0,
+  tf_trapno = 0x80, tf_err = 0x0, tf_eip = 0xc010bacf, tf_cs = 0x8, tf_padding4 = 0x0, tf_eflags = 0x282,
+  tf_esp = 0xc010fae4, tf_ss = 0x8fd8, tf_padding5 = 0xc13a}
+
+(gdb) p /x current
+$3 = 0xc139f118
+
+(gdb) p /x binary
+$5 = 0xc014960c
+(gdb) n     
+(gdb) p /x *elf
+$6 = {e_magic = 0x464c457f, e_elf = {0x1, 0x1, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, e_type = 0x2,
+  e_machine = 0x3, e_version = 0x1, e_entry = 0x800234, e_phoff = 0x34, e_shoff = 0x8cb8, e_flags = 0x0,
+  e_ehsize = 0x34, e_phentsize = 0x20, e_phnum = 0x4, e_shentsize = 0x28, e_shnum = 0x11, e_shstrndx = 0xe}
+
+(gdb) p /x end
+$8 = 0x200012
+(gdb) p /x start
+$9 = 0x200000
+
+(gdb) p /x la
+$16 = 0x800000
+
+   │596          //(3.6) alloc memory, and  copy the contents of every program section (from, from+end) to process│
+   │597             end = ph->p_va + ph->p_filesz;                                                                │
+   │598          //(3.6.1) copy TEXT/DATA section of bianry program                                               │
+  >│599             while (start < end) {                                                                         │
+   │600                 if ((page = pgdir_alloc_page(mm->pgdir, la, perm)) == NULL) {                             │
+   │601                     goto bad_cleanup_mmap;                                                                │
+   ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+   │0xc010b328 <load_icode+397>     mov    0x10(%eax),%eax                                                        │
+   │0xc010b32b <load_icode+400>     add    %edx,%eax                                                              │
+   │0xc010b32d <load_icode+402>     mov    %eax,-0x40(%ebp)                                                       │
+  >│0xc010b330 <load_icode+405>     jmp    0xc010b3b9 <load_icode+542>                                            │
+   │0xc010b335 <load_icode+410>     mov    -0x30(%ebp),%eax                                                       │
+   │0xc010b338 <load_icode+413>     mov    0xc(%eax),%eax                                                         │
+   │0xc010b33b <load_icode+416>     sub    $0x4,%esp                                                              │
+   │0xc010b33e <load_icode+419>     pushl  -0x1c(%ebp)
+
+(gdb) p /x start
+$17 = 0x800020
+(gdb) p /x end
+$18 = 0x801434
+
+(gdb) p /x *mm
+$23 = {mmap_list = {prev = 0xc139f238, next = 0xc139f1d8}, mmap_cache = 0x0, pgdir = 0xc13a9000, map_count = 0x4,
+  sm_priv = 0xc019cfd4, mm_count = 0x1, mm_lock = 0x0}
+(gdb) p /x *current
+$22 = {state = 0x2, pid = 0x2, runs = 0x1, kstack = 0xc13a7000, need_resched = 0x0, parent = 0xc139f090,
+  mm = 0xc139f1a0, context = {eip = 0xc010aa13, esp = 0xc13a8fb4, ebx = 0x0, ecx = 0x0, edx = 0x0, esi = 0x0,
+    edi = 0x0, ebp = 0x0}, tf = 0xc13a8f60, cr3 = 0x13a9000, flags = 0x0, name = {0x0 <repeats 15 times>, 0xc1},
+  list_link = {prev = 0xc119d0c4, next = 0xc139f0e8}, hash_link = {prev = 0xc019b6e8, next = 0xc019b6e8},
+  exit_code = 0xc139f008, wait_state = 0x0, cptr = 0x0, yptr = 0x0, optr = 0x0}
+
+(gdb) p /x *tf
+$24 = {tf_regs = {reg_edi = 0x8f60, reg_esi = 0x8f60, reg_ebp = 0xc13a8fcc, reg_oesp = 0xc13a8f80,
+    reg_ebx = 0xc014960c, reg_edx = 0xc010fade, reg_ecx = 0x4, reg_eax = 0x4}, tf_gs = 0x0, tf_padding0 = 0x0,
+  tf_fs = 0x0, tf_padding1 = 0x0, tf_es = 0x10, tf_padding2 = 0x0, tf_ds = 0x10, tf_padding3 = 0x0,
+  tf_trapno = 0x80, tf_err = 0x0, tf_eip = 0xc010bacf, tf_cs = 0x8, tf_padding4 = 0x0, tf_eflags = 0x282,
+  tf_esp = 0xc010fae4, tf_ss = 0x8fd8, tf_padding5 = 0xc13a}
+
+54      static int                                                                                            │
+  >│55      sys_putc(uint32_t arg[]) {                                                                            │
+b+ │56          int c = (int)arg[0];                                                                              │
+   │57          cputchar(c);                                                                                      │
+   │58          return 0;                                                                                         │
+   │59      }                                                                                                     │
+   ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  >│0xc010c0ae <sys_putc>           push   %ebp                                                                   │
+   │0xc010c0af <sys_putc+1>         mov    %esp,%ebp                                                              │
+   │0xc010c0b1 <sys_putc+3>         sub    $0x18,%esp                                                             │
+b+ │0xc010c0b4 <sys_putc+6>         mov    0x8(%ebp),%eax 
 
 
 

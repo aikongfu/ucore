@@ -1,0 +1,457 @@
+build02@ubuntu:/data/code/01.learn/01.os/01.ucore/labcodes/lab5$ sudo make V=
++ cc kern/init/entry.S
+gcc -Ikern/init/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/init/entry.S -o obj/kern/init/entry.o
++ cc kern/init/init.c
+gcc -Ikern/init/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/init/init.c -o obj/kern/init/init.o
+In file included from kern/init/init.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/init/init.c: In function ‘lab1_switch_to_user’:
+kern/init/init.c:152:1: warning: "/*" within comment [-Wcomment]
+ /**
+ ^
+kern/init/init.c: At top level:
+kern/init/init.c:185:1: warning: ‘lab1_switch_test’ defined but not used [-Wunused-function]
+ lab1_switch_test(void) {
+ ^
++ cc kern/libs/stdio.c
+gcc -Ikern/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/libs/stdio.c -o obj/kern/libs/stdio.o
+In file included from kern/libs/stdio.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/libs/readline.c
+gcc -Ikern/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/libs/readline.c -o obj/kern/libs/readline.o
+In file included from libs/stdio.h:4:0,
+                 from kern/libs/readline.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/debug/panic.c
+gcc -Ikern/debug/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/debug/panic.c -o obj/kern/debug/panic.o
+In file included from kern/debug/panic.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/debug/kdebug.c
+gcc -Ikern/debug/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/debug/kdebug.c -o obj/kern/debug/kdebug.o
+In file included from kern/debug/kdebug.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/debug/kdebug.c: In function ‘print_stackframe’:
+kern/debug/kdebug.c:366:13: warning: assignment makes integer from pointer without a cast [-Wint-conversion]
+     args[0] = (uint32_t *)ebp + 2;
+             ^
++ cc kern/debug/kmonitor.c
+gcc -Ikern/debug/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/debug/kmonitor.c -o obj/kern/debug/kmonitor.o
+In file included from libs/stdio.h:4:0,
+                 from kern/debug/kmonitor.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/driver/ide.c
+gcc -Ikern/driver/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/driver/ide.c -o obj/kern/driver/ide.o
+In file included from kern/driver/ide.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/driver/clock.c
+gcc -Ikern/driver/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/driver/clock.c -o obj/kern/driver/clock.o
+In file included from libs/x86.h:4:0,
+                 from kern/driver/clock.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/driver/console.c
+gcc -Ikern/driver/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/driver/console.c -o obj/kern/driver/console.o
+In file included from kern/driver/console.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/driver/picirq.c
+gcc -Ikern/driver/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/driver/picirq.c -o obj/kern/driver/picirq.o
+In file included from kern/driver/picirq.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/driver/intr.c
+gcc -Ikern/driver/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/driver/intr.c -o obj/kern/driver/intr.o
+In file included from libs/x86.h:4:0,
+                 from kern/driver/intr.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/trap/trap.c
+gcc -Ikern/trap/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/trap/trap.c -o obj/kern/trap/trap.o
+In file included from kern/trap/trap.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/trap/trap.c: In function ‘switch2user’:
+kern/trap/trap.c:198:9: warning: statement with no effect [-Wunused-value]
+         switchk2u.tf_eflags | FL_IOPL_MASK;
+         ^
+kern/trap/trap.c: At top level:
+kern/trap/trap.c:22:13: warning: ‘print_ticks’ defined but not used [-Wunused-function]
+ static void print_ticks() {
+             ^
++ cc kern/trap/vectors.S
+gcc -Ikern/trap/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/trap/vectors.S -o obj/kern/trap/vectors.o
++ cc kern/trap/trapentry.S
+gcc -Ikern/trap/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/trap/trapentry.S -o obj/kern/trap/trapentry.o
++ cc kern/mm/vmm.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/vmm.c -o obj/kern/mm/vmm.o
+In file included from kern/mm/vmm.h:4:0,
+                 from kern/mm/vmm.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/mm/vmm.c: In function ‘check_vmm’:
+kern/mm/vmm.c:282:12: warning: unused variable ‘nr_free_pages_store’ [-Wunused-variable]
+     size_t nr_free_pages_store = nr_free_pages();
+            ^
++ cc kern/mm/swap_fifo.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/swap_fifo.c -o obj/kern/mm/swap_fifo.o
+In file included from kern/mm/swap_fifo.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/mm/swap.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/swap.c -o obj/kern/mm/swap.o
+In file included from kern/mm/swap.h:4:0,
+                 from kern/mm/swap.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/mm/kmalloc.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/kmalloc.c -o obj/kern/mm/kmalloc.o
+In file included from kern/mm/kmalloc.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/mm/kmalloc.c: In function ‘__slob_free_pages’:
+kern/mm/kmalloc.c:93:23: warning: passing argument 1 of ‘kva2page’ makes pointer from integer without a cast [-Wint-conversion]
+   free_pages(kva2page(kva), 1 << order);
+                       ^
+In file included from kern/mm/kmalloc.c:7:0:
+kern/mm/pmm.h:140:1: note: expected ‘void *’ but argument is of type ‘long unsigned int’
+ kva2page(void *kva) {
+ ^
++ cc kern/mm/swap_extended_clock.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/swap_extended_clock.c -o obj/kern/mm/swap_extended_clock.o
+In file included from kern/mm/swap_extended_clock.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/mm/swap_extended_clock.c:26:8: warning: return type defaults to ‘int’ [-Wimplicit-int]
+ static _clear_accessed_flag(pte_t *pgdir, list_entry_t *le) {
+        ^
+kern/mm/swap_extended_clock.c: In function ‘_clear_accessed_flag’:
+kern/mm/swap_extended_clock.c:33:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
++ cc kern/mm/default_pmm.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/default_pmm.c -o obj/kern/mm/default_pmm.o
+In file included from kern/mm/pmm.h:4:0,
+                 from kern/mm/default_pmm.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/mm/default_pmm.c: In function ‘default_free_pages’:
+kern/mm/default_pmm.c:162:18: warning: unused variable ‘t’ [-Wunused-variable]
+     struct Page *t = base + base->property;
+                  ^
++ cc kern/mm/pmm.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/pmm.c -o obj/kern/mm/pmm.o
+In file included from kern/mm/pmm.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/mm/buddy_pmm.c
+gcc -Ikern/mm/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/mm/buddy_pmm.c -o obj/kern/mm/buddy_pmm.o
+In file included from kern/mm/pmm.h:4:0,
+                 from kern/mm/buddy_pmm.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/mm/buddy_pmm.c: In function ‘buddy_free_pages’:
+kern/mm/buddy_pmm.c:300:14: warning: variable ‘position’ set but not used [-Wunused-but-set-variable]
+     uint32_t position = 0;
+              ^
+kern/mm/buddy_pmm.c:299:28: warning: unused variable ‘right_longest’ [-Wunused-variable]
+     uint32_t left_longest, right_longest;
+                            ^
+kern/mm/buddy_pmm.c:299:14: warning: unused variable ‘left_longest’ [-Wunused-variable]
+     uint32_t left_longest, right_longest;
+              ^
+kern/mm/buddy_pmm.c:298:25: warning: unused variable ‘index’ [-Wunused-variable]
+     uint32_t node_size, index = 0;
+                         ^
+kern/mm/buddy_pmm.c:298:14: warning: unused variable ‘node_size’ [-Wunused-variable]
+     uint32_t node_size, index = 0;
+              ^
+kern/mm/buddy_pmm.c: In function ‘buddy_check’:
+kern/mm/buddy_pmm.c:348:35: warning: unused variable ‘D’ [-Wunused-variable]
+     struct Page *p0, *A, *B, *C, *D;
+                                   ^
+kern/mm/buddy_pmm.c:348:31: warning: unused variable ‘C’ [-Wunused-variable]
+     struct Page *p0, *A, *B, *C, *D;
+                               ^
+kern/mm/buddy_pmm.c: At top level:
+kern/mm/buddy_pmm.c:196:17: warning: ‘buddy_size’ defined but not used [-Wunused-function]
+ static uint32_t buddy_size(struct buddy* self, uint32_t offset) {
+                 ^
++ cc kern/fs/swapfs.c
+gcc -Ikern/fs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/fs/swapfs.c -o obj/kern/fs/swapfs.o
+In file included from kern/mm/swap.h:4:0,
+                 from kern/fs/swapfs.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/process/entry.S
+gcc -Ikern/process/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/process/entry.S -o obj/kern/process/entry.o
++ cc kern/process/switch.S
+gcc -Ikern/process/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/process/switch.S -o obj/kern/process/switch.o
++ cc kern/process/proc.c
+gcc -Ikern/process/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/process/proc.c -o obj/kern/process/proc.o
+In file included from kern/process/proc.h:4:0,
+                 from kern/process/proc.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+kern/process/proc.c: In function ‘init_main’:
+kern/process/proc.c:860:12: warning: unused variable ‘kernel_allocated_store’ [-Wunused-variable]
+     size_t kernel_allocated_store = kallocated();
+            ^
+kern/process/proc.c:859:12: warning: unused variable ‘nr_free_pages_store’ [-Wunused-variable]
+     size_t nr_free_pages_store = nr_free_pages();
+            ^
++ cc kern/schedule/sched.c
+gcc -Ikern/schedule/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/schedule/sched.c -o obj/kern/schedule/sched.o
+In file included from libs/list.h:6:0,
+                 from kern/schedule/sched.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc kern/syscall/syscall.c
+gcc -Ikern/syscall/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Ikern/debug/ -Ikern/driver/ -Ikern/trap/ -Ikern/mm/ -Ikern/libs/ -Ikern/sync/ -Ikern/fs/ -Ikern/process -Ikern/schedule -Ikern/syscall -c kern/syscall/syscall.c -o obj/kern/syscall/syscall.o
+In file included from kern/process/proc.h:4:0,
+                 from kern/syscall/syscall.c:2:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc libs/string.c
+gcc -Ilibs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/  -c libs/string.c -o obj/libs/string.o
+In file included from libs/string.h:4:0,
+                 from libs/string.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc libs/printfmt.c
+gcc -Ilibs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/  -c libs/printfmt.c -o obj/libs/printfmt.o
+In file included from libs/printfmt.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc libs/hash.c
+gcc -Ilibs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/  -c libs/hash.c -o obj/libs/hash.o
+In file included from libs/stdlib.h:4:0,
+                 from libs/hash.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc libs/rand.c
+gcc -Ilibs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/  -c libs/rand.c -o obj/libs/rand.o
+In file included from libs/x86.h:4:0,
+                 from libs/rand.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc user/hello.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/hello.c -o obj/user/hello.o
+In file included from libs/stdio.h:4:0,
+                 from user/hello.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc user/libs/panic.c
+gcc -Iuser/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/libs/panic.c -o obj/user/libs/panic.o
+In file included from user/libs/panic.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc user/libs/syscall.c
+gcc -Iuser/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/libs/syscall.c -o obj/user/libs/syscall.o
+In file included from user/libs/syscall.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc user/libs/ulib.c
+gcc -Iuser/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/libs/ulib.c -o obj/user/libs/ulib.o
+In file included from user/libs/ulib.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc user/libs/initcode.S
+gcc -Iuser/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/libs/initcode.S -o obj/user/libs/initcode.o
++ cc user/libs/stdio.c
+gcc -Iuser/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/libs/stdio.c -o obj/user/libs/stdio.o
+In file included from user/libs/stdio.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc user/libs/umain.c
+gcc -Iuser/libs/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/libs/umain.c -o obj/user/libs/umain.o
+In file included from user/libs/ulib.h:4:0,
+                 from user/libs/umain.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_hello.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/hello.o
++ cc user/badarg.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/badarg.c -o obj/user/badarg.o
+In file included from libs/stdio.h:4:0,
+                 from user/badarg.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_badarg.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/badarg.o
++ cc user/forktree.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/forktree.c -o obj/user/forktree.o
+In file included from user/libs/ulib.h:4:0,
+                 from user/forktree.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_forktree.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/forktree.o
++ cc user/badsegment.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/badsegment.c -o obj/user/badsegment.o
+In file included from libs/stdio.h:4:0,
+                 from user/badsegment.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_badsegment.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/badsegment.o
++ cc user/faultread.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/faultread.c -o obj/user/faultread.o
+In file included from libs/stdio.h:4:0,
+                 from user/faultread.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_faultread.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/faultread.o
++ cc user/divzero.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/divzero.c -o obj/user/divzero.o
+In file included from libs/stdio.h:4:0,
+                 from user/divzero.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_divzero.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/divzero.o
++ cc user/exit.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/exit.c -o obj/user/exit.o
+In file included from libs/stdio.h:4:0,
+                 from user/exit.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_exit.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/exit.o
++ cc user/softint.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/softint.c -o obj/user/softint.o
+In file included from libs/stdio.h:4:0,
+                 from user/softint.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_softint.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/softint.o
++ cc user/waitkill.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/waitkill.c -o obj/user/waitkill.o
+In file included from user/libs/ulib.h:4:0,
+                 from user/waitkill.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_waitkill.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/waitkill.o
++ cc user/spin.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/spin.c -o obj/user/spin.o
+In file included from libs/stdio.h:4:0,
+                 from user/spin.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_spin.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/spin.o
++ cc user/yield.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/yield.c -o obj/user/yield.o
+In file included from user/libs/ulib.h:4:0,
+                 from user/yield.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_yield.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/yield.o
++ cc user/testbss.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/testbss.c -o obj/user/testbss.o
+In file included from libs/stdio.h:4:0,
+                 from user/testbss.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_testbss.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/testbss.o
++ cc user/faultreadkernel.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/faultreadkernel.c -o obj/user/faultreadkernel.o
+In file included from libs/stdio.h:4:0,
+                 from user/faultreadkernel.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_faultreadkernel.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/faultreadkernel.o
++ cc user/forktest.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/forktest.c -o obj/user/forktest.o
+In file included from user/libs/ulib.h:4:0,
+                 from user/forktest.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_forktest.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/forktest.o
++ cc user/pgdir.c
+gcc -Iuser/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Iuser/include/ -Iuser/libs/ -c user/pgdir.c -o obj/user/pgdir.o
+In file included from libs/stdio.h:4:0,
+                 from user/pgdir.c:1:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
+ld -m    elf_i386 -nostdlib -T tools/user.ld -o obj/__user_pgdir.out  obj/user/libs/panic.o obj/user/libs/syscall.o obj/user/libs/ulib.o obj/user/libs/initcode.o obj/user/libs/stdio.o obj/user/libs/umain.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o obj/user/pgdir.o
++ ld bin/kernel
+ld -m    elf_i386 -nostdlib -T tools/kernel.ld -o bin/kernel  obj/kern/init/entry.o obj/kern/init/init.o obj/kern/libs/stdio.o obj/kern/libs/readline.o obj/kern/debug/panic.o obj/kern/debug/kdebug.o obj/kern/debug/kmonitor.o obj/kern/driver/ide.o obj/kern/driver/clock.o obj/kern/driver/console.o obj/kern/driver/picirq.o obj/kern/driver/intr.o obj/kern/trap/trap.o obj/kern/trap/vectors.o obj/kern/trap/trapentry.o obj/kern/mm/vmm.o obj/kern/mm/swap_fifo.o obj/kern/mm/swap.o obj/kern/mm/kmalloc.o obj/kern/mm/swap_extended_clock.o obj/kern/mm/default_pmm.o obj/kern/mm/pmm.o obj/kern/mm/buddy_pmm.o obj/kern/fs/swapfs.o obj/kern/process/entry.o obj/kern/process/switch.o obj/kern/process/proc.o obj/kern/schedule/sched.o obj/kern/syscall/syscall.o  obj/libs/string.o obj/libs/printfmt.o obj/libs/hash.o obj/libs/rand.o -b binary  obj/__user_hello.out obj/__user_badarg.out obj/__user_forktree.out obj/__user_badsegment.out obj/__user_faultread.out obj/__user_divzero.out obj/__user_exit.out obj/__user_softint.out obj/__user_waitkill.out obj/__user_spin.out obj/__user_yield.out obj/__user_testbss.out obj/__user_faultreadkernel.out obj/__user_forktest.out obj/__user_pgdir.out
++ cc boot/bootasm.S
+gcc -Iboot/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Os -nostdinc -c boot/bootasm.S -o obj/boot/bootasm.o
++ cc boot/bootmain.c
+gcc -Iboot/ -fno-builtin -Wall -ggdb -m32  -g3 -nostdinc  -fno-stack-protector -Ilibs/ -Os -nostdinc -c boot/bootmain.c -o obj/boot/bootmain.o
+In file included from boot/bootmain.c:1:0:
+libs/defs.h:59:1: warning: multi-line comment [-Wcomment]
+ // #define le2page(le, member)                 \
+ ^
++ cc tools/sign.c
+gcc-4.8 -Itools/ -g -Wall -O2 -s -g3 -c tools/sign.c -o obj/sign/tools/sign.o
+gcc-4.8 -g -Wall -O2 -s -g3 obj/sign/tools/sign.o -o bin/sign
++ ld bin/bootblock
+ld -m    elf_i386 -nostdlib -N -T tools/boot.ld obj/boot/bootasm.o obj/boot/bootmain.o -o obj/bootblock.o
+'obj/bootblock.out' size: 442 bytes
+build 512 bytes boot sector: 'bin/bootblock' success!
+dd if=/dev/zero of=bin/ucore.img count=10000
+10000+0 records in
+10000+0 records out
+5120000 bytes (5.1 MB, 4.9 MiB) copied, 0.0506355 s, 101 MB/s
+dd if=bin/bootblock of=bin/ucore.img conv=notrunc
+1+0 records in
+1+0 records out
+512 bytes copied, 0.00109726 s, 467 kB/s
+dd if=bin/kernel of=bin/ucore.img seek=1 conv=notrunc
+1513+1 records in
+1513+1 records out
+775156 bytes (775 kB, 757 KiB) copied, 0.00916495 s, 84.6 MB/s
+dd if=/dev/zero of=bin/swap.img bs=1M count=128
+128+0 records in
+128+0 records out
+134217728 bytes (134 MB, 128 MiB) copied, 0.221218 s, 607 MB/s
