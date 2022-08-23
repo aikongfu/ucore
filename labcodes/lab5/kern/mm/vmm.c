@@ -529,6 +529,24 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
             goto failed;
         }
     } else {
+        struct Page *page=NULL;
+        // 如果当前页错误的原因是写入了只读页面
+        if (*ptep & PTE_P) {
+            // 写时复制：复制一块内存给当前进程
+            cprintf("\n\nCOW: ptep 0x%x, pte 0x%x\n",ptep, *ptep);
+            // 原先所使用的只读物理页
+            page = pte2page(*ptep);
+            // 如果该物理页面被多个进程引用
+            if (page_ref(page) > 1) {
+                struct Page* newPage = pgdir_alloc_page(mm->pgdir, addr, perm);
+                void * kva_src = page2kva(page);
+                void * kva_dest = page2kva(newPage);
+                memcpy(kva_dest, kva_src, PGSIZE); 
+            } else {
+                page_insert(mm->pgdir, pa2page, addr, perm);
+            }
+        }
+
         // 如果不全为0，则可能被交换到了swap磁盘中
         if(swap_init_ok) {
             struct Page *page=NULL;

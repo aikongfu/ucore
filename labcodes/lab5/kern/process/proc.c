@@ -764,6 +764,9 @@ repeat:
             }
         }
     }
+    // 如果没有，设置当前进程状态为PROC_SLEEPING，并执行schedule调度其他进程运行
+    // 当该进程的某个子进程结束运行后，当前进程会被唤醒，并在do_wait函数中回收子进程的PCB内存资源。
+    // wait_state是WT_CHILD
     if (haskid) {
         current->state = PROC_SLEEPING;
         current->wait_state = WT_CHILD;
@@ -774,7 +777,7 @@ repeat:
         goto repeat;
     }
     return -E_BAD_PROC;
-
+// 如果有，则回收该进程并函数返回
 found:
     if (proc == idleproc || proc == initproc) {
         panic("wait idleproc or initproc.\n");
