@@ -1,3 +1,10 @@
 file bin/kernel
 target remote :1234
 break kern_init
+b cpu_idle
+b init_main
+b kernel_execve
+b *0x800020 
+b *0x800234
+continue
+
