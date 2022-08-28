@@ -31,6 +31,9 @@
  * contains the new ESP value for CPL = 0. When an interrupt happens in protected
  * mode, the x86 CPU will look in the TSS for SS0 and ESP0 and load their value
  * into SS and ESP respectively.
+ * 
+ * 字段 SS0 包含 CPL = 0 的堆栈段选择器，ESP0 包含 CPL = 0 的新 ESP 值。
+ * 当在保护模式下发生中断时，x86 CPU 将在 TSS 中查找 SS0 和 ESP0 并加载它们的值 分别为 SS 和 ESP
  * */
 static struct taskstate ts = {0};
 
@@ -60,8 +63,30 @@ const struct pmm_manager *pmm_manager;
  * always available at virtual address PGADDR(PDX(VPT), PDX(VPT), 0), to which
  * vpd is set bellow.
  * */
+// #define VPT                 0xFAC00000
+// 0xFAC00000 = 1111101011 0000000000 000000000000
 pte_t * const vpt = (pte_t *)VPT;
+
+// PDXSHIFT 22
+// PTXSHIFT 12
+// 0x3FF = 1023 =   1111111111
+// page directory index
+// #define PDX(la) ((((uintptr_t)(la)) >> PDXSHIFT) & 0x3FF)
+// (VPT >> 22) & 0x3FF = (0xFAC00000 >> 22) & 0x3FF = 1003 = 1111101011
+// PGADDR(1003, 1003, 0)
+// construct linear address from indexes and offset
+// #define PGADDR(d, t, o) ((uintptr_t)((d) << PDXSHIFT | (t) << PTXSHIFT | (o)))
+// (1003 << 22) | (1003) << 12 | 0) =  1111101011 1111101011 000000000000
 pde_t * const vpd = (pde_t *)PGADDR(PDX(VPT), PDX(VPT), 0);
+
+/**
+ * 最终
+ * vpt 页目录表中第一个目录表项指向的页表的起始虚地址
+ * vpd 页目录表的起始虚地址
+ * vpt = 1111101011 0000000000 000000000000
+ * vpd = 1111101011 1111101011 000000000000
+ * 
+ */
 
 /* *
  * Global Descriptor Table:
@@ -154,6 +179,7 @@ init_memmap(struct Page *base, size_t n) {
 struct Page *
 alloc_pages(size_t n) {
     struct Page *page=NULL;
+    // 保证原子性，在这个过程中防止被中断
     bool intr_flag;
     
     while (1)
@@ -191,6 +217,7 @@ size_t
 nr_free_pages(void) {
     size_t ret;
     bool intr_flag;
+    // #define local_intr_save(x)      do { x = __intr_save(); } while (0)
     local_intr_save(intr_flag);
     {
         ret = pmm_manager->nr_free_pages();
@@ -199,10 +226,15 @@ nr_free_pages(void) {
     return ret;
 }
 
+// 初始化物理内存
 /* pmm_init - initialize the physical memory management */
 static void
 page_init(void) {
+    // KERNBASE = 0xC0000000
+    // 在建立了临时的地址映射机制后，原0x8000相当于0x8000 + 0xC0000000
+    // 所以要从0x8000 + 0xC0000000开始来找e820map的数据
     struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
+    // 最大物理内存
     uint64_t maxpa = 0;
 
     cprintf("e820map:\n");
@@ -217,6 +249,7 @@ page_init(void) {
             }
         }
     }
+    // 通过KMEMSIZE限制最大内存为896M
     if (maxpa > KMEMSIZE) {
         maxpa = KMEMSIZE;
     }
@@ -226,14 +259,19 @@ page_init(void) {
     npage = maxpa / PGSIZE;
     pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);
 
+    // 先把pages设置为reserved，后面再把type为E820_ARM（1）的设置为可用
     for (i = 0; i < npage; i ++) {
         SetPageReserved(pages + i);
     }
 
+    // 空闲地址的起始地址
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
+    // 循环处理前面扫描出来的几块内容区域
     for (i = 0; i < memmap->nr_map; i ++) {
+        // 内容区域的begin-->end
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
+        // 如果内存类型是E820_ARM（可用），比较
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
@@ -241,10 +279,25 @@ page_init(void) {
             if (end > KMEMSIZE) {
                 end = KMEMSIZE;
             }
+
+            // 对每一个扫出来的内存区域，通过 begin向上取整对齐，end向下取整对齐
             if (begin < end) {
                 begin = ROUNDUP(begin, PGSIZE);
                 end = ROUNDDOWN(end, PGSIZE);
+                // 此内存区域的page数量：n (end - begin) / PGSIZE
+                // pa2page:
+                // static inline struct Page *
+                // pa2page(uintptr_t pa) {
+                //     if (PPN(pa) >= npage) {
+                //         panic("pa2page called with invalid pa");
+                //     }
+                //     return &pages[PPN(pa)];
+                // }
+                // (begin >> 12)(根据起始地址得到的页数) 必需要小于 n ---->相当于是除以4K，因为2^12=4096=1page大小
+                // &pages[PPN(pa)];  PPN(pa) 另一个角度来讲就是pages数组里的index
+                // pa2page(begin) 通过这种方式，可以把一个physical address变成page
                 if (begin < end) {
+                    // 接着开始初始化（memory map -> page）
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
                 }
             }
@@ -263,7 +316,7 @@ enable_paging(void) {
     lcr0(cr0);
 }
 
-//boot_map_segment - setup&enable the paging mechanism
+// boot_map_segment - setup&enable the paging mechanism
 // parameters
 //  la:   linear address of this memory need to map (after x86 segment map)
 //  size: memory size
@@ -271,7 +324,9 @@ enable_paging(void) {
 //  perm: permission of this memory  
 static void
 boot_map_segment(pde_t *pgdir, uintptr_t la, size_t size, uintptr_t pa, uint32_t perm) {
+    // 页表偏移
     assert(PGOFF(la) == PGOFF(pa));
+    
     size_t n = ROUNDUP(size + PGOFF(la), PGSIZE) / PGSIZE;
     la = ROUNDDOWN(la, PGSIZE);
     pa = ROUNDDOWN(pa, PGSIZE);
@@ -380,9 +435,9 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
      *   memset(void *s, char c, size_t n) : sets the first n bytes of the memory area pointed by s
      *                                       to the specified value c.
      * DEFINEs:
-     *   PTE_P           0x001                   // page table/directory entry flags bit : Present
-     *   PTE_W           0x002                   // page table/directory entry flags bit : Writeable
-     *   PTE_U           0x004                   // page table/directory entry flags bit : User can access
+     *   PTE_P           0x001                   // 00000001 page table/directory entry flags bit : Present
+     *   PTE_W           0x002                   // 00000010 page table/directory entry flags bit : Writeable
+     *   PTE_U           0x004                   // 00000100 page table/directory entry flags bit : User can access
      */
 #if 0
     pde_t *pdep = NULL;   // (1) find page directory entry
@@ -396,6 +451,82 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     }
     return NULL;          // (8) return page table entry
 #endif
+    // typedef uintptr_t pde_t
+    // PDX 左边10位(PDE）
+    // PTX 中间10位(PTE)
+    // KADDR - takes a physical address and returns the corresponding kernel virtual address
+    // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF) address in page table or page directory entry
+    // #define PDE_ADDR(pde)   PTE_ADDR(pde) address in page table or page directory entry
+    // pdep: page dirtory 
+    pde_t *pdep = NULL;
+    // la -> 2进制 -> 前10位 -> 即PDX page dir
+    uintptr_t pde = PDX(la);
+
+    // pgdir:  the kernel virtual base address of PDT
+    pdep = &pgdir[pde];
+    // 非present也就是不存在这样的page（缺页），需要分配页
+    if (!(*pdep & PTE_P)) {
+        struct Page *p;
+        // 如果不需要分配或者分配的页为NULL
+        if (!create || (p = alloc_page()) == NULL) {
+            return NULL;
+        }
+        set_page_ref(p, 1);
+        // page table的索引值（PTE)
+        // pages: virtual address of physicall page array
+        // page - pages相当于pages数组的索引值
+        // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
+        uintptr_t pti = page2pa(p);
+        // // page table的索引值（PTE)
+        // // pages: virtual address of physicall page array
+        // // page - pages相当于pages数组的索引值
+        // // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
+        // uintptr_t pti = page2pa(p);
+
+        // // KADDR: takes a physical address and returns the corresponding kernel virtual address.
+        // /* *
+        // * KADDR - takes a physical address and returns the corresponding kernel virtual
+        // * address. It panics if you pass an invalid physical address.
+        // * 
+        // * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
+        // * pa >> 12 + 0xC0000000
+        // * */
+        // memset(KADDR(pti), 0, sizeof(struct Page));
+
+        // // 相当于把物理地址给了pdep
+        // // pdep: page directory entry point
+        // uintptr_t *pdep = pti | PTE_P | PTE_W | PTE_U;
+        // KADDR: takes a physical address and returns the corresponding kernel virtual address.
+        /* *
+        * KADDR - takes a physical address and returns the corresponding kernel virtual
+        * address. It panics if you pass an invalid physical address.
+        * 
+        * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
+        * pa >> 12 + 0xC0000000
+        * */
+        memset(KADDR(pti), 0, sizeof(struct Page));
+
+        // 相当于把物理地址给了pdep
+        // pdep: page directory entry point
+        *pdep = pti | PTE_P | PTE_W | PTE_U;
+    }
+
+    // 先找到pde address
+    // address in page table or page directory entry
+    // 0xFFF = 111111111111
+    // ~0xFFF = 1111111111 1111111111 000000000000
+    // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF)
+    // #define PDE_ADDR(pde)   PTE_ADDR(pde)
+    uintptr_t pa = PDE_ADDR(*pdep);
+    // 再转换为虚拟地址（线性地址）
+    // KADDR = pa >> 12 + 0xC0000000
+    // 0xC0000000 = 11000000 00000000 00000000 00000000
+    pte_t *pde_kva = KADDR(pa);
+    
+    // 需要映射的线性地址
+    // 中间10位(PTE)
+    uintptr_t need_to_map_ptx = PTX(la);
+    return &pde_kva[need_to_map_ptx];
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
@@ -433,7 +564,7 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
      *   PTE_P           0x001                   // page table/directory entry flags bit : Present
      */
 #if 0
-    if (0) {                      //(1) check if this page table entry is present
+    if (0) {                      //(1) check if page directory is present
         struct Page *page = NULL; //(2) find corresponding page to pte
                                   //(3) decrease page reference
                                   //(4) and free this page when page reference reachs 0
@@ -441,6 +572,15 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
                                   //(6) flush tlb
     }
 #endif
+
+    if ((*ptep & PTE_P)) {
+        struct Page *page = pte2page(*ptep);
+        if (page_ref_dec(page) == 0) {
+            free_page(page);
+        }
+        *ptep = 0;
+        tlb_invalidate(pgdir, la);
+    }
 }
 
 void
@@ -486,6 +626,7 @@ exit_range(pde_t *pgdir, uintptr_t start, uintptr_t end) {
 int
 copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
     assert(start % PGSIZE == 0 && end % PGSIZE == 0);
+    // 0x00200000 ~ 0xB0000000
     assert(USER_ACCESS(start, end));
     // copy content by page unit.
     do {
@@ -500,29 +641,46 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
             if ((nptep = get_pte(to, start, 1)) == NULL) {
                 return -E_NO_MEM;
             }
-        uint32_t perm = (*ptep & PTE_USER);
-        //get page from ptep
-        struct Page *page = pte2page(*ptep);
-        // alloc a page for process B
-        struct Page *npage=alloc_page();
-        assert(page!=NULL);
-        assert(npage!=NULL);
-        int ret=0;
-        /* LAB5:EXERCISE2 YOUR CODE
-         * replicate content of page to npage, build the map of phy addr of nage with the linear addr start
-         *
-         * Some Useful MACROs and DEFINEs, you can use them in below implementation.
-         * MACROs or Functions:
-         *    page2kva(struct Page *page): return the kernel vritual addr of memory which page managed (SEE pmm.h)
-         *    page_insert: build the map of phy addr of an Page with the linear addr la
-         *    memcpy: typical memory copy function
-         *
-         * (1) find src_kvaddr: the kernel virtual address of page
-         * (2) find dst_kvaddr: the kernel virtual address of npage
-         * (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
-         * (4) build the map of phy addr of  nage with the linear addr start
-         */
-        assert(ret == 0);
+            uint32_t perm = (*ptep & PTE_USER);
+            //get page from ptep
+            struct Page *page = pte2page(*ptep);
+            // alloc a page for process B
+            struct Page *npage=alloc_page();
+            assert(page!=NULL);
+            assert(npage!=NULL);
+            int ret=0;
+            /* LAB5:EXERCISE2 YOUR CODE
+            * replicate content of page to npage, build the map of phy addr of nage with the linear addr start
+            *
+            * Some Useful MACROs and DEFINEs, you can use them in below implementation.
+            * MACROs or Functions:
+            *    page2kva(struct Page *page): return the kernel vritual addr of memory which page managed (SEE pmm.h)
+            *    page_insert: build the map of phy addr of an Page with the linear addr la
+            *    memcpy: typical memory copy function
+            *
+            * (1) find src_kvaddr: the kernel virtual address of page
+            * (2) find dst_kvaddr: the kernel virtual address of npage
+            * (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
+            * (4) build the map of phy addr of  nage with the linear addr start
+            */
+            if (share) {
+                cprintf("Sharing the page 0x%x\n", page2kva(page));
+                // 物理页面共享，并设置两个PTE上的标志位为只读
+                page_insert(from, page, start, perm & ~PTE_W);
+                ret = page_insert(to, page, start, perm & ~PTE_W);
+            } else {
+                // (1) find src_kvaddr: the kernel virtual address of page
+                void *src_kvaddr = page2kva(page);
+                // (2) find dst_kvaddr: the kernel virtual address of npage
+                void *dst_kvaddr = page2kva(npage);
+                // (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
+                memcpy(dst_kvaddr, src_kvaddr, PGSIZE);
+                // (4) build the map of phy addr of  nage with the linear addr start
+                // 将该页面设置至对应的PTE中
+                ret = page_insert(to, npage, start, perm);
+            }
+
+            assert(ret == 0);
         }
         start += PGSIZE;
     } while (start != 0 && start < end);
@@ -616,7 +774,9 @@ check_alloc_page(void) {
 static void
 check_pgdir(void) {
     assert(npage <= KMEMSIZE / PGSIZE);
+    cprintf("|check_pgdir| npage = [%d], KMEMSIZE / PGSIZE = [%d]\n", npage, KMEMSIZE / PGSIZE);
     assert(boot_pgdir != NULL && (uint32_t)PGOFF(boot_pgdir) == 0);
+    cprintf("|check_pgdir| boot_pgdir = [%d], (uint32_t)PGOFF(boot_pgdir) = [%d]\n", boot_pgdir, (uint32_t)PGOFF(boot_pgdir));
     assert(get_page(boot_pgdir, 0x0, NULL) == NULL);
 
     struct Page *p1, *p2;
@@ -625,6 +785,8 @@ check_pgdir(void) {
 
     pte_t *ptep;
     assert((ptep = get_pte(boot_pgdir, 0x0, 0)) != NULL);
+    cprintf("|check_pgdir| ptep = [%d], *ptep = [%d]\n", ptep, *ptep);
+
     assert(pte2page(*ptep) == p1);
     assert(page_ref(p1) == 1);
 
@@ -640,8 +802,12 @@ check_pgdir(void) {
     assert(page_ref(p2) == 1);
 
     assert(page_insert(boot_pgdir, p1, PGSIZE, 0) == 0);
+    
+    cprintf("|check_pgdir| page_ref(p1) = [%d], page_ref(p2) = [%d]", page_ref(p1), page_ref(p2));
+    
     assert(page_ref(p1) == 2);
     assert(page_ref(p2) == 0);
+
     assert((ptep = get_pte(boot_pgdir, PGSIZE, 0)) != NULL);
     assert(pte2page(*ptep) == p1);
     assert((*ptep & PTE_U) == 0);
