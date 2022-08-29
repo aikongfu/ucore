@@ -12,5 +12,8 @@ b kern/init/init.c:28
 b cons_init
 b idt_init 
 b proc_init
+b proc_run
+b switch_to
 b cpu_idle
 #continue
+b *0x00100000

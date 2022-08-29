@@ -6,5 +6,15 @@ target remote :1234
 break kern_init
 b *0x00100000
 b check_alloc_page
+#b trap.c:301
+b do_execve
+b init_main
+b user_main
+b kernel_execve 
+b trap.c:312
+b *0x800234
+b *0x80022c
+b exit.c:8
+
 
 continue
