@@ -85,6 +85,19 @@ ide_init(void) {
         /* assume that no device here */
         ide_devices[ideno].valid = 0;
 
+        /**
+        static const struct {
+            unsigned short base;        // I/O Base
+            unsigned short ctrl;        // Control Base
+        } channels[2] = {
+            {IO_BASE0, IO_CTRL0},
+            {IO_BASE1, IO_CTRL1},
+        };
+        */
+
+        // #define IO_BASE(ideno)          (channels[(ideno) >> 1].base)
+        // #define IO_CTRL(ideno)          (channels[(ideno) >> 1].ctrl)
+        // ideno >> 1 = ideno / 2; 0 / 2 = 0, 1 / 2 = 0, 2 / 2 = 1, 3 / 2 = 1
         iobase = IO_BASE(ideno);
 
         /* wait device ready */
