@@ -51,6 +51,7 @@ kern_init(void) {
     vmm_init();                 // init virtual memory management
     cprintf("%s\n\n", "vmm_init end.");
     sched_init();               // init scheduler
+    cprintf("%s\n\n", "sched_init end.");
     proc_init();                // init process table
     cprintf("%s\n\n", "proc_init end.");
     ide_init();                 // init ide devices
