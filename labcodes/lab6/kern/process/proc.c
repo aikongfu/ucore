@@ -143,7 +143,7 @@ alloc_proc(void) {
         proc->rq = NULL;
         // 初始化run_link
         list_init(&(proc->run_link));
-        
+        assert(list_empty(&(proc->run_link)));
         proc->time_slice = MAX_TIME_SLICE;
         // 初始化lab6_run_pool
         skew_heap_init(&(proc->lab6_run_pool));
