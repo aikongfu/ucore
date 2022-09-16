@@ -11,6 +11,7 @@
 #include <swap.h>
 #include <vmm.h>
 #include <kmalloc.h>
+#include <kmonitor.h>
 
 /* *
  * Task State Segment:
@@ -178,6 +179,7 @@ init_memmap(struct Page *base, size_t n) {
 //alloc_pages - call pmm->alloc_pages to allocate a continuous n*PAGESIZE memory 
 struct Page *
 alloc_pages(size_t n) {
+    DEBUG("alloc_pages [%x]\n", n);
     struct Page *page=NULL;
     // 保证原子性，在这个过程中防止被中断
     bool intr_flag;
