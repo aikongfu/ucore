@@ -38,6 +38,8 @@
  * */
 static struct taskstate ts = {0};
 
+static uint32_t page_count = 0;
+
 // virtual address of physicall page array
 struct Page *pages;
 // amount of physical memory (in pages)
@@ -179,7 +181,9 @@ init_memmap(struct Page *base, size_t n) {
 //alloc_pages - call pmm->alloc_pages to allocate a continuous n*PAGESIZE memory 
 struct Page *
 alloc_pages(size_t n) {
-    DEBUG("alloc_pages [%x]\n", n);
+
+    page_count += n;
+    DEBUG("alloc_pages page_count = [%x]\n", page_count);
     struct Page *page=NULL;
     // 保证原子性，在这个过程中防止被中断
     bool intr_flag;
