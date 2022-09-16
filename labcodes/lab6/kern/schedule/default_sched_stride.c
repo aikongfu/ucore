@@ -97,7 +97,7 @@ stride_dequeue(struct run_queue *rq, struct proc_struct *proc) {
       *         list_del_init: remove a entry from the  list
       */
      assert(!list_empty(&(proc->run_link)) && proc->rq == rq);
-     skew_heap_remove(rq->lab6_run_pool, &(proc->lab6_run_pool));
+     skew_heap_remove(rq->lab6_run_pool, &(proc->lab6_run_pool), proc_stride_comp_f);
      list_del_init(&(proc->run_link));
      rq->proc_num--;
 }
@@ -124,7 +124,7 @@ stride_pick_next(struct run_queue *rq) {
       * (3) return p
       */
      assert(rq);
-     if (list_empty(rq->lab6_run_pool)) {
+     if (list_empty(&(rq->lab6_run_pool))) {
           return NULL;
      }
 
