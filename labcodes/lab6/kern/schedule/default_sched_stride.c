@@ -132,7 +132,8 @@ stride_pick_next(struct run_queue *rq) {
      if (!proc) {
           return NULL;
      }
-     proc->lab6_stride =  BIG_STRIDE / proc->lab6_priority;
+
+     proc->lab6_stride +=  BIG_STRIDE / proc->lab6_priority;
      return proc;
 }
 
