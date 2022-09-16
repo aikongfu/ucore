@@ -886,15 +886,6 @@ user_main(void *arg) {
     panic("user_main execve failed.\n");
 }
 
-static int
-    testbss(void *arg) {
-#ifdef TEST
-    KERNEL_EXECVE2(TEST, TESTSTART, TESTSIZE);
-#else
-    KERNEL_EXECVE(exit);
-#endif
-    panic("testbss execve failed.\n");
-}
 
 // init_main - the second kernel thread used to create user_main kernel threads
 static int
@@ -904,10 +895,6 @@ init_main(void *arg) {
 
     int pid = kernel_thread(user_main, NULL, 0);
     if (pid <= 0) {
-        panic("create user_main failed.\n");
-    }
-    int pid2 = kernel_thread(testbss, NULL, 0);
-    if (pid2 <= 0) {
         panic("create user_main failed.\n");
     }
     while (do_wait(0, NULL) == 0) {
