@@ -6,6 +6,7 @@
 #include <memlayout.h>
 #include <atomic.h>
 #include <assert.h>
+#include <kmonitor.h>
 
 /* fork flags used in do_fork*/
 #define CLONE_VM            0x00000100  // set if VM shared between processes
@@ -125,6 +126,7 @@ page2pa(struct Page *page) {
 static inline struct Page *
 pa2page(uintptr_t pa) {
     if (PPN(pa) >= npage) {
+        DEBUG("pa = [%x]\n", pa);
         panic("pa2page called with invalid pa");
     }
     return &pages[PPN(pa)];
