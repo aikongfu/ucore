@@ -125,8 +125,8 @@ page2pa(struct Page *page) {
 static inline struct Page *
 pa2page(uintptr_t pa) {
     if (PPN(pa) >= npage) {
-        cprintf("pa = [%x]\n", pa);
-        panic("pa2page called with invalid pa");
+        // cprintf("pa = [%x]\n", pa);
+        panic("pa2page called with invalid pa, pa = [%x]\n", pa);
     }
     return &pages[PPN(pa)];
 }
