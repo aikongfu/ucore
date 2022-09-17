@@ -2,5 +2,7 @@ file bin/kernel
 target remote :1234
 break kern_init
 b proc_init
+b alloc_pages
+b do_pgfault
 b RR_enqueue
 continue

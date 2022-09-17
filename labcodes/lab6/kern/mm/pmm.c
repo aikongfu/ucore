@@ -183,7 +183,7 @@ struct Page *
 alloc_pages(size_t n) {
 
     page_count += n;
-    DEBUG("alloc_pages page_count = [%d]\n", page_count);
+    // DEBUG("alloc_pages page_count = [%d]\n", page_count);
     struct Page *page=NULL;
     // 保证原子性，在这个过程中防止被中断
     bool intr_flag;

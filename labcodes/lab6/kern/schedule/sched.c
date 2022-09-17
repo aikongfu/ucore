@@ -17,7 +17,7 @@ static struct run_queue *rq;
 
 static inline void
 sched_class_enqueue(struct proc_struct *proc) {
-    DEBUG("enqueue proc [%p], proc->name = [%s]\n", proc, proc->name);
+    //DEBUG("enqueue proc [%p], proc->name = [%s]\n", proc, proc->name);
     if (proc != idleproc) {
         sched_class->enqueue(rq, proc);
     }
