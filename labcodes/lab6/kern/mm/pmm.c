@@ -11,7 +11,6 @@
 #include <swap.h>
 #include <vmm.h>
 #include <kmalloc.h>
-#include <kdebug.h>
 
 /* *
  * Task State Segment:
@@ -37,8 +36,6 @@
  * 当在保护模式下发生中断时，x86 CPU 将在 TSS 中查找 SS0 和 ESP0 并加载它们的值 分别为 SS 和 ESP
  * */
 static struct taskstate ts = {0};
-
-static uint32_t page_count = 0;
 
 // virtual address of physicall page array
 struct Page *pages;
@@ -181,9 +178,6 @@ init_memmap(struct Page *base, size_t n) {
 //alloc_pages - call pmm->alloc_pages to allocate a continuous n*PAGESIZE memory 
 struct Page *
 alloc_pages(size_t n) {
-
-    page_count += n;
-    // DEBUG("alloc_pages page_count = [%d]\n", page_count);
     struct Page *page=NULL;
     // 保证原子性，在这个过程中防止被中断
     bool intr_flag;
