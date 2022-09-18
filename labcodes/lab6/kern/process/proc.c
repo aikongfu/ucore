@@ -878,12 +878,15 @@ kernel_execve(const char *name, unsigned char *binary, size_t size) {
 // user_main - kernel thread used to exec a user program
 static int
 user_main(void *arg) {
+/**
 #ifdef TEST
     KERNEL_EXECVE2(TEST, TESTSTART, TESTSIZE);
 #else
+*/
     // KERNEL_EXECVE(testbss);
+    KERNEL_EXECVE(badarg);
     KERNEL_EXECVE(exit);
-#endif
+// #endif
     panic("user_main execve failed.\n");
 }
 

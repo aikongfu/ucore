@@ -2,7 +2,12 @@ file bin/kernel
 target remote :1234
 break kern_init
 b proc_init
-b alloc_pages
-b do_pgfault
+#b alloc_pages
+#b do_pgfault
+b  kern/process/proc.c:563
 b RR_enqueue
+b stride_enqueue
+b sys_fork
+b user_main
+b kernel_execve
 continue
