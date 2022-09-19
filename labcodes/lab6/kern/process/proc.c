@@ -142,12 +142,12 @@ alloc_proc(void) {
         // LAB6
         proc->rq = NULL;
         // 初始化run_link
-        list_init(&(proc->run_link));
-		// memset(&proc->run_link, 0, sizeof(list_entry_t));
+        // list_init(&(proc->run_link));
+		memset(&proc->run_link, 0, sizeof(list_entry_t));
         proc->time_slice = 0;
         // 初始化lab6_run_pool
-        proc->lab6_run_pool.left = proc->lab6_run_pool.right = proc->lab6_run_pool.parent = NULL;
-		// memset(&proc->lab6_run_pool, 0, sizeof(skew_heap_entry_t));
+        // proc->lab6_run_pool.left = proc->lab6_run_pool.right = proc->lab6_run_pool.parent = NULL;
+		memset(&proc->lab6_run_pool, 0, sizeof(skew_heap_entry_t));
 		proc->lab6_stride = 0;
 		proc->lab6_priority = 1;
     }
