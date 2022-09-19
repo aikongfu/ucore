@@ -71,6 +71,7 @@ stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
       * (3) set proc->rq pointer to rq
       * (4) increase rq->proc_num
       */
+     cprintf("stride_enqueue proc->pid = [%d] proc->name = [%s]\n", proc->pid, proc->name);
      rq->lab6_run_pool = skew_heap_insert(rq->lab6_run_pool, &(proc->lab6_run_pool), proc_stride_comp_f);
      // list_add_before(&(rq->run_list), &(proc->run_link));
      if (proc->time_slice == 0 || proc->time_slice > rq->max_time_slice) {
@@ -96,6 +97,7 @@ stride_dequeue(struct run_queue *rq, struct proc_struct *proc) {
       *         skew_heap_remove: remove a entry from skew_heap
       *         list_del_init: remove a entry from the  list
       */
+     cprintf("stride_dequeue proc->pid = [%d] proc->name = [%s]\n", proc->pid, proc->name);
      skew_heap_remove(rq->lab6_run_pool, &(proc->lab6_run_pool), proc_stride_comp_f);
      rq->proc_num--;
 }
