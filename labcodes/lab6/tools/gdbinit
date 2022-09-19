@@ -10,4 +10,6 @@ b stride_enqueue
 b sys_fork
 b user_main
 b kernel_execve
+b do_exit
+b kern/process/proc.c:561
 continue

@@ -143,14 +143,14 @@ alloc_proc(void) {
         proc->rq = NULL;
         // 初始化run_link
         list_init(&(proc->run_link));
-        assert(list_empty(&(proc->run_link)));
-        proc->time_slice = MAX_TIME_SLICE;
+		// memset(&proc->run_link, 0, sizeof(list_entry_t));
+        proc->time_slice = 0;
         // 初始化lab6_run_pool
-        skew_heap_init(&(proc->lab6_run_pool));
-        proc->lab6_stride = 0;
-        proc->lab6_priority = 0;
+        proc->lab6_run_pool.left = proc->lab6_run_pool.right = proc->lab6_run_pool.parent = NULL;
+		// memset(&proc->lab6_run_pool, 0, sizeof(skew_heap_entry_t));
+		proc->lab6_stride = 0;
+		proc->lab6_priority = 1;
     }
-    
     return proc;
 }
 
@@ -878,15 +878,16 @@ kernel_execve(const char *name, unsigned char *binary, size_t size) {
 // user_main - kernel thread used to exec a user program
 static int
 user_main(void *arg) {
-/**
+
 #ifdef TEST
     KERNEL_EXECVE2(TEST, TESTSTART, TESTSIZE);
 #else
-*/
+
+
     // KERNEL_EXECVE(testbss);
-    KERNEL_EXECVE(badarg);
+    // KERNEL_EXECVE(badarg);
     KERNEL_EXECVE(exit);
-// #endif
+#endif
     panic("user_main execve failed.\n");
 }
 

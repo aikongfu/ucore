@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <default_sched.h>
 #include <default_sched_stride.h>
-#include <kdebug.h>
 
 // the list of timer
 static list_entry_t timer_list;
@@ -17,7 +16,6 @@ static struct run_queue *rq;
 
 static inline void
 sched_class_enqueue(struct proc_struct *proc) {
-    //DEBUG("enqueue proc [%p], proc->name = [%s]\n", proc, proc->name);
     if (proc != idleproc) {
         sched_class->enqueue(rq, proc);
     }
@@ -49,7 +47,7 @@ void
 sched_init(void) {
     list_init(&timer_list);
 
-    // sched_class = &default_sched_class;
+    //sched_class = &default_sched_class;
     sched_class = &default_sched_stride_class;
 
     rq = &__rq;
