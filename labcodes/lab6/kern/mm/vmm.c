@@ -352,12 +352,8 @@ check_vma_struct(void) {
         }
         assert(vma_below_5 == NULL);
     }
-    cprintf("check_vma_struct: loop assert, nr_free_pages() = [%d] \n", nr_free_pages());
-    mm_destroy(mm);
-    cprintf("check_vma_struct: mm_destroy, nr_free_pages() = [%d] \n", nr_free_pages());
 
-	cprintf("check_vma_struct: end-> nr_free_pages_store = [%d]\tnr_free_pages() = [%d]\n", nr_free_pages_store, nr_free_pages());
-    // assert(nr_free_pages_store == nr_free_pages());
+    mm_destroy(mm);
 
     cprintf("check_vma_struct() succeeded!\n");
 }
@@ -368,8 +364,6 @@ struct mm_struct *check_mm_struct;
 static void
 check_pgfault(void) {
     size_t nr_free_pages_store = nr_free_pages();
-    cprintf("check_pgfault: after size_t nr_free_pages_store = nr_free_pages();\n");\
-    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
 
     check_mm_struct = mm_create();
     assert(check_mm_struct != NULL);
@@ -397,9 +391,9 @@ check_pgfault(void) {
         sum -= *(char *)(addr + i);
     }
     assert(sum == 0);
-    cprintf("pgdir = [%p], addr = [%d]\n, ROUNDDOWN(addr, PGSIZE) = [%d]", pgdir, addr, ROUNDDOWN(addr, PGSIZE));
+
     page_remove(pgdir, ROUNDDOWN(addr, PGSIZE));
-    cprintf("pgdir[0] = [%d]\n", pgdir[0]);
+
     free_page(pde2page(pgdir[0]));
     pgdir[0] = 0;
 
@@ -407,7 +401,6 @@ check_pgfault(void) {
     mm_destroy(mm);
     check_mm_struct = NULL;
 
-    cprintf("check_pgfault: nr_free_pages_store = [%d], nr_free_pages() = [%d] \n", nr_free_pages_store, nr_free_pages());
     assert(nr_free_pages_store == nr_free_pages());
 
     cprintf("check_pgfault() succeeded!\n");
@@ -450,12 +443,10 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
 
     //try to find a vma which include addr
     // 根据addr从vma中查找对应的vma_struct
-    DEBUG("mm = [%p], error_code = [%x], addr = [%x]", mm, error_code, addr);
     struct vma_struct *vma = find_vma(mm, addr);
 
     pgfault_num++;
     //If the addr is in the range of a mm's vma?
-    DEBUG("mm = [%p], vma = [%p], addr = [%x]\n", mm, vma, addr);
     if (vma == NULL || vma->vm_start > addr) {
         cprintf("not valid addr %x, and  can not find it in vma\n", addr);
         goto failed;
