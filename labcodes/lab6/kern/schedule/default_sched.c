@@ -12,8 +12,6 @@ RR_init(struct run_queue *rq) {
 
 static void
 RR_enqueue(struct run_queue *rq, struct proc_struct *proc) {
-    list_entry_t * run_link = &(proc->run_link);
-    
     assert(list_empty(&(proc->run_link)));
     list_add_before(&(rq->run_list), &(proc->run_link));
     if (proc->time_slice == 0 || proc->time_slice > rq->max_time_slice) {

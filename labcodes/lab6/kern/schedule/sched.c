@@ -52,6 +52,7 @@ sched_init(void) {
 
     rq = &__rq;
     rq->max_time_slice = MAX_TIME_SLICE;
+//     rq->max_time_slice = 5;
     sched_class->init(rq);
 
     cprintf("sched class: %s\n", sched_class->name);

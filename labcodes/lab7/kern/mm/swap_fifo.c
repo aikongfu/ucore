@@ -24,7 +24,7 @@
  *              a general list struct to a special struct (such as struct page). You can find some MACRO:
  *              le2page (in memlayout.h), (in future labs: le2vma (in vmm.h), le2proc (in proc.h),etc.
  */
-
+// FIFO可交换页，按照时间顺序排序
 list_entry_t pra_list_head;
 /*
  * (2) _fifo_init_mm: init pra_list_head and let  mm->sm_priv point to the addr of pra_list_head.
@@ -51,6 +51,7 @@ _fifo_map_swappable(struct mm_struct *mm, uintptr_t addr, struct Page *page, int
     //record the page access situlation
     /*LAB3 EXERCISE 2: YOUR CODE*/ 
     //(1)link the most recent arrival page at the back of the pra_list_head qeueue.
+    list_add(head, entry);
     return 0;
 }
 /*
@@ -60,14 +61,24 @@ _fifo_map_swappable(struct mm_struct *mm, uintptr_t addr, struct Page *page, int
 static int
 _fifo_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, int in_tick)
 {
-     list_entry_t *head=(list_entry_t*) mm->sm_priv;
-         assert(head != NULL);
-     assert(in_tick==0);
-     /* Select the victim */
-     /*LAB3 EXERCISE 2: YOUR CODE*/ 
-     //(1)  unlink the  earliest arrival page in front of pra_list_head qeueue
-     //(2)  set the addr of addr of this page to ptr_page
-     return 0;
+    list_entry_t *head=(list_entry_t*) mm->sm_priv;
+    assert(head != NULL);
+    assert(in_tick==0);
+    /* Select the victim */
+    /*LAB3 EXERCISE 2: YOUR CODE*/ 
+    //(1)  unlink the  earliest arrival page in front of pra_list_head qeueue
+    //(2)  set the addr of addr of this page to ptr_page
+    list_entry_t *le = head->prev;
+    assert(le != NULL);
+    assert(le != head);
+
+    list_del(le);
+
+    struct Page *p = le2page(le, pra_page_link);
+    assert(p != NULL);
+    *ptr_page = p;
+    
+    return 0;
 }
 
 static int

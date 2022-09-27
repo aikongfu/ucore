@@ -5,8 +5,6 @@
 #include <list.h>
 #include <memlayout.h>
 #include <sync.h>
-#include <proc.h>
-#include <sem.h>
 
 //pre define
 struct mm_struct;
@@ -31,15 +29,13 @@ struct vma_struct {
 
 // the control struct for a set of vma using the same PDT
 struct mm_struct {
-    list_entry_t mmap_list;        // linear list link which sorted by start addr of vma
-    struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
-    pde_t *pgdir;                  // the PDT of these vma
-    int map_count;                 // the count of these vma
+    list_entry_t mmap_list;        // vma按照start addr排序的链表 linear list link which sorted by start addr of vma
+    struct vma_struct *mmap_cache; // 当前的vma，主要用来提升效率 current accessed vma, used for speed purpose
+    pde_t *pgdir;                  // 这些mva对应的PDT the PDT of these vma 
+    int map_count;                 // 这些vma的数量 the count of these vma
     void *sm_priv;                 // the private data for swap manager
     int mm_count;                  // the number ofprocess which shared the mm
-    semaphore_t mm_sem;            // mutex for using dup_mmap fun to duplicat the mm 
-    int locked_by;                 // the lock owner process's pid
-
+    lock_t mm_lock;                // mutex for using dup_mmap fun to duplicat the mm
 };
 
 struct vma_struct *find_vma(struct mm_struct *mm, uintptr_t addr);
@@ -92,18 +88,14 @@ mm_count_dec(struct mm_struct *mm) {
 static inline void
 lock_mm(struct mm_struct *mm) {
     if (mm != NULL) {
-        down(&(mm->mm_sem));
-        if (current != NULL) {
-            mm->locked_by = current->pid;
-        }
+        lock(&(mm->mm_lock));
     }
 }
 
 static inline void
 unlock_mm(struct mm_struct *mm) {
     if (mm != NULL) {
-        up(&(mm->mm_sem));
-        mm->locked_by = 0;
+        unlock(&(mm->mm_lock));
     }
 }
 
