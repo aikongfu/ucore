@@ -1,3 +1,15 @@
 file bin/kernel
 target remote :1234
 break kern_init
+b proc_init
+b idle_proc
+b init_main
+
+b user_main
+b check_sync
+b philosopher_using_semaphore
+b phi_take_forks_sema
+b phi_put_forks_sema
+
+continue
+
