@@ -128,11 +128,10 @@ void phi_take_forks_condvar(int i) {
     
     phi_test_condvar(i);
 
-    if (state_condvar[i] != EATING) {
-        cprintf("phi_take_forks_condvar: %d didn't get fork and will wait\n", i);
-        up(&(mtp->cv[i]));
+    while (state_condvar[i] != EATING) {
+        cprintf("phi_take_forks_condvar: %d didn't get fork and will wait\n",i);
+        cond_wait(&mtp->cv[i]);
     }
-
 //--------leave routine in monitor--------------
       if(mtp->next_count>0)
          up(&(mtp->next));
