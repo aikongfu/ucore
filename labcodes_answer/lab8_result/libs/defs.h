@@ -32,11 +32,16 @@ typedef unsigned long long uint64_t;
 typedef int32_t intptr_t;
 typedef uint32_t uintptr_t;
 
+typedef int64_t longptr_t;
+typedef int64_t ulongptr_t;
+
 /* size_t is used for memory object sizes */
 typedef uintptr_t size_t;
 
 /* off_t is used for file offsets and lengths */
-typedef intptr_t off_t;
+// typedef intptr_t off_t;
+typedef longptr_t off_t;
+typedef longptr_t ino_t;
 
 /* used for page numbers */
 typedef size_t ppn_t;
