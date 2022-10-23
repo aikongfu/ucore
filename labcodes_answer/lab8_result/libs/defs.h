@@ -33,7 +33,7 @@ typedef int32_t intptr_t;
 typedef uint32_t uintptr_t;
 
 typedef int64_t longptr_t;
-typedef int64_t ulongptr_t;
+typedef uint64_t ulongptr_t;
 
 /* size_t is used for memory object sizes */
 typedef uintptr_t size_t;
