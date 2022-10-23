@@ -51,6 +51,9 @@ static inline uintptr_t rcr2(void) __attribute__((always_inline));
 static inline uintptr_t rcr3(void) __attribute__((always_inline));
 static inline void invlpg(void *addr) __attribute__((always_inline));
 
+// 内联汇编
+// inb函数内联了inb指令，用于从指定端口读取1字节数据。
+// outb函数内联了outb指令，用于向指定端口写入1字节数据。
 static inline uint8_t
 inb(uint16_t port) {
     uint8_t data;
@@ -65,6 +68,14 @@ inw(uint16_t port) {
     return data;
 }
 
+// 内联汇编
+// insl函数内联了cld; rep insl指令，cld用于清除方向标志，使偏移量向正方向移动，这个偏移量其实就是传入的addr，会被关联到edi，反汇编的结果中可以看到，请大家自己实验。rep前缀用于重复执行insl，重复的次数由ecx决定，即传入的参数cnt。最终数据会被连续读取到addr指向的内存处。
+// CLD与STD是用来操作方向标志位DF（Direction Flag）。CLD使DF复位，即DF=0，STD使DF置位，即DF=1.用于串操作指令中。
+// repne 不等于时重复 
+// insl(0x1F0, dst, SECTSIZE / 4);
+// 0x1F0读数据
+// dst目标地址
+// cnt 重复次数
 static inline void
 insl(uint32_t port, void *addr, int cnt) {
     asm volatile (

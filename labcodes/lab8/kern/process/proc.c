@@ -122,6 +122,37 @@ alloc_proc(void) {
      *     uint32_t lab6_stride;                       // FOR LAB6 ONLY: the current stride of the process
      *     uint32_t lab6_priority;                     // FOR LAB6 ONLY: the priority of process, set by lab6_set_priority(uint32_t)
      */
+
+        proc->state =  (enum proc_state)PROC_UNINIT;
+        proc->pid = -1;
+        proc->runs = 0;
+        proc->kstack = 0;
+        proc->need_resched = 0;
+        proc->parent = NULL;
+        proc->mm = NULL;
+        memset(&(proc->context), 0, sizeof(struct context));
+        proc->tf = NULL;
+        proc->cr3 = boot_cr3;
+        proc->flags = 0;
+        memset(proc->name, 0, PROC_NAME_LEN);
+
+        // LAB5
+        //PCB新增的条目，初始化进程等待状态
+        proc->wait_state = 0; 
+        // 新proc相关的proc
+        proc->cptr = proc->optr = proc->yptr = NULL;
+
+        // LAB6
+        proc->rq = NULL;
+        // 初始化run_link
+        // list_init(&(proc->run_link));
+		memset(&proc->run_link, 0, sizeof(list_entry_t));
+        proc->time_slice = 0;
+        // 初始化lab6_run_pool
+        // proc->lab6_run_pool.left = proc->lab6_run_pool.right = proc->lab6_run_pool.parent = NULL;
+		memset(&proc->lab6_run_pool, 0, sizeof(skew_heap_entry_t));
+		proc->lab6_stride = 0;
+		proc->lab6_priority = 1;
     //LAB8:EXERCISE2 YOUR CODE HINT:need add some code to init fs in proc_struct, ...
     }
     return proc;
@@ -145,9 +176,16 @@ get_proc_name(struct proc_struct *proc) {
 // set_links - set the relation links of process
 static void
 set_links(struct proc_struct *proc) {
+    // 加入进程链表
     list_add(&proc_list, &(proc->list_link));
+
+    // proc进程的younger sibling为空
     proc->yptr = NULL;
+    // proc进程的old sibling设置为proc的parent的最新的child proc
     if ((proc->optr = proc->parent->cptr) != NULL) {
+        // proc的old sibling的younger sibling为proc
+        // 即原proc的parent的最新的child proc的younger sibing为proc
+        // 也就是proc变成parent最新的child  
         proc->optr->yptr = proc;
     }
     proc->parent->cptr = proc;
@@ -173,14 +211,21 @@ remove_links(struct proc_struct *proc) {
 // get_pid - alloc a unique pid for process
 static int
 get_pid(void) {
+    // MAX_PID = 8192
     static_assert(MAX_PID > MAX_PROCESS);
     struct proc_struct *proc;
+    // proc 链表
     list_entry_t *list = &proc_list, *le;
+
+    // next_safe = 8192, last_pid = 8192
     static int next_safe = MAX_PID, last_pid = MAX_PID;
+
+    // first time last_pid = 1
     if (++ last_pid >= MAX_PID) {
         last_pid = 1;
         goto inside;
     }
+
     if (last_pid >= next_safe) {
     inside:
         next_safe = MAX_PID;
@@ -276,6 +321,7 @@ kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flags) {
 // setup_kstack - alloc pages with size KSTACKPAGE as process kernel stack
 static int
 setup_kstack(struct proc_struct *proc) {
+    // KSTACKPAGE = 2, 也就是只能分配两个page作为运行的stack
     struct Page *page = alloc_pages(KSTACKPAGE);
     if (page != NULL) {
         proc->kstack = (uintptr_t)page2kva(page);
@@ -320,6 +366,7 @@ copy_mm(uint32_t clone_flags, struct proc_struct *proc) {
     if (oldmm == NULL) {
         return 0;
     }
+    // 如果是CLONE_VM，则是进程共享的mm
     if (clone_flags & CLONE_VM) {
         mm = oldmm;
         goto good_mm;
@@ -453,6 +500,14 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    5. insert proc_struct into hash_list && proc_list
     //    6. call wakeup_proc to make the new child process RUNNABLE
     //    7. set ret vaule using child proc's pid
+    
+    // 分配并初始化进程控制块（alloc_proc函数）；
+    // 分配并初始化内核栈（setup_stack函数）；
+    // 根据clone_flag标志复制或共享进程内存管理结构（copy_mm函数）；
+    // 设置进程在内核（将来也包括用户态）正常运行和调度所需的中断帧和执行上下文（copy_thread函数）；
+    // 把设置好的进程控制块放入hash_list和proc_list两个全局进程链表中；
+    // 自此，进程已经准备好执行了，把进程状态设置为“就绪”态；
+    // 设置返回码为子进程的id号。
 
 	//LAB5 YOUR CODE : (update LAB4 steps)
    /* Some Functions
@@ -462,6 +517,39 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
 	*    update step 5: insert proc_struct into hash_list && proc_list, set the relation links of process
     */
 	
+    if ((proc = alloc_proc()) == NULL) {
+        goto fork_out;
+    }
+
+    proc->parent = current;
+    
+    // 确保进程在等待
+    assert(current->wait_state == 0); 
+
+    if (setup_kstack(proc) != 0) {
+        goto bad_fork_cleanup_proc;
+    }
+
+    if (copy_mm(clone_flags, proc) != 0) {
+        goto bad_fork_cleanup_kstack;
+    }
+    copy_thread(proc, stack, tf);
+
+    bool intr_flag;
+    local_intr_save(intr_flag);
+    {
+        proc->pid = get_pid();
+        hash_proc(proc);
+        // 设置进程链接
+        set_links(proc);
+        // list_add(&proc_list, &proc->list_link);
+        // nr_process++;
+    }
+    local_intr_restore(intr_flag);
+
+    wakeup_proc(proc);
+
+    ret = proc->pid;
 fork_out:
     return ret;
 
@@ -714,6 +802,9 @@ repeat:
             }
         }
     }
+    // 如果没有，设置当前进程状态为PROC_SLEEPING，并执行schedule调度其他进程运行
+    // 当该进程的某个子进程结束运行后，当前进程会被唤醒，并在do_wait函数中回收子进程的PCB内存资源。
+    // wait_state是WT_CHILD
     if (haskid) {
         current->state = PROC_SLEEPING;
         current->wait_state = WT_CHILD;
@@ -724,7 +815,7 @@ repeat:
         goto repeat;
     }
     return -E_BAD_PROC;
-
+// 如果有，则回收该进程并函数返回
 found:
     if (proc == idleproc || proc == initproc) {
         panic("wait idleproc or initproc.\n");
@@ -845,15 +936,31 @@ void
 proc_init(void) {
     int i;
 
+    // init the process set's list
     list_init(&proc_list);
+
+    // HASH_LIST_SIZE = 1 << 10 = 1024
+    // has list for process set based on pid
+    // static list_entry_t hash_list[HASH_LIST_SIZE];
+    // 一个list_entry_t数组
     for (i = 0; i < HASH_LIST_SIZE; i ++) {
         list_init(hash_list + i);
     }
 
+    // alloc_proc - alloc a proc_struct and init all fields of proc_struct
+    // 即相当于初始化idleproc，先分配内存，再赋值
     if ((idleproc = alloc_proc()) == NULL) {
         panic("cannot alloc idleproc.\n");
     }
 
+    // 设置一些属性
+    // bootstack = 0xc010f000
+    //     .align PGSIZE
+    //     .globl bootstack
+    // bootstack:
+    //     .space KSTACKSIZE
+    //     .globl bootstacktop
+    // bootstacktop:
     idleproc->pid = 0;
     idleproc->state = PROC_RUNNABLE;
     idleproc->kstack = (uintptr_t)bootstack;
@@ -867,6 +974,7 @@ proc_init(void) {
     set_proc_name(idleproc, "idle");
     nr_process ++;
 
+    // 设置current = idleproc
     current = idleproc;
 
     int pid = kernel_thread(init_main, NULL, 0);
