@@ -26,6 +26,7 @@
 #define SFS_BLKBITS                                 (SFS_BLKSIZE * CHAR_BIT)
 
 /* # of entries in a block */
+// 4096 / 4 = 1024
 #define SFS_BLK_NENTRY                              (SFS_BLKSIZE / sizeof(uint32_t))
 
 /* file types */
