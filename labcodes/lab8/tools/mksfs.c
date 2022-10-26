@@ -30,7 +30,7 @@ typedef int bool;
 #define warn(...)           __error(warn, 0, __VA_ARGS__)
 #define bug(...)            __error(bug, 1, __VA_ARGS__)
 
-#define static_assert(x)                                                                \
+// #define static_assert(x)                                                                \
     switch (x) {case 0: case (x): ; }
 
 /* 2^31 + 2^29 - 2^25 + 2^22 - 2^19 - 2^16 + 1 */
@@ -396,7 +396,7 @@ update_cache(struct sfs_fs *sfs, struct cache_block **cbp, uint32_t *inop) {
 
 static void
 append_block(struct sfs_fs *sfs, struct cache_inode *file, size_t size, uint32_t ino, const char *filename) {
-    static_assert(SFS_LN_NBLKS <= SFS_L2_NBLKS);
+    static_assert(SFS_LN_NBLKS <= SFS_L2_NBLKS, "expect SFS_LN_NBLKS <= SFS_L2_NBLKS");
     assert(size <= SFS_BLKSIZE);
     uint32_t nblks = file->nblks;
     struct inode *inode = &(file->inode);
@@ -560,10 +560,10 @@ create_img(struct sfs_fs *sfs, const char *home) {
 
 static void
 static_check(void) {
-    static_assert(sizeof(off_t) == 8);
-    static_assert(sizeof(ino_t) == 8);
-    static_assert(SFS_MAX_NBLKS <= 0x80000000UL);
-    static_assert(SFS_MAX_FILE_SIZE <= 0x80000000UL);
+    static_assert(sizeof(off_t) == 8, "expect sizeof(off_t) == 8");
+    static_assert(sizeof(ino_t) == 8, "expect sizeof(ino_t) == 8");
+    static_assert(SFS_MAX_NBLKS <= 0x80000000UL, "SFS_MAX_NBLKS <= 0x80000000UL");
+    static_assert(SFS_MAX_FILE_SIZE <= 0x80000000UL, "SFS_MAX_FILE_SIZE <= 0x80000000UL");
 }
 
 int
