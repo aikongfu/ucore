@@ -753,7 +753,7 @@ load_icode(int fd, int argc, char **kargv) {
             if ((ret = load_icode_read(fd, page2kva(page) + off, size, offset)) != 0) {
                 goto bad_cleanup_mmap;
             }
-            start += size,
+            start += size, offset += size;
         }
 
         //(3.6.2) build BSS section of binary program
