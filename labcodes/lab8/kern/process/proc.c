@@ -685,7 +685,7 @@ load_icode(int fd, int argc, char **kargv) {
         goto bad_pgdir_cleanup_mm;
     }
 
-    struct page *page;
+    struct Page *page;
     // LAB8 这里要从文件中读取ELF header，而不是Lab7中的内存了
     struct elfhdr __elf, *elf = &__elf;
     if ((ret = load_icode_read(fd, elf, sizeof(struct elfhdr), 0)) != 0) {
