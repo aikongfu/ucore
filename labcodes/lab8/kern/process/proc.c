@@ -669,7 +669,7 @@ load_icode(int fd, int argc, char **kargv) {
      * (8) if up steps failed, you should cleanup the env.
      */
     assert(fd >= 0);
-    assert(argc > = 0 && argc <= EXEC_MAX_ARG_NUM);
+    assert(argc >= 0 && argc <= EXEC_MAX_ARG_NUM);
 
     if (current->mm != NULL) {
         panic("load_icode: current->mm must be empty\n");
@@ -702,10 +702,10 @@ load_icode(int fd, int argc, char **kargv) {
     // elf->e_phnum ：number of entries in program header or 0
     struct proghdr __ph, *ph = &__ph;
     uint32_t vm_flags, perm, phnum;
-    for (phnum = 0; phnum < elf->e_phnum, phnum++) {
+    for (phnum = 0; phnum < elf->e_phnum; phnum++) {
         // LAB8 从文件特定偏移处读取每个段的详细信息（包括大小、基地址等等）
         off_t phoff = elf->e_phoff + sizeof(struct proghdr) * phnum;
-        if ((ret = (load_icode_read(fd, ph, sizeof(struct prochdr), phoff))) != 0) {
+        if ((ret = (load_icode_read(fd, ph, sizeof(struct proghdr), phoff))) != 0) {
             goto bad_elf_cleanup_pgdir;
         }
 
@@ -730,7 +730,6 @@ load_icode(int fd, int argc, char **kargv) {
         if ((ret = mm_map(mm, ph->p_va, ph->p_memsz, vm_flags, NULL)) != 0) {
             goto bad_cleanup_mmap;
         }
-        unsigned char *from = binary + ph->p_offset;
         off_t offset = ph->p_offset;
         size_t off, size;
         uintptr_t start = ph->p_va, end, la = ROUNDDOWN(start, PGSIZE);
@@ -754,7 +753,7 @@ load_icode(int fd, int argc, char **kargv) {
             if ((ret = load_icode_read(fd, page2kva(page) + off, size, offset)) != 0) {
                 goto bad_cleanup_mmap;
             }
-            start += size, from += size;
+            start += size,
         }
 
         //(3.6.2) build BSS section of binary program
