@@ -451,82 +451,27 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     }
     return NULL;          // (8) return page table entry
 #endif
-    // typedef uintptr_t pde_t
-    // PDX 左边10位(PDE）
-    // PTX 中间10位(PTE)
-    // KADDR - takes a physical address and returns the corresponding kernel virtual address
-    // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF) address in page table or page directory entry
-    // #define PDE_ADDR(pde)   PTE_ADDR(pde) address in page table or page directory entry
-    // pdep: page dirtory 
-    pde_t *pdep = NULL;
-    // la -> 2进制 -> 前10位 -> 即PDX page dir
-    uintptr_t pde = PDX(la);
-
-    // pgdir:  the kernel virtual base address of PDT
-    pdep = &pgdir[pde];
-    // 非present也就是不存在这样的page（缺页），需要分配页
+    // 获取传入的线性地址中所对应的页目录条目的物理地址
+    pde_t *pdep = &pgdir[PDX(la)];
+    // 如果该条目不可用(not present)
     if (!(*pdep & PTE_P)) {
-        struct Page *p;
-        // 如果不需要分配或者分配的页为NULL
-        if (!create || (p = alloc_page()) == NULL) {
+        struct Page *page;
+        // 如果分配页面失败，或者不允许分配，则返回NULL
+        if (!create || (page = alloc_page()) == NULL)
             return NULL;
-        }
-        set_page_ref(p, 1);
-        // page table的索引值（PTE)
-        // pages: virtual address of physicall page array
-        // page - pages相当于pages数组的索引值
-        // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
-        uintptr_t pti = page2pa(p);
-        // // page table的索引值（PTE)
-        // // pages: virtual address of physicall page array
-        // // page - pages相当于pages数组的索引值
-        // // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
-        // uintptr_t pti = page2pa(p);
-
-        // // KADDR: takes a physical address and returns the corresponding kernel virtual address.
-        // /* *
-        // * KADDR - takes a physical address and returns the corresponding kernel virtual
-        // * address. It panics if you pass an invalid physical address.
-        // * 
-        // * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
-        // * pa >> 12 + 0xC0000000
-        // * */
-        // memset(KADDR(pti), 0, sizeof(struct Page));
-
-        // // 相当于把物理地址给了pdep
-        // // pdep: page directory entry point
-        // uintptr_t *pdep = pti | PTE_P | PTE_W | PTE_U;
-        // KADDR: takes a physical address and returns the corresponding kernel virtual address.
-        /* *
-        * KADDR - takes a physical address and returns the corresponding kernel virtual
-        * address. It panics if you pass an invalid physical address.
-        * 
-        * PPN(__m_pa) = __m_pa >> 12, 也就是在pages数组中的索引 
-        * pa >> 12 + 0xC0000000
-        * */
-        memset(KADDR(pti), 0, sizeof(struct Page));
-
-        // 相当于把物理地址给了pdep
-        // pdep: page directory entry point
-        *pdep = pti | PTE_P | PTE_W | PTE_U;
+        // 设置该物理页面的引用次数为1
+        set_page_ref(page, 1);
+        // 获取当前物理页面所管理的物理地址
+        uintptr_t pa = page2pa(page);
+        // 清空该物理页面的数据。需要注意的是使用虚拟地址
+        memset(KADDR(pa), 0, PGSIZE);
+        // 将新分配的页面设置为当前缺失的页目录条目中
+        // 之后该页面就是其中的一个二级页面
+        *pdep = pa | PTE_U | PTE_W | PTE_P;
     }
+    // 返回在pgdir中对应于la的二级页表项
+    return &((pte_t *)KADDR(PDE_ADDR(*pdep)))[PTX(la)];
 
-    // 先找到pde address
-    // address in page table or page directory entry
-    // 0xFFF = 111111111111
-    // ~0xFFF = 1111111111 1111111111 000000000000
-    // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF)
-    // #define PDE_ADDR(pde)   PTE_ADDR(pde)
-    uintptr_t pa = PDE_ADDR(*pdep);
-    // 再转换为虚拟地址（线性地址）
-    // KADDR = pa >> 12 + 0xC0000000
-    // 0xC0000000 = 11000000 00000000 00000000 00000000
-    pte_t *pde_kva = KADDR(pa);
-    
-    // 需要映射的线性地址
-    // 中间10位(PTE)
-    uintptr_t need_to_map_ptx = PTX(la);
-    return &pde_kva[need_to_map_ptx];
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
