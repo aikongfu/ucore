@@ -611,60 +611,38 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
     // 第一块没有对齐，从偏移的地方开始对齐
     // 中间对齐
     // 最后一块没有对齐
-
-    // 1.第一块没有对齐，先读没有对齐的这一块
-    if ((blkoff = (offset % SFS_BLKSIZE)) != 0) {
+if ((blkoff = offset % SFS_BLKSIZE) != 0) {
         size = (nblks != 0) ? (SFS_BLKSIZE - blkoff) : (endpos - offset);
-
-        // 根据DIR的inode和inode里面block的逻辑索引找到第No.个硬盘块
-        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0) {
+        // 获取第一个基础块所对应的block的编号`ino`
+        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
-        }
-        
-        if ((ret = sfs_buf_op(sfs, buf, size, ino, blkoff)) != 0) {
-        // if ((ret = sfs_buf_op(sfs, buf, size, blkno, offset)) != 0) {
+        // 通过上一步取出的`ino`，读取/写入一部分第一个基础块的末尾数据
+        if ((ret = sfs_buf_op(sfs, buf, size, ino, blkoff)) != 0)
             goto out;
-        }
-
         alen += size;
-        if (nblks == 0) {
+        if (nblks == 0)
             goto out;
-        }
-        
-        buf += size, blkno++, nblks--;
+        buf += size, blkno ++, nblks --;
     }
-    
-    // 2.读中间对齐的数据
+    // 循环读取/写入对齐好的数据
     size = SFS_BLKSIZE;
     while (nblks != 0) {
-        
-        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0) {
+        // 获取inode对应的基础块编号
+        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
-        }
-
-        if ((ret = sfs_block_op(sfs, buf, ino, 1)) != 0) {
+        // 单次读取/写入一基础块的数据
+        if ((ret = sfs_block_op(sfs, buf, ino, 1)) != 0)
             goto out;
-        }
-        
-        alen += size;
-        buf += size, blkno++, nblks--;
+        alen += size, buf += size, blkno ++, nblks --;
     }
-
-    // 3.读最后一块没有对齐的数据
-    // |-512-|-512-|-512-|-512-|
-    // 假如 为1050
-    if (size = endpos % SFS_BLKSIZE != 0) {
-        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0) {
+    // 如果末尾位置没有与最后一个基础块对齐，则多读取/写入一点末尾基础块的数据
+    if ((size = endpos % SFS_BLKSIZE) != 0) {
+        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
-        }
-
-        if ((ret = sfs_buf_op(sfs, buf, size, ino, 0)) != 0) {
+        if ((ret = sfs_buf_op(sfs, buf, size, ino, 0)) != 0)
             goto out;
-        }
-        
         alen += size;
     }
-
 out:
     *alenp = alen;
     if (offset + alen > sin->din->size) {
