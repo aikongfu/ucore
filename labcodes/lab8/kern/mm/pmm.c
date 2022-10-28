@@ -458,38 +458,32 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     // #define PTE_ADDR(pte)   ((uintptr_t)(pte) & ~0xFFF) address in page table or page directory entry
     // #define PDE_ADDR(pde)   PTE_ADDR(pde) address in page table or page directory entry
     // pdep: page dirtory 
-    pde_t *pdep = NULL;
-
-    // pgdir:  the kernel virtual base address of PDT
-    pdep = &pgdir[PDX(la)];
-    // 非present也就是不存在这样的page（缺页），需要分配页
+    // 获取传入的线性地址中所对应的页目录条目的物理地址
+    pde_t *pdep = &pgdir[PDX(la)];
+    // 如果该条目不可用(not present)
     if (!(*pdep & PTE_P)) {
-        struct Page *p;
-        // 如果不需要分配或者分配的页为NULL
-        if (!create || (p = alloc_page()) == NULL) {
+        struct Page *page;
+        // 如果分配页面失败，或者不允许分配，则返回NULL
+        if (!create || (page = alloc_page()) == NULL)
             return NULL;
-        }
-        set_page_ref(p, 1);
-        // page table的索引值（PTE)
-        // pages: virtual address of physicall page array
-        // page - pages相当于pages数组的索引值
-        // 得到相对pages数组起始地址的偏移量，再左移12位，也就是变成page table的索引值
-        uintptr_t pa = page2pa(p);
-
-        memset(KADDR(pa), 0, sizeof(struct Page));
-
-        // 相当于把物理地址给了pdep
-        // pdep: page directory entry point
-        *pdep = pa | PTE_P | PTE_W | PTE_U;
+        // 设置该物理页面的引用次数为1
+        set_page_ref(page, 1);
+        // 获取当前物理页面所管理的物理地址
+        uintptr_t pa = page2pa(page);
+        // 清空该物理页面的数据。需要注意的是使用虚拟地址
+        memset(KADDR(pa), 0, PGSIZE);
+        // 将新分配的页面设置为当前缺失的页目录条目中
+        // 之后该页面就是其中的一个二级页面
+        *pdep = pa | PTE_U | PTE_W | PTE_P;
     }
-
+    // 返回在pgdir中对应于la的二级页表项
     // 要找到PTE(Page Table Entry)页表项
     // 1.此时*ptep的高10位为PDE的索引，中间10位为PTE的索引（物理地址）
     // 则 PDE_ADDR(*pdep) 即为PDE的地址
     // KADDR即为转化为内存虚地址
     // 也即((pte_t *)KADDR(PDE_ADDR(*pdep)))即为页表
     // PTX(la)即为在PT中的索引
-    return &((pte_t *)KADDR(PDE_ADDR(ptep)))[PTX(la)]
+    return &((pte_t *)KADDR(PDE_ADDR(*pdep)))[PTX(la)];
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
