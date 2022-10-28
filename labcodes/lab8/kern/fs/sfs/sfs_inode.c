@@ -627,27 +627,24 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
         }
 
         alen += size;
-        if (nblks == 0) {
+        buf += size;
+        offset += size;
+        blkno ++;
+        if (nblks == 0)
             goto out;
-        }
-        
-        buf += size, blkno++, nblks--;
+        else
+            nblks --;
     }
     
     // 2.读中间对齐的数据
-    size = SFS_BLKSIZE;
-    while (nblks != 0) {
-        
-        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0) {
+    if (nblks > 0) {
+        if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
-        }
-
-        if ((ret = sfs_block_op(sfs, buf, ino, 1)) != 0) {
+        if ((ret = sfs_block_op(sfs, buf, ino, nblks)) != 0)
             goto out;
-        }
-        
-        alen += size;
-        buf += size, blkno++, nblks--;
+        buf += nblks * SFS_BLKSIZE;
+        alen += nblks * SFS_BLKSIZE;
+        blkno += nblks;
     }
 
     // 3.读最后一块没有对齐的数据

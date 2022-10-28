@@ -126,7 +126,7 @@ alloc_proc(void) {
         proc->state =  (enum proc_state)PROC_UNINIT;
         proc->pid = -1;
         proc->runs = 0;
-        proc->kstack = 0;
+        proc->kstack = NULL;
         proc->need_resched = 0;
         proc->parent = NULL;
         proc->mm = NULL;
@@ -134,7 +134,7 @@ alloc_proc(void) {
         proc->tf = NULL;
         proc->cr3 = boot_cr3;
         proc->flags = 0;
-        memset(proc->name, 0, PROC_NAME_LEN);
+        memset(proc->name, 0, PROC_NAME_LEN + 1);
 
         // LAB5
         //PCB新增的条目，初始化进程等待状态
