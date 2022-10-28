@@ -97,7 +97,7 @@ default_init_memmap(struct Page *base, size_t n) {
     // 加入到free_list中
     // 双向循环链表
     // free_list<->add1_pages<->add2_pages<->add3_pages<->free_list
-    list_add(&free_list, &base->page_link);
+    list_add(&free_list, &(base->page_link));
 }
 
 static struct Page *
@@ -125,7 +125,7 @@ default_alloc_pages(size_t n) {
             struct Page *pn = page + n;
             pn->property = page->property - n;
             SetPageProperty(pn);
-            list_add_after(&page->page_link, &pn->page_link);
+            list_add(list_prev(le), &pn->page_link);
         }
 
         ClearPageProperty(page);

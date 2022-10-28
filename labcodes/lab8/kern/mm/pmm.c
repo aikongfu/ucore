@@ -652,11 +652,11 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
          * replicate content of page to npage, build the map of phy addr of nage with the linear addr start
          */
         // 获取源页面所在的虚拟地址（注意，此时的PDT是内核状态下的页目录表）
-        void * kva_src = page2kva(page);
+        uintptr_t src_kvaddr = page2kva(page);
         // 获取目标页面所在的虚拟地址
-        void * kva_dst = page2kva(npage);
+        uintptr_t dst_kvaddr = page2kva(npage);
         // 页面数据复制
-        memcpy(kva_dst, kva_src, PGSIZE);
+        memcpy(dst_kvaddr, src_kvaddr, PGSIZE);
         // 将该页面设置至对应的PTE中
         ret = page_insert(to, npage, start, perm);
 
