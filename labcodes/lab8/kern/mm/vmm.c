@@ -8,7 +8,6 @@
 #include <x86.h>
 #include <swap.h>
 #include <kmalloc.h>
-#include <kdebug.h>
 
 /* 
   vmm design include two parts: mm_struct (mm) & vma_struct (vma)
@@ -43,17 +42,14 @@ static void check_pgfault(void);
 // mm_create -  alloc a mm_struct & initialize it.
 struct mm_struct *
 mm_create(void) {
-    // 分配内存给mm_struct结构的mm
     struct mm_struct *mm = kmalloc(sizeof(struct mm_struct));
 
     if (mm != NULL) {
-        // 初始化mm_struct对应的mmap_list
         list_init(&(mm->mmap_list));
         mm->mmap_cache = NULL;
         mm->pgdir = NULL;
         mm->map_count = 0;
 
-        // 只有完成swap manager之后swap_init_ok = 1
         if (swap_init_ok) swap_init_mm(mm);
         else mm->sm_priv = NULL;
         
@@ -64,14 +60,6 @@ mm_create(void) {
 }
 
 // vma_create - alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
-/**
- * @brief alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
- *              分配一块内存给新创建的vma_struct，设置其vm_start, vm_end, vm_flags
- * @param vm_start 
- * @param vm_end 
- * @param vm_flags 权限等（如读、写） 
- * @return struct vma_struct*  the virtual continuous memory area(vma), [vm_start, vm_end),  addr belong to a vma means  vma.vm_start<= addr <vma.vm_end 
- */
 struct vma_struct *
 vma_create(uintptr_t vm_start, uintptr_t vm_end, uint32_t vm_flags) {
     struct vma_struct *vma = kmalloc(sizeof(struct vma_struct));
@@ -168,22 +156,10 @@ mm_destroy(struct mm_struct *mm) {
     mm=NULL;
 }
 
-/**
- * @brief 建立对应的vma结构，并把vma插入到mm结构中
- * 
- * @param mm mm
- * @param addr 线性地址
- * @param len 长度
- * @param vm_flags vm_flags 
- * @param vma_store vma_store映射后的vma_struct
- * @return int 
- */
 int
 mm_map(struct mm_struct *mm, uintptr_t addr, size_t len, uint32_t vm_flags,
        struct vma_struct **vma_store) {
-    // 分别向下，向上取整
     uintptr_t start = ROUNDDOWN(addr, PGSIZE), end = ROUNDUP(addr + len, PGSIZE);
-    // USERBASE, USERTOP比较
     if (!USER_ACCESS(start, end)) {
         return -E_INVAL;
     }
@@ -193,17 +169,14 @@ mm_map(struct mm_struct *mm, uintptr_t addr, size_t len, uint32_t vm_flags,
     int ret = -E_INVAL;
 
     struct vma_struct *vma;
-    // 从mm查找vma,找到则直接返回
     if ((vma = find_vma(mm, start)) != NULL && end > vma->vm_start) {
         goto out;
     }
     ret = -E_NO_MEM;
 
-    // 没找到，创建新的vma
     if ((vma = vma_create(start, end, vm_flags)) == NULL) {
         goto out;
     }
-    // 将vma插入mm
     insert_vma_struct(mm, vma);
     if (vma_store != NULL) {
         *vma_store = vma;
@@ -417,17 +390,8 @@ volatile unsigned int pgfault_num=0;
  */
 int
 do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
-    // 页访问异常错误码有32位。
-    // 位0为１表示对应物理页不存在；
-    // 位１为１表示写异常（比如写了只读页；位２为１表示访问权限异常（比如用户态程序访问内核空间的数据）
-    
-    // CR2是页故障线性地址寄存器，保存最后一次出现页故障的全32位线性地址。
-    // CR2用于发生页异常时报告出错信息。当发生页异常时，处理器把引起页异常的线性地址保存在CR2中。
-    // 操作系统中对应的中断服务例程可以检查CR2的内容，从而查出线性地址空间中的哪个页引起本次异常。
     int ret = -E_INVAL;
-
     //try to find a vma which include addr
-    // 根据addr从vma中查找对应的vma_struct
     struct vma_struct *vma = find_vma(mm, addr);
 
     pgfault_num++;
@@ -437,8 +401,6 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
         goto failed;
     }
     //check the error_code
-    // 与 00000011
-    // 
     switch (error_code & 3) {
     default:
             /* error code flag : default is 3 ( W/R=1, P=1): write, present */
@@ -489,71 +451,15 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
     *   mm->pgdir : the PDT of these vma
     *
     */
-   
-    // 根据get_pte来获取pte如果不存在，则分配一个新的
-    ptep = get_pte(mm->pgdir, addr, 1);
-    if (ptep == NULL) {
-        cprintf("get_pte in do_pgfault failed\n");
-        goto failed;
-    }
-    struct Page *p;
-    // 如果对应的物理页不存在，分配一个新的页，且把物理地址和逻辑地址映射 
-    if (*ptep == 0) {
-        p = pgdir_alloc_page(mm->pgdir, addr, perm);
-        if (p == NULL) {
-            cprintf("alloc_page in do_pgfault failed\n");
-            goto failed;
-        }
-    } else {
-        struct Page *page=NULL;
-        // 如果当前页错误的原因是写入了只读页面
-        if (*ptep & PTE_P) {
-            // 写时复制：复制一块内存给当前进程
-            cprintf("\n\nCOW: ptep 0x%x, pte 0x%x\n",ptep, *ptep);
-            // 原先所使用的只读物理页
-            page = pte2page(*ptep);
-            // 如果该物理页面被多个进程引用
-            if (page_ref(page) > 1) {
-                struct Page* newPage = pgdir_alloc_page(mm->pgdir, addr, perm);
-                void * kva_src = page2kva(page);
-                void * kva_dest = page2kva(newPage);
-                memcpy(kva_dest, kva_src, PGSIZE); 
-            } else {
-                page_insert(mm->pgdir, pa2page, addr, perm);
-            }
-        }
-
-        // 如果不全为0，则可能被交换到了swap磁盘中
-        if(swap_init_ok) {
-            struct Page *page=NULL;
-            int swapIn;
-            // 从磁盘中换出
-            swapIn = swap_in(mm, addr, &page);
-            if (swapIn != 0) {
-                cprintf("swap_in in do_pgfault failed\n");
-                goto failed;
-            }
-
-            // build the map of phy addr of an Page with the linear addr la
-            page_insert(mm->pgdir, page, addr, perm);
-            // if (page_insert(mm->pgdir, page, addr, perm) != 0) {
-            //     cprintf("page_insert in do_pgfault failed\n");
-            //     goto failed;
-            // }
-
-            swap_map_swappable(mm, addr, page, 1);
-            page->pra_vaddr = addr;
-        } else {
-            cprintf("no swap_init_ok, but ptep is %x, failed\n", *ptep);
-            goto failed;
-        }
-    }
-#if 0
     /*LAB3 EXERCISE 1: YOUR CODE*/
-    ptep = ???              //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.
+    //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.
+    if ((ptep = get_pte(mm->pgdir, addr, 1)) == NULL)
+        goto failed;
     if (*ptep == 0) {
-                            //(2) if the phy addr isn't exist, then alloc a page & map the phy addr with logical addr
-
+        //(2) if the phy addr isn't exist, then alloc a page & map the phy addr with logical addr
+        struct Page *page = pgdir_alloc_page(mm->pgdir, addr, perm);
+        if (page == NULL)
+            goto failed;
     }
     else {
     /*LAB3 EXERCISE 2: YOUR CODE
@@ -577,31 +483,29 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
 		     We should add the LAB3's results here.
      */
         if(swap_init_ok) {
-            struct Page *page=NULL;
-                                    //(1）According to the mm AND addr, try to load the content of right disk page
-                                    //    into the memory which page managed.
-                                    //(2) According to the mm, addr AND page, setup the map of phy addr <---> logical addr
-                                    //(3) make the page swappable.
-                                    //(4) [NOTICE]: you myabe need to update your lab3's implementation for LAB5's normal execution.
+            struct Page *page = NULL;
+            //(1）According to the mm AND addr, try to load the content of right disk page
+            //    into the memory which page managed.
+            swap_in(mm, addr, &page);
+            //(2) According to the mm, addr AND page, setup the map of phy addr <---> logical addr
+            page_insert(mm->pgdir, page, addr, perm);
+            //(3) make the page swappable.
+            page->pra_vaddr = addr;
+            swap_map_swappable(mm, addr, page, 0);
         }
         else {
             cprintf("no swap_init_ok but ptep is %x, failed\n",*ptep);
             goto failed;
         }
    }
-#endif
    ret = 0;
 failed:
     return ret;
 }
 
-// user_mem_check查询进程对应的用户态空间的
 bool
 user_mem_check(struct mm_struct *mm, uintptr_t addr, size_t len, bool write) {
-    // 如果mm不空为，是用户太的空间
     if (mm != NULL) {
-        // check 0x00200000 <= addr < addr + len <= 0xB0000000
-        // 是逻辑地址（虚拟地址）
         if (!USER_ACCESS(addr, addr + len)) {
             return 0;
         }
@@ -614,7 +518,6 @@ user_mem_check(struct mm_struct *mm, uintptr_t addr, size_t len, bool write) {
             if (!(vma->vm_flags & ((write) ? VM_WRITE : VM_READ))) {
                 return 0;
             }
-            // VM_STACK 0x00000008 00001000
             if (write && (vma->vm_flags & VM_STACK)) {
                 if (start < vma->vm_start + PGSIZE) { //check stack start & size
                     return 0;
@@ -624,8 +527,6 @@ user_mem_check(struct mm_struct *mm, uintptr_t addr, size_t len, bool write) {
         }
         return 1;
     }
-    // 内核态
-    // 0xC0000000 <= addr < addr + len <= 0xC0000000 + 0x38000000 = 0xF8000000
     return KERN_ACCESS(addr, addr + len);
 }
 

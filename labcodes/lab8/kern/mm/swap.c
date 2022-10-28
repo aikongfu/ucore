@@ -43,8 +43,6 @@ swap_init(void)
      sm = &swap_manager_fifo;
      int r = sm->init();
      
-     cprintf("swap_init sm = [%c]\n", sm->name);
-     cprintf("swap_init r = [%d]\n", r);
      if (r == 0)
      {
           swap_init_ok = 1;
@@ -81,22 +79,20 @@ swap_set_unswappable(struct mm_struct *mm, uintptr_t addr)
 
 volatile unsigned int swap_out_num=0;
 
-// 换出
 int
 swap_out(struct mm_struct *mm, int n, int in_tick)
 {
      int i;
-     for (i = 0; i != n; ++ i) {
+     for (i = 0; i != n; ++ i)
+     {
           uintptr_t v;
           //struct Page **ptr_page=NULL;
           struct Page *page;
           // cprintf("i %d, SWAP: call swap_out_victim\n",i);
-          
-          // Try to swap out a page, return then victim
           int r = sm->swap_out_victim(mm, &page, in_tick);
           if (r != 0) {
-               cprintf("i %d, swap_out: call swap_out_victim failed\n",i);
-               break;
+                    cprintf("i %d, swap_out: call swap_out_victim failed\n",i);
+                  break;
           }          
           //assert(!PageReserved(page));
 
@@ -122,16 +118,6 @@ swap_out(struct mm_struct *mm, int n, int in_tick)
      return i;
 }
 
-/**
- * 
- * 
- * @brief 根据mm和addr，把数据从磁盘中换出到page
- * 
- * @param mm the control struct for a set of vma using the same PDT
- * @param addr linear address
- * @param ptr_result 换出到的page指针
- * @return int 
- */
 int
 swap_in(struct mm_struct *mm, uintptr_t addr, struct Page **ptr_result)
 {
@@ -205,8 +191,6 @@ check_swap(void)
      cprintf("BEGIN check_swap: count %d, total %d\n",count,total);
      
      //now we set the phy pages env     
-     // the control struct for a set of vma using the same PDT
-     // 使用相同PDT的vma集合
      struct mm_struct *mm = mm_create();
      assert(mm != NULL);
 
@@ -218,15 +202,9 @@ check_swap(void)
      pde_t *pgdir = mm->pgdir = boot_pgdir;
      assert(pgdir[0] == 0);
 
-     // vma_create - alloc a vma_struct & initialize it. (addr range: vm_start~vm_end)
-     // BEING_CHECK_VALID_VADDR 0X1000
-     // CHECK_VALID_VADDR (CHECK_VALID_VIR_PAGE_NUM+1)*0x1000 = 6 * 0x1000
-     // VM_WRITE | VM_READ (可读，可写)
-     // 0x1000 - 0x5000
      struct vma_struct *vma = vma_create(BEING_CHECK_VALID_VADDR, CHECK_VALID_VADDR, VM_WRITE | VM_READ);
      assert(vma != NULL);
 
-     // insert_vma_struct -insert vma in mm's list link
      insert_vma_struct(mm, vma);
 
      //setup the temp Page Table vaddr 0~4MB

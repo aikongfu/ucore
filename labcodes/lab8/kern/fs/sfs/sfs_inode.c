@@ -247,7 +247,6 @@ failed_cleanup:
 /*
  * sfs_bmap_get_nolock - according sfs_inode and index of block, find the NO. of disk block
  *                       no lock protect
- * 根据sfs_inode和block索引查找硬盘块（没有加锁保护）
  * @sfs:      sfs file system
  * @sin:      sfs inode in memory
  * @index:    the index of block in inode
@@ -260,7 +259,6 @@ sfs_bmap_get_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, uint32_t index, b
     int ret;
     uint32_t ent, ino;
 	// the index of disk block is in the fist SFS_NDIRECT  direct blocks
-    // 是否在直接索引里面
     if (index < SFS_NDIRECT) {
         if ((ino = din->direct[index]) == 0 && create) {
             if ((ret = sfs_block_alloc(sfs, &ino)) != 0) {
@@ -272,7 +270,6 @@ sfs_bmap_get_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, uint32_t index, b
         goto out;
     }
     // the index of disk block is in the indirect blocks.
-    // SFS_BLK_NENTRY = 4096 / 4 = 1024
     index -= SFS_NDIRECT;
     if (index < SFS_BLK_NENTRY) {
         ent = din->indirect;
@@ -348,7 +345,6 @@ sfs_bmap_free_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, uint32_t index) 
 
 /*
  * sfs_bmap_load_nolock - according to the DIR's inode and the logical index of block in inode, find the NO. of disk block.
- * 根据DIR的inode和inode里面block的逻辑索引找到第No.个硬盘块
  * @sfs:      sfs file system
  * @sin:      sfs inode in memory
  * @index:    the logical index of disk block in inode
@@ -545,7 +541,7 @@ sfs_close(struct inode *node) {
 }
 
 /*  
- * sfs_io_nolock - Rd/Wr a file content from offset position to offset + length  disk blocks<-->buffer (in memroy)
+ * sfs_io_nolock - Rd/Wr a file contentfrom offset position to offset+ length  disk blocks<-->buffer (in memroy)
  * @sfs:      sfs file system
  * @sin:      sfs inode in memory
  * @buf:      the buffer Rd/Wr
@@ -590,14 +586,10 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
     int ret = 0;
     size_t size, alen = 0;
     uint32_t ino;
-    // offset = 10110, endpos = 50960
-    // SFS_BLKSIZE = 4096
-    // blkno = 10110 / 4096 = 2
-    // nblks = 50960 / 4096 - 2 = 12 - 2 = 10, 即要读10个blocks
     uint32_t blkno = offset / SFS_BLKSIZE;          // The NO. of Rd/Wr begin block
     uint32_t nblks = endpos / SFS_BLKSIZE - blkno;  // The size of Rd/Wr blocks
 
-    //LAB8:EXERCISE1 YOUR CODE HINT: call sfs_bmap_load_nolock, sfs_rbuf, sfs_rblock,etc. read different kind of blocks in file
+  //LAB8:EXERCISE1 YOUR CODE HINT: call sfs_bmap_load_nolock, sfs_rbuf, sfs_rblock,etc. read different kind of blocks in file
 	/*
 	 * (1) If offset isn't aligned with the first block, Rd/Wr some content from offset to the end of the first block
 	 *       NOTICE: useful function: sfs_bmap_load_nolock, sfs_buf_op
@@ -607,36 +599,34 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
      * (3) If end position isn't aligned with the last block, Rd/Wr some content from begin to the (endpos % SFS_BLKSIZE) of the last block
 	 *       NOTICE: useful function: sfs_bmap_load_nolock, sfs_buf_op	
 	*/
-    // 主要分三种情况，
-    // 第一块没有对齐，从偏移的地方开始对齐
-    // 中间对齐
-    // 最后一块没有对齐
-if ((blkoff = offset % SFS_BLKSIZE) != 0) {
+    
+    if (offset % SFS_BLKSIZE) {
+        blkoff = offset % SFS_BLKSIZE;
         size = (nblks != 0) ? (SFS_BLKSIZE - blkoff) : (endpos - offset);
-        // 获取第一个基础块所对应的block的编号`ino`
         if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
-        // 通过上一步取出的`ino`，读取/写入一部分第一个基础块的末尾数据
         if ((ret = sfs_buf_op(sfs, buf, size, ino, blkoff)) != 0)
             goto out;
         alen += size;
+        buf += size;
+        offset += size;
+        blkno ++;
         if (nblks == 0)
             goto out;
-        buf += size, blkno ++, nblks --;
+        else
+            nblks --;
     }
-    // 循环读取/写入对齐好的数据
-    size = SFS_BLKSIZE;
-    while (nblks != 0) {
-        // 获取inode对应的基础块编号
+    if (nblks > 0) {
         if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
-        // 单次读取/写入一基础块的数据
-        if ((ret = sfs_block_op(sfs, buf, ino, 1)) != 0)
+        if ((ret = sfs_block_op(sfs, buf, ino, nblks)) != 0)
             goto out;
-        alen += size, buf += size, blkno ++, nblks --;
+        buf += nblks * SFS_BLKSIZE;
+        alen += nblks * SFS_BLKSIZE;
+        blkno += nblks;
     }
-    // 如果末尾位置没有与最后一个基础块对齐，则多读取/写入一点末尾基础块的数据
-    if ((size = endpos % SFS_BLKSIZE) != 0) {
+    if (endpos % SFS_BLKSIZE) {
+        size = endpos % SFS_BLKSIZE;
         if ((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0)
             goto out;
         if ((ret = sfs_buf_op(sfs, buf, size, ino, 0)) != 0)
